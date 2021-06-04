@@ -15,13 +15,17 @@ type Props = {
 const Exhibit: React.VFC<Props> = (props) => {
   const { exhibit } = props;
   return (
-    <Box h={100} w={350} backgroundColor='white' borderRadius='lg'>
-      <Heading as="h1">{exhibit.name}</Heading>
-      <Flex justify="space-between"  align='center'>
-      <Avatar src="https://bit.ly/broken-link" />
-      <Box>{exhibit.userName}</Box>
-      <Box>{exhibit.createdAt}</Box>
-      <Box>{exhibit.likes}</Box>
+    <Box w={350} backgroundColor="white" borderRadius="lg" p={3}>
+      <Heading as="h1" fontSize="md" minH="30px">
+        {exhibit.name}
+      </Heading>
+      <Flex justify="space-between" align="center" mt={3}>
+        <Flex alignItems="center">
+          <Avatar src="https://bit.ly/broken-link" mr={3} />
+          <Box>{exhibit.userName}</Box>
+        </Flex>
+        <Box>{exhibit.createdAt}</Box>
+        <Box>❤︎{exhibit.likes}</Box>
       </Flex>
     </Box>
   );
