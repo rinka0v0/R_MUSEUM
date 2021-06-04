@@ -1,6 +1,7 @@
 import { Box } from "@chakra-ui/layout";
+import React from "react";
 
-const Footer = () => {
+const Footer: React.VFC = () => {
   return (
     <Box as="footer">
       <Box textAlign="center">R_MUSEUM</Box>
@@ -8,4 +9,4 @@ const Footer = () => {
   );
 };
 
-export default Footer
+export default Footer;
