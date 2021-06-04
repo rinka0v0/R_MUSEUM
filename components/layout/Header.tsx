@@ -35,10 +35,10 @@ const Header: React.VFC<Props> = (props) => {
         </NextLink>
         {isLogin ? (
           <>
-            <NextLink href="/post">
-              <PrimaryButton>寄贈する</PrimaryButton>
+            <PrimaryButton>寄贈する</PrimaryButton>
+            <NextLink href="/mypage">
+              <Avatar src="https://bit.ly/broken-link" mr={3} ml={3} />
             </NextLink>
-            <Avatar src="https://bit.ly/broken-link" mr={3} ml={3} />
           </>
         ) : (
           <PrimaryButton>ログイン</PrimaryButton>
