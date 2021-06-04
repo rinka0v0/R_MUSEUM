@@ -1,0 +1,24 @@
+users: 
+  documentId: userID
+  name: String
+  iconULR: String?
+  profile: String?
+  cratedAt: Date
+
+products:
+  documentId: auto
+  title: String
+  userName: String
+  sorceCode: String
+  tagsIDs: [String]
+  likes: Number
+  comments:
+    documentId: auto
+    comment: String
+  createdAt: Date
+
+tags:
+  documentId: String
+  name: String
+  createdAt: Date
+  count: Number
