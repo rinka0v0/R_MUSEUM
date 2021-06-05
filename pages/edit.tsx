@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Input } from "@chakra-ui/input";
-import { Box, Flex, Heading } from "@chakra-ui/layout";
+import { Box, Flex, Heading, HStack } from "@chakra-ui/layout";
 import Header from "../components/layout/Header";
 import dynamic from "next/dynamic";
 import marked from "marked";
@@ -8,6 +8,8 @@ import DOMPurify from "dompurify";
 
 import "easymde/dist/easymde.min.css";
 import Footer from "../components/layout/Footer";
+import PrimaryButton from "../components/atoms/button/PrimaryButton";
+import { Button } from "@chakra-ui/button";
 
 // クライアント側でインポートする必要がある
 const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
@@ -22,6 +24,12 @@ const Edit: React.VFC = () => {
   return (
     <>
       <Header isLogin={true} />
+      <HStack spacing={3} mt={5}>
+        <Button colorScheme='red'> 削除</Button>
+        <PrimaryButton>保存</PrimaryButton>
+        <PrimaryButton>公開</PrimaryButton>
+      </HStack>
+
       <Flex flexDirection="column" align="center">
         <Heading fontSize={20}>タイトル</Heading>
         <Input
@@ -47,7 +55,7 @@ const Edit: React.VFC = () => {
         </Box>
 
         <Heading mb="2em">プレビュー</Heading>
-        <Box bg="white" w="80%" borderRadius={5} p={8} minH="300px">
+        <Box bg="white" w="80%" borderRadius={5} p={8} minH="300px" mb={3}>
           <Box
             as="span"
             dangerouslySetInnerHTML={{
