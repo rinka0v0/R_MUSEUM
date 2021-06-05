@@ -25,10 +25,7 @@ const Exhibit: React.VFC<Props> = (props) => {
           <Avatar src="https://bit.ly/broken-link" mr={3} />
           <Box>{exhibit.userName}</Box>
         </Flex>
-        {exhibit.sourceCode ? (
-          <Box bg="teal">コード公開</Box>
-        ) : //   <Box bg="#B8B5FF" p={1}>コード非公開</Box>
-        null}
+        {exhibit.sourceCode ? <Box bg="teal">コード公開中</Box> : null}
         <Flex>
           <Box>{exhibit.createdAt}</Box>
           <Box mx={2}>❤︎{exhibit.likes}</Box>

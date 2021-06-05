@@ -7,12 +7,12 @@ const Mypage: React.VFC = () => {
   return (
     <>
       <Header isLogin={true} />
-      <Flex alignItems="center" flexDirection="column" maxH='1000px'>
+      <Flex alignItems="center" flexDirection="column" maxH="1000px">
         <Flex
-        w={{md: "90%"}}
+          w={{ md: "90%" }}
           alignItems="center"
           my={10}
-          justify='space-around'
+          justify="space-around"
           flexDirection={{ base: "column", md: "row" }}
         >
           <Avatar
@@ -24,7 +24,7 @@ const Mypage: React.VFC = () => {
           />
           <Box width="70%">
             <Box fontSize={30}>rinka</Box>
-            <Box as="p" fontSize={{base: '.95em', md: '16px'}}>
+            <Box as="p" fontSize={{ base: ".95em", md: "16px" }}>
               自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介
             </Box>
           </Box>
