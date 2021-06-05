@@ -9,6 +9,7 @@ type Props = {
     createdAt: string;
     likes: number;
     userIcon?: string;
+    sourceCode?: string;
   };
 };
 
@@ -24,8 +25,14 @@ const Exhibit: React.VFC<Props> = (props) => {
           <Avatar src="https://bit.ly/broken-link" mr={3} />
           <Box>{exhibit.userName}</Box>
         </Flex>
-        <Box>{exhibit.createdAt}</Box>
-        <Box>❤︎{exhibit.likes}</Box>
+        {exhibit.sourceCode ? (
+          <Box bg="teal">コード公開</Box>
+        ) : //   <Box bg="#B8B5FF" p={1}>コード非公開</Box>
+        null}
+        <Flex>
+          <Box>{exhibit.createdAt}</Box>
+          <Box mx={2}>❤︎{exhibit.likes}</Box>
+        </Flex>
       </Flex>
     </Box>
   );
