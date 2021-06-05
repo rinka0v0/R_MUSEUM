@@ -6,12 +6,13 @@ users:
   cratedAt: Date
 
 products:
-  documentId: auto
+  documentId: String
   title: String
   userName: String
   sorceCode: String
   tagsIDs: [String]
   likes: Number
+  open: boolean
   comments:
     documentId: auto
     comment: String
