@@ -27,9 +27,8 @@ const Exhibit: React.VFC<Props> = (props) => {
         </Flex>
         {exhibit.sourceCode ? (
           <Box bg="teal">コード公開</Box>
-        ) : (
-          <Box bg="#B8B5FF" p={1}>コード非公開</Box>
-        )}
+        ) : //   <Box bg="#B8B5FF" p={1}>コード非公開</Box>
+        null}
         <Flex>
           <Box>{exhibit.createdAt}</Box>
           <Box mx={2}>❤︎{exhibit.likes}</Box>
