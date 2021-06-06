@@ -1,6 +1,7 @@
 import { Avatar } from "@chakra-ui/avatar";
 import { Box, Flex, Heading } from "@chakra-ui/layout";
 import React from "react";
+import Footer from "../components/layout/Footer";
 import Header from "../components/layout/Header";
 
 const Mypage: React.VFC = () => {
@@ -33,6 +34,7 @@ const Mypage: React.VFC = () => {
           rinkaさんの作品
         </Heading>
       </Flex>
+      <Footer />
       <></>
     </>
   );
