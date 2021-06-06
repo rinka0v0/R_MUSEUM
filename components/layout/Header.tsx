@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import NextLink from "next/link";
 import { IconButton } from "@chakra-ui/button";
 import { SearchIcon } from "@chakra-ui/icons";
@@ -7,12 +7,19 @@ import { Avatar } from "@chakra-ui/avatar";
 import PrimaryButton from "../atoms/button/PrimaryButton";
 import Link from "next/link";
 
+import { nanoid } from "nanoid";
+
 type Props = {
   isLogin: boolean;
 };
 
 const Header: React.VFC<Props> = (props) => {
   const { isLogin } = props;
+
+  const onClickBtn = useCallback(() => {
+    console.log(nanoid());
+  }, []);
+
   return (
     <Flex
       as="nav"
@@ -35,7 +42,9 @@ const Header: React.VFC<Props> = (props) => {
         </NextLink>
         {isLogin ? (
           <>
-            <PrimaryButton>寄贈する</PrimaryButton>
+            <NextLink href={`/products/${nanoid()}/edit`}>
+              <PrimaryButton onClick={onClickBtn}>寄贈する</PrimaryButton>
+            </NextLink>
             <NextLink href="/mypage">
               <Avatar src="https://bit.ly/broken-link" mr={3} ml={3} />
             </NextLink>
