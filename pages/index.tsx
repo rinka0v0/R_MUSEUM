@@ -43,7 +43,7 @@ const IndexPage: React.VFC = () => {
             <TrendLanguage languages={["TypeScript", "Go", "React"]} />
           </Box>
           <Heading as="h2" textAlign="center">
-            寄贈品一覧
+            作品一覧
           </Heading>
           <Exhibit
             exhibit={{
@@ -56,7 +56,7 @@ const IndexPage: React.VFC = () => {
           />
           <Exhibit
             exhibit={{
-              name: "name",
+              name: "TypeScriptで作ったアプリ（React + TypeScript）",
               userName: "rinka",
               userIcon: "",
               likes: 0,

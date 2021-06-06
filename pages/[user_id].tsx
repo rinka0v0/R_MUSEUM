@@ -4,10 +4,10 @@ import React from "react";
 import Footer from "../components/layout/Footer";
 import Header from "../components/layout/Header";
 
-const Mypage: React.VFC = () => {
+const ProductPage: React.VFC = () => {
   return (
     <>
-      <Header isLogin={true} />
+      <Header isLogin={false} />
       <Flex alignItems="center" flexDirection="column" maxH="1000px">
         <Flex
           w={{ md: "90%" }}
@@ -35,9 +35,8 @@ const Mypage: React.VFC = () => {
         </Heading>
       </Flex>
       <Footer />
-      <></>
     </>
   );
 };
 
-export default Mypage;
+export default ProductPage;
