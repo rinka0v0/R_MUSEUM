@@ -1,19 +1,22 @@
 import { Avatar } from "@chakra-ui/avatar";
+import { Button } from "@chakra-ui/button";
 import { Box, Flex, Heading } from "@chakra-ui/layout";
+import Link from "next/link";
 import React from "react";
 import PrimaryButton from "../../components/atoms/button/PrimaryButton";
 import Footer from "../../components/layout/Footer";
 import Header from "../../components/layout/Header";
-
 
 const Mypage: React.VFC = () => {
   return (
     <>
       <Header isLogin={true} />
       <Flex alignItems="center" flexDirection="column" maxH="1000px">
-      <Flex justify='flex-end'>
-        <PrimaryButton>プロフィール編集</PrimaryButton>
-      </Flex>
+        <Box ml="auto" mr={5} mt={5}>
+          <Link href="/mypage/edit">
+            <PrimaryButton>プロフィール編集</PrimaryButton>
+          </Link>
+        </Box>
         <Flex
           w={{ md: "90%" }}
           alignItems="center"
@@ -21,13 +24,16 @@ const Mypage: React.VFC = () => {
           justify="space-around"
           flexDirection={{ base: "column", md: "row" }}
         >
-          <Avatar
-            src="https://bit.ly/broken-link"
-            size="2xl"
-            mr={3}
-            ml={3}
-            mt={5}
-          />
+          <Box>
+            <Avatar
+              src="https://bit.ly/broken-link"
+              size="2xl"
+              mx={3}
+              my={5}
+              display='block'
+            />
+            <Button>アイコンの変更</Button>
+          </Box>
           <Box width="70%">
             <Box fontSize={30}>rinka</Box>
             <Box as="p" fontSize={{ base: ".95em", md: "16px" }}>
