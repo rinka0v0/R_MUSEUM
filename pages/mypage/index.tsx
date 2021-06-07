@@ -1,14 +1,19 @@
 import { Avatar } from "@chakra-ui/avatar";
 import { Box, Flex, Heading } from "@chakra-ui/layout";
 import React from "react";
-import Footer from "../components/layout/Footer";
-import Header from "../components/layout/Header";
+import PrimaryButton from "../../components/atoms/button/PrimaryButton";
+import Footer from "../../components/layout/Footer";
+import Header from "../../components/layout/Header";
+
 
 const Mypage: React.VFC = () => {
   return (
     <>
       <Header isLogin={true} />
       <Flex alignItems="center" flexDirection="column" maxH="1000px">
+      <Flex justify='flex-end'>
+        <PrimaryButton>プロフィール編集</PrimaryButton>
+      </Flex>
         <Flex
           w={{ md: "90%" }}
           alignItems="center"
