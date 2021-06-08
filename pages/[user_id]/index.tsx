@@ -34,7 +34,6 @@ const ProductPage: React.VFC = () => {
           rinkaさんの作品
         </Heading>
       </Flex>
-      <Footer />
     </>
   );
 };

@@ -6,7 +6,6 @@ import TrendLanguage from "../components/card/TrendLanguage";
 import Exhibit from "../components/card/Exhibit";
 import PrimaryButton from "../components/atoms/button/PrimaryButton";
 import { Box, Flex, Heading, VStack } from "@chakra-ui/layout";
-import Footer from "../components/layout/Footer";
 
 const IndexPage: React.VFC = () => {
   const [tasks, setTasks] = useState([{ id: "", title: "" }]);
@@ -35,7 +34,7 @@ const IndexPage: React.VFC = () => {
   };
 
   return (
-    <Box minH="100vh">
+    <Box>
       <Header isLogin={isLogin} />
       <Flex align="center" justify="center" flexDirection="column">
         <VStack w="100%" spacing={8}>
@@ -71,7 +70,7 @@ const IndexPage: React.VFC = () => {
           >
             ログイン
           </PrimaryButton>
-          <button
+          {/* <button
             onClick={async () => {
               try {
                 await auth.signOut();
@@ -82,13 +81,12 @@ const IndexPage: React.VFC = () => {
             }}
           >
             LOG OUT
-          </button>
-          <button disabled={!input} onClick={newTask}>
+          </button> */}
+          {/* <button disabled={!input} onClick={newTask}>
             SEND
-          </button>
+          </button> */}
         </VStack>
       </Flex>
-      <Footer />
     </Box>
   );
 };

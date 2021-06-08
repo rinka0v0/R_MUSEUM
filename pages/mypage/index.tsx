@@ -45,7 +45,6 @@ const Mypage: React.VFC = () => {
           rinkaさんの作品
         </Heading>
       </Flex>
-      <Footer />
       <></>
     </>
   );

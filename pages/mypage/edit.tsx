@@ -129,7 +129,6 @@ const EditMyPage: React.VFC = () => {
           </Box>
         </Flex>
       </Flex>
-      <Footer />
       <></>
     </>
   );

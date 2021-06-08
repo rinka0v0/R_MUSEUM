@@ -1,5 +1,4 @@
 import { Box, Flex, Link } from "@chakra-ui/layout";
-// import Link from "next/link";
 import React from "react";
 
 const Footer: React.VFC = () => {
