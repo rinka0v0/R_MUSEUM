@@ -13,12 +13,16 @@ const EditMyPage: React.VFC = () => {
   const [instagram, setInstagram] = useState("");
   const [gitHub, setGitHub] = useState("");
 
+  const onClickBtn = () => {
+    alert("保存！！");
+  };
+
   return (
     <>
       <Header isLogin={true} />
       <Flex alignItems="center" flexDirection="column" maxH="1000px">
         <Flex
-          w={{ md: "90%" }}
+          w="90%"
           alignItems="center"
           my={10}
           justify="space-around"
@@ -46,44 +50,82 @@ const EditMyPage: React.VFC = () => {
                 h="250px"
               ></Textarea>
             </Box>
-            <Box border="1px solid #ddd" p={3} borderRadius={3}>
-              <Text>GitHubのURL</Text>
-              <InputGroup>
-                <InputLeftAddon>http://github.com/</InputLeftAddon>
-                <Input
-                  value={gitHub}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    setGitHub(e.target.value);
-                  }}
-                />
-              </InputGroup>
-            </Box>
-            <Box border="1px solid #ddd" p={3} borderRadius={3}>
-              <Text>Twitterユーザー名</Text>
-              <InputGroup>
-                <InputLeftAddon>https://twitter.com/</InputLeftAddon>
 
-                <Input
-                  value={twitter}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    setTwitter(e.target.value);
-                  }}
-                />
-              </InputGroup>
+            <Box display={{ base: "none", md: "block" }}>
+              <Box border="1px solid #ddd" p={3} borderRadius={3}>
+                <Text>GitHubのURL</Text>
+                <InputGroup>
+                  <InputLeftAddon>http://github.com/</InputLeftAddon>
+                  <Input
+                    value={gitHub}
+                    placeholder="例） rinka0v0"
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      setGitHub(e.target.value);
+                    }}
+                  />
+                </InputGroup>
+              </Box>
+              <Box border="1px solid #ddd" p={3} borderRadius={3}>
+                <Text>Twitterユーザー名</Text>
+                <InputGroup>
+                  <InputLeftAddon>https://twitter.com/</InputLeftAddon>
+                  <Input
+                    value={twitter}
+                    placeholder="例） rinka0y0"
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      setTwitter(e.target.value);
+                    }}
+                  />
+                </InputGroup>
+              </Box>
+              <Box border="1px solid #ddd" p={3} borderRadius={3}>
+                <Text>Instagramユーザー名</Text>
+                <InputGroup>
+                  <InputLeftAddon>https://instagram.com/</InputLeftAddon>
+                  <Input
+                    value={instagram}
+                    placeholder="例） rinka0x0"
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      setInstagram(e.target.value);
+                    }}
+                  />
+                </InputGroup>
+              </Box>
             </Box>
-            <Box border="1px solid #ddd" p={3} borderRadius={3}>
-              <Text>Instagramユーザー名</Text>
-              <InputGroup>
-                <InputLeftAddon>https://instagram.com/</InputLeftAddon>
+
+            <Box display={{ base: "block", md: "none" }}>
+              <Box border="1px solid #ddd" p={3} borderRadius={3}>
+                <Text>GitHubユーザー名</Text>
                 <Input
                   value={instagram}
+                  placeholder="例） https://github.com/rinka0x0"
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     setInstagram(e.target.value);
                   }}
                 />
-              </InputGroup>
+              </Box>
+              <Box border="1px solid #ddd" p={3} borderRadius={3}>
+                <Text>Twitterユーザー名</Text>
+                <Input
+                  value={instagram}
+                  placeholder="例） https://twitter.com/rinka0x0"
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    setInstagram(e.target.value);
+                  }}
+                />
+              </Box>
+              <Box border="1px solid #ddd" p={3} borderRadius={3}>
+                <Text>Instagramユーザー名</Text>
+                <Input
+                  value={instagram}
+                  placeholder="例） https://instagram.com/rinka0x0"
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    setInstagram(e.target.value);
+                  }}
+                />
+              </Box>
             </Box>
-            <PrimaryButton>保存</PrimaryButton>
+            <PrimaryButton onClick={onClickBtn}>保存</PrimaryButton>
           </Box>
         </Flex>
       </Flex>
