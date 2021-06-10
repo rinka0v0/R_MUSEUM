@@ -22,10 +22,10 @@ const TrendLanguage: React.VFC<Props> = (props) => {
       </Heading>
       <Flex justify="center" flexDirection="column">
         {languages.map((language, id) => (
-          <>
-            <Box key={id}>{language}</Box>
+          <Box key={id}>
+            <Box >{language}</Box>
             <Progress size="sm" value={30} />
-          </>
+          </Box>
         ))}
       </Flex>
     </Flex>
