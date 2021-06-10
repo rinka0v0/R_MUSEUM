@@ -9,7 +9,6 @@ import { Button } from "@chakra-ui/button";
 
 import Header from "../../../components/layout/Header";
 import PrimaryButton from "../../../components/atoms/button/PrimaryButton";
-import Footer from "../../../components/layout/Footer";
 
 
 // クライアント側でインポートする必要がある
@@ -44,11 +43,10 @@ const Edit: React.VFC = () => {
         <Heading fontSize={20}>使用言語</Heading>
         <Input placeholder="使用言語" w="80%" />
         <Heading fontSize={20}>ソースコードのURL</Heading>
-        <Input placeholder="sorce code URL" w="80%" />
+        <Input placeholder="GitHubなどのURL" w="80%" />
         <Box mt="3em" width="80%">
           <SimpleMDE
             onChange={(e: string) => {
-              // DOMPurify sanitizes HTML
               setHTML(DOMPurify.sanitize(marked(e)));
               setMarkdown(e);
             }}
@@ -65,7 +63,6 @@ const Edit: React.VFC = () => {
           ></Box>
         </Box>
       </Flex>
-      <Footer />
     </>
   );
 };

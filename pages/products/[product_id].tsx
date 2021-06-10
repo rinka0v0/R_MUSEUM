@@ -1,7 +1,6 @@
 import { Avatar } from "@chakra-ui/avatar";
 import { Box, Flex } from "@chakra-ui/layout";
 import React from "react";
-import Footer from "../../components/layout/Footer";
 import Header from "../../components/layout/Header";
 
 const ProductPage: React.VFC = () => {
@@ -20,7 +19,6 @@ const ProductPage: React.VFC = () => {
           testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest
         </Box>
       </Flex>
-      <Footer />
     </Box>
   );
 };
