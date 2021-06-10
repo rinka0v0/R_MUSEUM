@@ -19,3 +19,36 @@ if (!firebase.apps.length) {
 
 export const db = firebase.firestore();
 export const auth = firebase.auth();
+
+// export const loginWithGoogle = () => {
+//   const provider = new firebase.auth.GoogleAuthProvider();
+//   firebase
+//     .auth()
+//     .signInWithPopup(provider)
+//     .then((result: firebase.auth.UserCredential) => {
+//       // const credential = result.credential
+//       console.log(result);
+//       // return result;
+//     })
+//     .catch((error) => {
+//       console.log(error);
+//     });
+// };
+
+// Redirect
+export const loginWithGoogle = ():void => {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  firebase
+    .auth()
+    .signInWithRedirect(provider)
+    .then((result) => {
+      console.log(result);
+    });
+};
+
+export const logout = ():void => {
+  auth.signOut().then(() => {
+    window.location.reload();
+    console.log("ログアウトしました");
+  });
+};
