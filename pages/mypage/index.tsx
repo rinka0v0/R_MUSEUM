@@ -4,7 +4,6 @@ import { Box, Flex, Heading } from "@chakra-ui/layout";
 import Link from "next/link";
 import React from "react";
 import PrimaryButton from "../../components/atoms/button/PrimaryButton";
-import Footer from "../../components/layout/Footer";
 import Header from "../../components/layout/Header";
 
 const Mypage: React.VFC = () => {

@@ -3,7 +3,6 @@ import { Box, Flex, Text } from "@chakra-ui/layout";
 import { Textarea } from "@chakra-ui/textarea";
 import React, { useState } from "react";
 import PrimaryButton from "../../components/atoms/button/PrimaryButton";
-import Footer from "../../components/layout/Footer";
 import Header from "../../components/layout/Header";
 
 const EditMyPage: React.VFC = () => {
