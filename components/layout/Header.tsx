@@ -16,6 +16,16 @@ import {
   PopoverHeader,
   PopoverTrigger,
 } from "@chakra-ui/popover";
+import { useDisclosure } from "@chakra-ui/hooks";
+import {
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
+} from "@chakra-ui/modal";
+import { loginWithGoogle, logout } from "../../firebase";
 
 type Props = {
   isLogin: boolean;
@@ -23,6 +33,8 @@ type Props = {
 
 const Header: React.VFC<Props> = (props) => {
   const { isLogin } = props;
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const onClickBtn = useCallback(() => {
     console.log(nanoid());
@@ -62,21 +74,40 @@ const Header: React.VFC<Props> = (props) => {
                 <PopoverCloseButton />
                 <PopoverHeader>Menu</PopoverHeader>
                 <PopoverBody p={0}>
-                  <Box  border="1px solid #ddd" h='30px'>
+                  <Box border="1px solid #ddd" h="30px">
                     <Link href="/mypage">マイページ</Link>
                   </Box>
-                  <Box border="1px solid #ddd" h='30px'>
+                  <Box border="1px solid #ddd" h="30px">
                     <Link href="/dashboard">作品の管理</Link>
                   </Box>
-                  <Box border="1px solid #ddd" h='30px'>
-                    <Link href="">サインアウト</Link>
+                  <Box border="1px solid #ddd" h="30px">
+                    <Box onClick={logout} cursor="pointer">
+                      サインアウト
+                    </Box>
                   </Box>
                 </PopoverBody>
               </PopoverContent>
             </Popover>
           </>
         ) : (
-          <PrimaryButton>ログイン</PrimaryButton>
+          <>
+            <PrimaryButton onClick={onOpen}>ログイン</PrimaryButton>
+            <Modal isOpen={isOpen} onClose={onClose}>
+              <ModalOverlay>
+                <ModalContent>
+                  <ModalHeader>ログイン</ModalHeader>
+                  <ModalCloseButton />
+                  <ModalBody>
+                    <Flex flexDirection="column" alignItems="center">
+                      <PrimaryButton onClick={loginWithGoogle}>
+                        Login with Google
+                      </PrimaryButton>
+                    </Flex>
+                  </ModalBody>
+                </ModalContent>
+              </ModalOverlay>
+            </Modal>
+          </>
         )}
       </Flex>
     </Flex>
