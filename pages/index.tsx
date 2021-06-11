@@ -1,5 +1,4 @@
 import React, { useContext } from "react";
-import Header from "../components/layout/Header";
 import TrendLanguage from "../components/card/TrendLanguage";
 import Exhibit from "../components/card/Exhibit";
 import { Box, Flex, Heading, VStack } from "@chakra-ui/layout";
@@ -10,7 +9,6 @@ const IndexPage: React.VFC = () => {
 
   return (
     <Box>
-      <Header isLogin={currentUser ? true : false} />
       <Flex align="center" justify="center" flexDirection="column">
         <VStack w="100%" spacing={8}>
           <Box w="80%" mt={10}>

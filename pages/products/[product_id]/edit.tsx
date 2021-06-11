@@ -6,10 +6,7 @@ import marked from "marked";
 import DOMPurify from "dompurify";
 import "easymde/dist/easymde.min.css";
 import { Button } from "@chakra-ui/button";
-
-import Header from "../../../components/layout/Header";
 import PrimaryButton from "../../../components/atoms/button/PrimaryButton";
-
 
 // クライアント側でインポートする必要がある
 const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
@@ -23,7 +20,6 @@ const Edit: React.VFC = () => {
 
   return (
     <>
-      <Header isLogin={true} />
       <HStack spacing={3} mt={5}>
         <Button colorScheme="red"> 削除</Button>
         <PrimaryButton>保存</PrimaryButton>

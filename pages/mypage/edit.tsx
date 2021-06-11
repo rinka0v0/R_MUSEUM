@@ -3,7 +3,6 @@ import { Box, Flex, Text } from "@chakra-ui/layout";
 import { Textarea } from "@chakra-ui/textarea";
 import React, { useState } from "react";
 import PrimaryButton from "../../components/atoms/button/PrimaryButton";
-import Header from "../../components/layout/Header";
 
 const EditMyPage: React.VFC = () => {
   const [name, setName] = useState("");
@@ -18,7 +17,6 @@ const EditMyPage: React.VFC = () => {
 
   return (
     <>
-      <Header isLogin={true} />
       <Flex alignItems="center" flexDirection="column" maxH="1000px">
         <Flex
           w="90%"

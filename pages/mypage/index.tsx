@@ -4,12 +4,10 @@ import { Box, Flex, Heading } from "@chakra-ui/layout";
 import Link from "next/link";
 import React from "react";
 import PrimaryButton from "../../components/atoms/button/PrimaryButton";
-import Header from "../../components/layout/Header";
 
 const Mypage: React.VFC = () => {
   return (
     <>
-      <Header isLogin={true} />
       <Flex alignItems="center" flexDirection="column" maxH="1000px">
         <Box ml="auto" mr={5} mt={5}>
           <Link href="/mypage/edit">
@@ -29,7 +27,7 @@ const Mypage: React.VFC = () => {
               size="2xl"
               mx={3}
               my={5}
-              display='block'
+              display="block"
             />
             <Button>アイコンの変更</Button>
           </Box>
