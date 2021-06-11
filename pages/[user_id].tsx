@@ -2,9 +2,11 @@ import { Avatar } from "@chakra-ui/avatar";
 import { Box, Flex, Heading } from "@chakra-ui/layout";
 import React from "react";
 import Footer from "../components/layout/Footer";
+import Header from "../components/layout/Header";
 const ProductPage: React.VFC = () => {
   return (
     <>
+      <Header />
       <Flex alignItems="center" flexDirection="column" maxH="1000px">
         <Flex
           w={{ md: "90%" }}

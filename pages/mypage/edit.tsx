@@ -1,8 +1,12 @@
 import { Input, InputGroup, InputLeftAddon } from "@chakra-ui/input";
 import { Box, Flex, Text } from "@chakra-ui/layout";
 import { Textarea } from "@chakra-ui/textarea";
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../../auth/AuthProvider";
 import PrimaryButton from "../../components/atoms/button/PrimaryButton";
+import Header from "../../components/layout/Header";
+import Router from "next/router";
+import Loading from "../../components/layout/Loading";
 
 const EditMyPage: React.VFC = () => {
   const [name, setName] = useState("");
@@ -11,12 +15,23 @@ const EditMyPage: React.VFC = () => {
   const [instagram, setInstagram] = useState("");
   const [gitHub, setGitHub] = useState("");
 
+  const { currentUser, signInCheck } = useContext(AuthContext);
+
   const onClickBtn = () => {
     alert("保存！！");
   };
 
+  useEffect(() => {
+    !currentUser && Router.push("/");
+  }, [currentUser]);
+
+  if (!signInCheck || !currentUser) {
+    return <Loading />;
+  }
+
   return (
     <>
+      <Header />
       <Flex alignItems="center" flexDirection="column" maxH="1000px">
         <Flex
           w="90%"

@@ -1,13 +1,28 @@
 import { Avatar } from "@chakra-ui/avatar";
 import { Button } from "@chakra-ui/button";
 import { Box, Flex, Heading } from "@chakra-ui/layout";
+import Router from "next/router";
 import Link from "next/link";
-import React from "react";
+import React, { useContext, useEffect } from "react";
+import { AuthContext } from "../../auth/AuthProvider";
 import PrimaryButton from "../../components/atoms/button/PrimaryButton";
+import Loading from "../../components/layout/Loading";
+import Header from "../../components/layout/Header";
 
 const Mypage: React.VFC = () => {
+  const { currentUser, signInCheck } = useContext(AuthContext);
+
+  useEffect(() => {
+    !currentUser && Router.push("/");
+  }, [currentUser]);
+
+  if (!signInCheck || !currentUser) {
+    return <Loading />;
+  }
+
   return (
     <>
+      <Header />
       <Flex alignItems="center" flexDirection="column" maxH="1000px">
         <Box ml="auto" mr={5} mt={5}>
           <Link href="/mypage/edit">

@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+import Router from "next/router";
 import { Input } from "@chakra-ui/input";
 import { Box, Flex, Heading, HStack } from "@chakra-ui/layout";
 import marked from "marked";
@@ -7,6 +8,9 @@ import DOMPurify from "dompurify";
 import "easymde/dist/easymde.min.css";
 import { Button } from "@chakra-ui/button";
 import PrimaryButton from "../../../components/atoms/button/PrimaryButton";
+import Header from "../../../components/layout/Header";
+import { AuthContext } from "../../../auth/AuthProvider";
+import Loading from "../../../components/layout/Loading";
 
 // クライアント側でインポートする必要がある
 const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
@@ -18,8 +22,19 @@ const Edit: React.VFC = () => {
   const [markdown, setMarkdown] = useState("");
   const [html, setHTML] = useState("");
 
+  const { currentUser, signInCheck } = useContext(AuthContext);
+
+  useEffect(() => {
+    !currentUser && Router.push("/");
+  }, [currentUser]);
+
+  if (!signInCheck || !currentUser) {
+    return <Loading />;
+  }
+
   return (
     <>
+      <Header />
       <HStack spacing={3} mt={5}>
         <Button colorScheme="red"> 削除</Button>
         <PrimaryButton>保存</PrimaryButton>

@@ -1,9 +1,23 @@
+import Router from "next/router";
 import { Box, Flex, Heading } from "@chakra-ui/layout";
-import React from "react";
+import React, { useContext, useEffect } from "react";
+import Header from "../../components/layout/Header";
+import Loading from "../../components/layout/Loading";
+import { AuthContext } from "../../auth/AuthProvider";
 
 const Dashbord: React.VFC = () => {
+  const { currentUser, signInCheck } = useContext(AuthContext);
+
+  useEffect(() => {
+    !currentUser && Router.push("/");
+  }, [currentUser]);
+
+  if (!signInCheck || !currentUser) {
+    return <Loading />;
+  }
   return (
     <>
+      <Header />
       <Flex flexDirection="column" alignItems="center">
         <Heading fontSize={20} my={5}>
           自分の作品一覧
