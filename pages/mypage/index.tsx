@@ -1,5 +1,4 @@
 import { Avatar } from "@chakra-ui/avatar";
-import { Button } from "@chakra-ui/button";
 import { Box, Flex, Heading } from "@chakra-ui/layout";
 import Router from "next/router";
 import Link from "next/link";
@@ -38,23 +37,27 @@ const Mypage: React.VFC = () => {
         >
           <Box>
             <Avatar
-              src="https://bit.ly/broken-link"
+              src={
+                currentUser.photoURL
+                  ? currentUser.photoURL
+                  : "https://bit.ly/broken-link"
+              }
               size="2xl"
               mx={3}
               my={5}
               display="block"
             />
-            <Button>アイコンの変更</Button>
+            {/* <Button>アイコンの変更</Button> */}
           </Box>
           <Box width="70%">
-            <Box fontSize={30}>rinka</Box>
+            <Box fontSize={30}>{currentUser.displayName}</Box>
             <Box as="p" fontSize={{ base: ".95em", md: "16px" }}>
               自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介自己紹介
             </Box>
           </Box>
         </Flex>
         <Heading fontSize={24} textAlign="center">
-          rinkaさんの作品
+          {currentUser.displayName}さんの作品
         </Heading>
       </Flex>
       <></>
