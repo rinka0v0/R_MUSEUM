@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useContext } from "react";
 import NextLink from "next/link";
 import { IconButton } from "@chakra-ui/button";
 import { SearchIcon } from "@chakra-ui/icons";
@@ -26,13 +26,11 @@ import {
   ModalOverlay,
 } from "@chakra-ui/modal";
 import { loginWithGoogle, logout } from "../../firebase";
+import { AuthContext } from "../../auth/AuthProvider";
 
-type Props = {
-  isLogin: boolean;
-};
+const Header: React.VFC = () => {
 
-const Header: React.VFC<Props> = (props) => {
-  const { isLogin } = props;
+  const { currentUser } = useContext(AuthContext);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -60,7 +58,7 @@ const Header: React.VFC<Props> = (props) => {
             mr={3}
           />
         </NextLink>
-        {isLogin ? (
+        {currentUser ? (
           <>
             <NextLink href={`/products/${nanoid()}/edit`}>
               <PrimaryButton onClick={onClickBtn}>寄贈する</PrimaryButton>
