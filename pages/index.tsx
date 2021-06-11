@@ -1,16 +1,16 @@
 import React, { useContext } from "react";
-import Header from "../components/layout/Header";
 import TrendLanguage from "../components/card/TrendLanguage";
 import Exhibit from "../components/card/Exhibit";
 import { Box, Flex, Heading, VStack } from "@chakra-ui/layout";
 import { AuthContext } from "../auth/AuthProvider";
+import Header from "../components/layout/Header";
 
 const IndexPage: React.VFC = () => {
   const { currentUser } = useContext(AuthContext);
 
   return (
     <Box>
-      <Header isLogin={currentUser ? true : false} />
+      <Header />
       <Flex align="center" justify="center" flexDirection="column">
         <VStack w="100%" spacing={8}>
           <Box w="80%" mt={10}>

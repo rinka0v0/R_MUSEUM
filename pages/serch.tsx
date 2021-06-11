@@ -13,7 +13,7 @@ const SerchPage: React.VFC = () => {
 
   return (
     <>
-      <Header isLogin={false} />
+      <Header />
       <Flex w="80%" justify="space-between" mx="auto" mt={10}>
         <Input
           placeholder="プログラミング言語で検索"

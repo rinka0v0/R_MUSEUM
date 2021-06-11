@@ -1,5 +1,6 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useContext } from "react";
 import NextLink from "next/link";
+import Router from "next/router";
 import { IconButton } from "@chakra-ui/button";
 import { SearchIcon } from "@chakra-ui/icons";
 import { Box, Flex } from "@chakra-ui/layout";
@@ -26,18 +27,14 @@ import {
   ModalOverlay,
 } from "@chakra-ui/modal";
 import { loginWithGoogle, logout } from "../../firebase";
+import { AuthContext } from "../../auth/AuthProvider";
 
-type Props = {
-  isLogin: boolean;
-};
-
-const Header: React.VFC<Props> = (props) => {
-  const { isLogin } = props;
-
+const Header: React.VFC = () => {
+  const { currentUser } = useContext(AuthContext);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const onClickBtn = useCallback(() => {
-    console.log(nanoid());
+  const pushSignIn = useCallback(() => {
+    Router.push("/signIn");
   }, []);
 
   return (
@@ -60,15 +57,23 @@ const Header: React.VFC<Props> = (props) => {
             mr={3}
           />
         </NextLink>
-        {isLogin ? (
+        {currentUser ? (
           <>
             <NextLink href={`/products/${nanoid()}/edit`}>
-              <PrimaryButton onClick={onClickBtn}>寄贈する</PrimaryButton>
+              <PrimaryButton>寄贈する</PrimaryButton>
             </NextLink>
 
             <Popover>
               <PopoverTrigger>
-                <Avatar src="https://bit.ly/broken-link" mx={3} />
+                <Avatar
+                  cursor="pointer"
+                  src={
+                    currentUser.photoURL
+                      ? currentUser.photoURL
+                      : "https://bit.ly/broken-link"
+                  }
+                  mx={3}
+                />
               </PopoverTrigger>
               <PopoverContent w="150px" mr={5}>
                 <PopoverCloseButton />
@@ -101,6 +106,9 @@ const Header: React.VFC<Props> = (props) => {
                     <Flex flexDirection="column" alignItems="center">
                       <PrimaryButton onClick={loginWithGoogle}>
                         Login with Google
+                      </PrimaryButton>
+                      <PrimaryButton onClick={pushSignIn}>
+                        Login with Email
                       </PrimaryButton>
                     </Flex>
                   </ModalBody>

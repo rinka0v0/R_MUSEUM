@@ -8,8 +8,8 @@ import { AuthProvider } from "../auth/AuthProvider";
 const MyApp = ({ Component, pageProps }: AppProps): JSX.Element => {
   return (
     <>
-      <AuthProvider>
-        <ChakraProvider theme={theme}>
+      <ChakraProvider theme={theme}>
+        <AuthProvider>
           <Head>
             <title>R_MUSEUM</title>
           </Head>
@@ -19,8 +19,8 @@ const MyApp = ({ Component, pageProps }: AppProps): JSX.Element => {
             </Box>
             <Footer />
           </Flex>
-        </ChakraProvider>
-      </AuthProvider>
+        </AuthProvider>
+      </ChakraProvider>
     </>
   );
 };

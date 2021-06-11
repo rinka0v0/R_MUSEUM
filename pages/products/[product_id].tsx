@@ -1,12 +1,12 @@
+import React from "react";
 import { Avatar } from "@chakra-ui/avatar";
 import { Box, Flex } from "@chakra-ui/layout";
-import React from "react";
 import Header from "../../components/layout/Header";
 
 const ProductPage: React.VFC = () => {
   return (
-    <Box minH="100vh">
-      <Header isLogin={false} />
+    <Box>
+      <Header />
       <Flex alignItems="center" flexDirection="column">
         <Flex alignItems="center" my={5}>
           <Avatar src="https://bit.ly/broken-link" mr={3} ml={3} />
