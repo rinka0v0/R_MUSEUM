@@ -1,5 +1,6 @@
 import React, { useCallback, useContext } from "react";
 import NextLink from "next/link";
+import Router from "next/router";
 import { IconButton } from "@chakra-ui/button";
 import { SearchIcon } from "@chakra-ui/icons";
 import { Box, Flex } from "@chakra-ui/layout";
@@ -31,6 +32,10 @@ import { AuthContext } from "../../auth/AuthProvider";
 const Header: React.VFC = () => {
   const { currentUser } = useContext(AuthContext);
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const pushSignIn = useCallback(() => {
+    Router.push("/signIn");
+  }, []);
 
   return (
     <Flex
@@ -101,6 +106,9 @@ const Header: React.VFC = () => {
                     <Flex flexDirection="column" alignItems="center">
                       <PrimaryButton onClick={loginWithGoogle}>
                         Login with Google
+                      </PrimaryButton>
+                      <PrimaryButton onClick={pushSignIn}>
+                        Login with Email
                       </PrimaryButton>
                     </Flex>
                   </ModalBody>
