@@ -11,12 +11,12 @@ type Props = {
 
 type AuthContextProps = {
   currentUser: User | null | undefined;
-  setCurrentUser: any;
+  signInCheck: boolean;
 };
 
 const AuthContext = createContext<AuthContextProps>({
   currentUser: undefined,
-  setCurrentUser: undefined,
+  signInCheck: false,
 });
 
 const AuthProvider: VFC<Props> = ({ children }) => {
@@ -28,15 +28,17 @@ const AuthProvider: VFC<Props> = ({ children }) => {
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
       if (user) {
-        console.log(user, "AuthProvider useEffect");
         setCurrentUser(user);
+        setSignInCheck(true);
+      } else {
+        setSignInCheck(true);
       }
-      setSignInCheck(true);
     });
-  }, []);
+  });
+
   if (signInCheck) {
     return (
-      <AuthContext.Provider value={{ currentUser, setCurrentUser }}>
+      <AuthContext.Provider value={{ currentUser, signInCheck }}>
         {children}
       </AuthContext.Provider>
     );
