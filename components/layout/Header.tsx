@@ -29,14 +29,8 @@ import { loginWithGoogle, logout } from "../../firebase";
 import { AuthContext } from "../../auth/AuthProvider";
 
 const Header: React.VFC = () => {
-
   const { currentUser } = useContext(AuthContext);
-
   const { isOpen, onOpen, onClose } = useDisclosure();
-
-  const onClickBtn = useCallback(() => {
-    console.log(nanoid());
-  }, []);
 
   return (
     <Flex
@@ -61,12 +55,20 @@ const Header: React.VFC = () => {
         {currentUser ? (
           <>
             <NextLink href={`/products/${nanoid()}/edit`}>
-              <PrimaryButton onClick={onClickBtn}>寄贈する</PrimaryButton>
+              <PrimaryButton>寄贈する</PrimaryButton>
             </NextLink>
 
             <Popover>
               <PopoverTrigger>
-                <Avatar src="https://bit.ly/broken-link" mx={3} />
+                <Avatar
+                  cursor="pointer"
+                  src={
+                    currentUser.photoURL
+                      ? currentUser.photoURL
+                      : "https://bit.ly/broken-link"
+                  }
+                  mx={3}
+                />
               </PopoverTrigger>
               <PopoverContent w="150px" mr={5}>
                 <PopoverCloseButton />
