@@ -3,7 +3,7 @@ import NextLink from "next/link";
 import Router from "next/router";
 import { IconButton } from "@chakra-ui/button";
 import { SearchIcon } from "@chakra-ui/icons";
-import { Box, Flex } from "@chakra-ui/layout";
+import { Box, Flex, Stack } from "@chakra-ui/layout";
 import { Avatar } from "@chakra-ui/avatar";
 import PrimaryButton from "../atoms/button/PrimaryButton";
 import Link from "next/link";
@@ -26,8 +26,9 @@ import {
   ModalHeader,
   ModalOverlay,
 } from "@chakra-ui/modal";
-import { loginWithGoogle, logout } from "../../firebase";
+import { loginWithGitHub, loginWithGoogle, logout } from "../../firebase";
 import { AuthContext } from "../../auth/AuthProvider";
+import useMessage from "../../hooks/useMessage";
 
 const Header: React.VFC = () => {
   const { currentUser } = useContext(AuthContext);
@@ -36,6 +37,23 @@ const Header: React.VFC = () => {
   const pushSignIn = useCallback(() => {
     Router.push("/signIn");
   }, []);
+
+  const { showMessage } = useMessage();
+
+  const GoogleLogin = () => {
+    try {
+      loginWithGoogle();
+    } catch (err) {
+      showMessage({ title: err.message, status: "error" });
+    }
+  };
+  const GitHubLogin = () => {
+    try {
+      loginWithGitHub();
+    } catch (err) {
+      showMessage({ title: err.message, status: "error" });
+    }
+  };
 
   return (
     <Flex
@@ -102,14 +120,19 @@ const Header: React.VFC = () => {
                 <ModalContent>
                   <ModalHeader>ログイン</ModalHeader>
                   <ModalCloseButton />
-                  <ModalBody>
+                  <ModalBody p={5}>
                     <Flex flexDirection="column" alignItems="center">
-                      <PrimaryButton onClick={loginWithGoogle}>
-                        Login with Google
-                      </PrimaryButton>
-                      <PrimaryButton onClick={pushSignIn}>
-                        Login with Email
-                      </PrimaryButton>
+                      <Stack spacing={5}>
+                        <PrimaryButton onClick={GoogleLogin}>
+                          Login with Google
+                        </PrimaryButton>
+                        <PrimaryButton onClick={GitHubLogin}>
+                          Login with GitHub
+                        </PrimaryButton>
+                        <PrimaryButton onClick={pushSignIn}>
+                          Login with Email
+                        </PrimaryButton>
+                      </Stack>
                     </Flex>
                   </ModalBody>
                 </ModalContent>
