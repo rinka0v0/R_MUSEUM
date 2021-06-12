@@ -21,8 +21,17 @@ const Edit: React.VFC = () => {
   const [title, setTitle] = useState("");
   const [markdown, setMarkdown] = useState("");
   const [html, setHTML] = useState("");
+  const [sourceCodeUrl, setSourceCodeUrl] = useState("");
 
   const { currentUser, signInCheck } = useContext(AuthContext);
+
+  const onClickSave = () => {};
+
+  const onClickDelete = () => {
+    if (confirm('削除しますか？')) {
+      console.log('削除')
+    }
+  }
 
   useEffect(() => {
     !currentUser && Router.push("/");
@@ -36,8 +45,8 @@ const Edit: React.VFC = () => {
     <>
       <Header />
       <HStack spacing={3} mt={5}>
-        <Button colorScheme="red"> 削除</Button>
-        <PrimaryButton>保存</PrimaryButton>
+        <Button colorScheme="red" onClick={onClickDelete}> 削除</Button>
+        <PrimaryButton onClick={onClickSave}>保存</PrimaryButton>
         <PrimaryButton>公開</PrimaryButton>
       </HStack>
 
@@ -54,7 +63,14 @@ const Edit: React.VFC = () => {
         <Heading fontSize={20}>使用言語</Heading>
         <Input placeholder="使用言語" w="80%" />
         <Heading fontSize={20}>ソースコードのURL</Heading>
-        <Input placeholder="GitHubなどのURL" w="80%" />
+        <Input
+          placeholder="GitHubなどのURL"
+          w="80%"
+          value={sourceCodeUrl}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setSourceCodeUrl(e.target.value)
+          }
+        />
         <Box mt="3em" width="80%">
           <SimpleMDE
             onChange={(e: string) => {
@@ -64,7 +80,7 @@ const Edit: React.VFC = () => {
           />
         </Box>
 
-        <Heading mb="2em">プレビュー</Heading>
+        <Heading my="1em">プレビュー</Heading>
         <Box bg="white" w="80%" borderRadius={5} p={8} minH="300px" mb={3}>
           <Box
             as="span"
