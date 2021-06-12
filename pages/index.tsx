@@ -1,13 +1,10 @@
-import React, { useContext } from "react";
+import React from "react";
 import TrendLanguage from "../components/card/TrendLanguage";
 import Exhibit from "../components/card/Exhibit";
 import { Box, Flex, Heading, VStack } from "@chakra-ui/layout";
-import { AuthContext } from "../auth/AuthProvider";
 import Header from "../components/layout/Header";
 
 const IndexPage: React.VFC = () => {
-  const { currentUser } = useContext(AuthContext);
-
   return (
     <Box>
       <Header />
