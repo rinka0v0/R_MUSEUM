@@ -11,6 +11,21 @@ import PrimaryButton from "../../../components/atoms/button/PrimaryButton";
 import Header from "../../../components/layout/Header";
 import { AuthContext } from "../../../auth/AuthProvider";
 import Loading from "../../../components/layout/Loading";
+import "github-markdown-css";
+
+import highlightjs from 'highlight.js';
+import 'highlight.js/styles/github.css';
+
+marked.setOptions({
+  highlight: (code, lang) => {
+    return highlightjs.highlightAuto(code, [lang]).value;
+  },
+  pedantic: false,
+  gfm: true,
+  breaks: true,
+  sanitize: true,
+  silent: false,
+});
 
 // クライアント側でインポートする必要がある
 const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
@@ -25,13 +40,24 @@ const Edit: React.VFC = () => {
 
   const { currentUser, signInCheck } = useContext(AuthContext);
 
-  const onClickSave = () => {};
+  const onClickSave = () => {
+    console.log();
+  };
 
   const onClickDelete = () => {
-    if (confirm('削除しますか？')) {
-      console.log('削除')
+    if (confirm("削除しますか？")) {
+      console.log("削除");
     }
-  }
+  };
+
+  const handleDrop = (data: CodeMirror.Editor, e: DragEvent) => {
+    const files = e.dataTransfer?.files;
+    if (files && files?.length > 0) {
+      const file = files[0];
+      alert("FileName :" + file.name);
+      console.log(file);
+    }
+  };
 
   useEffect(() => {
     !currentUser && Router.push("/");
@@ -45,7 +71,10 @@ const Edit: React.VFC = () => {
     <>
       <Header />
       <HStack spacing={3} mt={5}>
-        <Button colorScheme="red" onClick={onClickDelete}> 削除</Button>
+        <Button colorScheme="red" onClick={onClickDelete}>
+          {" "}
+          削除
+        </Button>
         <PrimaryButton onClick={onClickSave}>保存</PrimaryButton>
         <PrimaryButton>公開</PrimaryButton>
       </HStack>
@@ -71,17 +100,30 @@ const Edit: React.VFC = () => {
             setSourceCodeUrl(e.target.value)
           }
         />
-        <Box mt="3em" width="80%">
+        <Box mt="3em" width="80%" id="body" color="inherit">
           <SimpleMDE
+            value={markdown}
             onChange={(e: string) => {
               setHTML(DOMPurify.sanitize(marked(e)));
               setMarkdown(e);
+              console.log(markdown);
+              console.log(html);
             }}
+            events={{ drop: handleDrop }}
           />
         </Box>
 
         <Heading my="1em">プレビュー</Heading>
-        <Box bg="white" w="80%" borderRadius={5} p={8} minH="300px" mb={3}>
+        <Box
+          bg="white"
+          w="80%"
+          borderRadius={5}
+          p={8}
+          minH="300px"
+          mb={3}
+          className="markdown-body"
+          boxSizing="border-box"
+        >
           <Box
             as="span"
             dangerouslySetInnerHTML={{
