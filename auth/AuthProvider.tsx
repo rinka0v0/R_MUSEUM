@@ -1,7 +1,7 @@
 import firebase from "firebase/app";
 import { createContext, useEffect, useState, VFC, ReactNode } from "react";
 import Loading from "../components/layout/Loading";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
 
 export type User = firebase.User;
 
@@ -26,9 +26,18 @@ const AuthProvider: VFC<Props> = ({ children }) => {
   const [signInCheck, setSignInCheck] = useState(false);
 
   useEffect(() => {
-    auth.onAuthStateChanged((user) => {
+    auth.onAuthStateChanged(async (user) => {
       if (user) {
         setCurrentUser(user);
+        const userDoc = await db.collection("users").doc(user.uid).get();
+        if (!userDoc.exists) {
+          await userDoc.ref.set({
+            user_name: user.displayName,
+            profile: "",
+            iconURL: user.photoURL,
+            created_at: firebase.firestore.FieldValue.serverTimestamp(),
+          });
+        }
         setSignInCheck(true);
       } else {
         setSignInCheck(true);

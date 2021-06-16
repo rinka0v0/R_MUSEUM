@@ -18,7 +18,7 @@ const SignIn: VFC = () => {
   const [show, setShow] = useState(false);
 
   const handleClick = () => setShow(!show);
-  const {showMessage} = useMessage()
+  const { showMessage } = useMessage();
 
   const logIn = async (
     e: FormEvent<HTMLFormElement> & FormEvent<HTMLDivElement>
@@ -26,10 +26,10 @@ const SignIn: VFC = () => {
     e.preventDefault();
     try {
       await auth.signInWithEmailAndPassword(email, password);
-      showMessage({title: 'ログインしました',status: 'success'})
+      showMessage({ title: "ログインしました", status: "success" });
       Router.push("/");
     } catch (err) {
-        showMessage({title: err.message,status: 'error'})
+      showMessage({ title: err.message, status: "error" });
     }
   };
 
@@ -43,7 +43,14 @@ const SignIn: VFC = () => {
   return (
     <>
       <Header />
-      <Box width="80%" mx="auto" textAlign="center" as="form" onSubmit={logIn} mt={5}>
+      <Box
+        width="80%"
+        mx="auto"
+        textAlign="center"
+        as="form"
+        onSubmit={logIn}
+        mt={5}
+      >
         <Heading>ログイン</Heading>
         <Stack spacing={4}>
           <InputGroup>
@@ -73,7 +80,7 @@ const SignIn: VFC = () => {
           </InputGroup>
           <Button type="submit">Login</Button>
         </Stack>
-        <Link href='/signUp'>signup</Link>
+        <Link href="/signUp">signup</Link>
       </Box>
     </>
   );
