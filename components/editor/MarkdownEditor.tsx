@@ -8,6 +8,7 @@ import marked from "marked";
 import highlightjs from "highlight.js";
 import "highlight.js/styles/github.css";
 import "github-markdown-css";
+import { Flex } from "@chakra-ui/react";
 
 // クライアント側でインポートする必要がある
 const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
@@ -44,8 +45,11 @@ const MarkdownEditor: React.VFC<Props> = (props) => {
   //   }
   // };
   return (
-    <>
-      <Box w="100%">
+    <Flex
+      justify={{ base: "center", md: "space-around" }}
+      flexDirection={{ base: "column", md: "row" }}
+    >
+      <Box w={{ base: "100%", md: "45%" }}>
         <SimpleMDE
           value={markdown}
           onChange={(e: string) => {
@@ -54,26 +58,24 @@ const MarkdownEditor: React.VFC<Props> = (props) => {
           }}
           // events={{ drop: handleDrop }}
         />
-        <Heading my="1em">プレビュー</Heading>
-        <Box
-          bg="white"
-          w="100%"
-          borderRadius={5}
-          p={8}
-          minH="300px"
-          mb={3}
-          className="markdown-body"
-          boxSizing="border-box"
-        >
+      </Box>
+      <Box
+        w={{ base: "100%", md: "45%" }}
+        borderRadius={5}
+        minH='330px'
+      >
+        <Heading mb='.5em'>プレビュー</Heading>
+
+        <Box bg="white" minH="300px" className="markdown-body" p={5}>
           <Box
-            as="span"
+            boxSizing="border-box"
             dangerouslySetInnerHTML={{
               __html: html,
             }}
           ></Box>
         </Box>
       </Box>
-    </>
+    </Flex>
   );
 };
 
