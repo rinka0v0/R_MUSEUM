@@ -62,6 +62,7 @@ const TagInput: VFC = () => {
           h="46px"
           padding="4px 0 0 0"
           _focus={{ outline: "transparent" }}
+          disabled={tags.length >= 5}
         ></Input>
       </Box>
     </Flex>
