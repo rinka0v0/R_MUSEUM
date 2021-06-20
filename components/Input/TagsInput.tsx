@@ -79,7 +79,7 @@ const container = css`
     align-items: flex-start;
     flex-wrap: wrap;
     min-height: 48px;
-    // width: 480px;
+    width: 100%;
     padding: 0 8px;
     border: 1px solid rgb(214, 216, 218);
     border-radius: 6px;
