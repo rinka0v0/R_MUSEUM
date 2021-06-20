@@ -8,11 +8,12 @@ users:
 products:
   documentId: String
   title: String
+  content: String
   userName: String
   sorceCode: String
   tagsIDs: [String]
   likes: Number
-  open: boolean
+  open: boolean (公開OR非公開)
   comments:
     documentId: auto
     comment: String
@@ -20,6 +21,5 @@ products:
 
 tags:
   documentId: String
-  name: String
   createdAt: Date
   count: Number
