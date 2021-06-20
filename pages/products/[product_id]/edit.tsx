@@ -9,12 +9,9 @@ import Header from "../../../components/layout/Header";
 import { AuthContext } from "../../../auth/AuthProvider";
 import Loading from "../../../components/layout/Loading";
 import "github-markdown-css";
+import TagInput from "../../../components/Input/TagsInput";
 
 // クライアント側でインポートする必要がある
-const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
-  ssr: false,
-});
-
 const MarkdownEditor = dynamic(
   () => import("../../../components/editor/MarkdownEditor"),
   {
@@ -27,6 +24,7 @@ const Edit: React.VFC = () => {
   const [markdown, setMarkdown] = useState("");
   const [html, setHTML] = useState("");
   const [sourceCodeUrl, setSourceCodeUrl] = useState("");
+  const [tags, setTags] = useState<Array<string>>([]);
 
   const { currentUser, signInCheck } = useContext(AuthContext);
 
@@ -60,7 +58,7 @@ const Edit: React.VFC = () => {
         <PrimaryButton>公開</PrimaryButton>
       </HStack>
 
-      <Flex flexDirection="column" align="center">
+      <Flex flexDirection="column" align="center" w="100%">
         <Heading fontSize={20}>タイトル</Heading>
         <Input
           placeholder="作品のタイトル"
@@ -70,8 +68,7 @@ const Edit: React.VFC = () => {
           }
           w="80%"
         />
-        <Heading fontSize={20}>使用言語</Heading>
-        <Input placeholder="使用言語" w="80%" />
+        <TagInput tags={tags} setTags={setTags} />
         <Heading fontSize={20}>ソースコードのURL</Heading>
         <Input
           placeholder="GitHubなどのURL"
@@ -81,13 +78,14 @@ const Edit: React.VFC = () => {
             setSourceCodeUrl(e.target.value)
           }
         />
-
-        <MarkdownEditor
-          markdown={markdown}
-          html={html}
-          onChangeMarkdown={setMarkdown}
-          onChangeHTML={setHTML}
-        />
+        <Box w="100%" mt="4em">
+          <MarkdownEditor
+            markdown={markdown}
+            html={html}
+            onChangeMarkdown={setMarkdown}
+            onChangeHTML={setHTML}
+          />
+        </Box>
       </Flex>
     </>
   );

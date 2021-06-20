@@ -1,14 +1,18 @@
 /**@jsxRuntime classic */
 /** @jsx jsx */
-
-import { useState } from "react";
+import React from "react";
 import { VFC } from "react";
 import { jsx, css } from "@emotion/react";
 import { Box, Flex } from "@chakra-ui/layout";
-import { ListItem, UnorderedList, Input } from "@chakra-ui/react";
+import { UnorderedList, Input, ListItem } from "@chakra-ui/react";
 
-const TagInput: VFC = () => {
-  const [tags, setTags] = useState<string[]>([]);
+type Props = {
+  tags: Array<string>;
+  setTags: React.Dispatch<React.SetStateAction<string[]>>;
+};
+
+const TagInput: VFC<Props> = (props) => {
+  const { tags, setTags } = props;
 
   const inputKeyDown = (e: any) => {
     const val = e?.target.value;
@@ -56,7 +60,7 @@ const TagInput: VFC = () => {
           })}
         </UnorderedList>
         <Input
-          placeholder="使用した技術"
+          placeholder="使用言語"
           onKeyUp={(e) => inputKeyDown(e)}
           flex="1"
           h="46px"
