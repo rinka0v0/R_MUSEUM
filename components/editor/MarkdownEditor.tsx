@@ -18,8 +18,8 @@ const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
 type Props = {
   markdown: string;
   html: string;
-  onChangeMarkdown: React.Dispatch<React.SetStateAction<string>>;
-  onChangeHTML: React.Dispatch<React.SetStateAction<string>>;
+  setMarkdown: React.Dispatch<React.SetStateAction<string>>;
+  setHTML: React.Dispatch<React.SetStateAction<string>>;
 };
 
 marked.setOptions({
@@ -34,7 +34,7 @@ marked.setOptions({
 });
 
 const MarkdownEditor: React.VFC<Props> = (props) => {
-  const { markdown, html, onChangeMarkdown, onChangeHTML } = props;
+  const { markdown, html, setMarkdown, setHTML } = props;
 
   // const handleDrop = (data: CodeMirror.Editor, e: DragEvent) => {
   //   const files = e.dataTransfer?.files;
@@ -53,8 +53,8 @@ const MarkdownEditor: React.VFC<Props> = (props) => {
         <SimpleMDE
           value={markdown}
           onChange={(e: string) => {
-            onChangeMarkdown(e);
-            onChangeHTML(DOMPurify.sanitize(marked(e)));
+            setMarkdown(e);
+            setHTML(DOMPurify.sanitize(marked(e)));
           }}
           // events={{ drop: handleDrop }}
         />
