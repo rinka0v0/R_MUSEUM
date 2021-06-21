@@ -1,6 +1,6 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import Router from "next/router";
+import Router, { useRouter } from "next/router";
 import { Input } from "@chakra-ui/input";
 import { Box, Flex, Heading, HStack } from "@chakra-ui/layout";
 import { Button } from "@chakra-ui/button";
@@ -10,6 +10,9 @@ import { AuthContext } from "../../../auth/AuthProvider";
 import Loading from "../../../components/layout/Loading";
 import "github-markdown-css";
 import TagInput from "../../../components/Input/TagsInput";
+import useMessage from "../../../hooks/useMessage";
+import { db } from "../../../firebase";
+import firebase from "firebase";
 
 // クライアント側でインポートする必要がある
 const MarkdownEditor = dynamic(
@@ -20,23 +23,62 @@ const MarkdownEditor = dynamic(
 );
 
 const Edit: React.VFC = () => {
+  const router = useRouter();
+  // product_idを文字列として取り出す
+  const query = router.asPath.split("/")[2];
+
   const [title, setTitle] = useState("");
   const [markdown, setMarkdown] = useState("");
   const [html, setHTML] = useState("");
   const [sourceCodeUrl, setSourceCodeUrl] = useState("");
   const [tags, setTags] = useState<Array<string>>([]);
+  const [open, setOpen] = useState(false);
 
   const { currentUser, signInCheck } = useContext(AuthContext);
+  const { showMessage } = useMessage();
 
   const onClickSave = () => {
-    console.log();
-  };
-
-  const onClickDelete = () => {
-    if (confirm("削除しますか？")) {
-      console.log("削除");
+    if (title && markdown) {
+      db.collection("proucts")
+        .doc(query)
+        .set({
+          title: title,
+          content: markdown,
+          userName: "rinka",
+          sorceCode: sourceCodeUrl,
+          tagsIDs: tags,
+          open: open,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        })
+        .then(() => {
+          showMessage({ title: "保存しました", status: "success" });
+        });
+    } else {
+      showMessage({
+        title: "タイトルと紹介文を書いてください",
+        status: "error",
+      });
     }
   };
+
+  const onClickDelete = useCallback(() => {
+    if (confirm("削除しますか？")) {
+      db.collection("proucts")
+        .doc(query)
+        .delete()
+        .then(() => {
+          router.push("/");
+          showMessage({ title: "削除しました", status: "success" });
+        })
+        .catch((error) => {
+          showMessage({ title: error, status: "error" });
+        });
+    }
+  }, []);
+
+  const onClickOpen = useCallback(() => {
+    setOpen((pre) => !pre);
+  }, []);
 
   useEffect(() => {
     !currentUser && Router.push("/");
@@ -55,11 +97,15 @@ const Edit: React.VFC = () => {
           削除
         </Button>
         <PrimaryButton onClick={onClickSave}>保存</PrimaryButton>
-        <PrimaryButton>公開</PrimaryButton>
+        <PrimaryButton onClick={onClickOpen}>
+          {open ? "非公開" : "公開"}
+        </PrimaryButton>
       </HStack>
 
       <Flex flexDirection="column" align="center" w="100%">
-        <Heading fontSize={20}>タイトル</Heading>
+        <Heading fontSize={20} mt={5} mb={3}>
+          タイトル
+        </Heading>
         <Input
           placeholder="作品のタイトル"
           value={title}
@@ -68,8 +114,10 @@ const Edit: React.VFC = () => {
           }
           w="80%"
         />
-        <TagInput tags={tags} setTags={setTags} />
-        <Heading fontSize={20}>ソースコードのURL</Heading>
+
+        <Heading fontSize={20} my={5} mb={3}>
+          ソースコードのURL
+        </Heading>
         <Input
           placeholder="GitHubなどのURL"
           w="80%"
@@ -78,12 +126,22 @@ const Edit: React.VFC = () => {
             setSourceCodeUrl(e.target.value)
           }
         />
-        <Box w="100%" mt="4em">
+
+        <Heading fontSize={20} mt={5} mb={3}>
+          使用技術(5個まで)
+        </Heading>
+        <Box width="80%">
+          <TagInput tags={tags} setTags={setTags} />
+        </Box>
+        <Heading fontSize={20} my="2em">
+          作品の紹介文
+        </Heading>
+        <Box w="100%" mb="1em">
           <MarkdownEditor
             markdown={markdown}
             html={html}
-            onChangeMarkdown={setMarkdown}
-            onChangeHTML={setHTML}
+            setMarkdown={setMarkdown}
+            setHTML={setHTML}
           />
         </Box>
       </Flex>
