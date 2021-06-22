@@ -39,7 +39,7 @@ const Edit: React.VFC = () => {
 
   const onClickSave = () => {
     if (title && markdown) {
-      db.collection("proucts")
+      db.collection("products")
         .doc(query)
         .set({
           title: title,
@@ -63,7 +63,7 @@ const Edit: React.VFC = () => {
 
   const onClickDelete = useCallback(() => {
     if (confirm("削除しますか？")) {
-      db.collection("proucts")
+      db.collection("products")
         .doc(query)
         .delete()
         .then(() => {
