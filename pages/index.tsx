@@ -1,10 +1,33 @@
-import React from "react";
+import React, { useEffect } from "react";
 import TrendLanguage from "../components/card/TrendLanguage";
 import Exhibit from "../components/card/Exhibit";
 import { Box, Flex, Heading, VStack } from "@chakra-ui/layout";
 import Header from "../components/layout/Header";
+import { db } from "../firebase";
+import firebase from "firebase";
+import { useState } from "react";
 
 const IndexPage: React.VFC = () => {
+  const [products, setProducts] = useState<
+    Array<firebase.firestore.DocumentData>
+  >([]);
+
+  const fetchProducts = async () => {
+    db.collection("products")
+      .get()
+      .then((querySnapshot) => {
+        const fetchedProducts: Array<firebase.firestore.DocumentData> = [];
+        querySnapshot.forEach((doc) => {
+          fetchedProducts.push(doc.data());
+          console.log(doc.data());
+        });
+        setProducts(fetchedProducts);
+      });
+  };
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
   return (
     <Box>
       <Header />
@@ -34,6 +57,18 @@ const IndexPage: React.VFC = () => {
               createdAt: "10日前",
             }}
           />
+          {products.map((product, index) => (
+            <Exhibit
+              key={index}
+              exhibit={{
+                name: product.title,
+                userName: product.userName,
+                userIcon: "",
+                likes: 0,
+                createdAt: "10日前",
+              }}
+            />
+          ))}
         </VStack>
       </Flex>
     </Box>
