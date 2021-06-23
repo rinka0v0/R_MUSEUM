@@ -7,6 +7,11 @@ import { db } from "../firebase";
 import firebase from "firebase";
 import { useState } from "react";
 
+type ProductData = {
+  id: string;
+  data: firebase.firestore.DocumentData;
+};
+
 const IndexPage: React.VFC = () => {
   const [products, setProducts] = useState<
     Array<firebase.firestore.DocumentData>
@@ -16,9 +21,14 @@ const IndexPage: React.VFC = () => {
     db.collection("products")
       .get()
       .then((querySnapshot) => {
-        const fetchedProducts: Array<firebase.firestore.DocumentData> = [];
+        // const fetchedProducts: Array<
+        //   firebase.firestore.QueryDocumentSnapshot<firebase.firestore.DocumentData>
+        // > = [];
+        // const fetchedProducts: Array<firebase.firestore.DocumentData> = [];
+        const fetchedProducts: Array<ProductData> = [];
         querySnapshot.forEach((doc) => {
-          fetchedProducts.push(doc.data());
+          fetchedProducts.push({ id: doc.id, data: doc.data() });
+          console.log(doc.id);
           console.log(doc.data());
         });
         setProducts(fetchedProducts);
@@ -39,36 +49,24 @@ const IndexPage: React.VFC = () => {
           <Heading as="h2" textAlign="center">
             作品一覧
           </Heading>
-          <Exhibit
-            exhibit={{
-              name: "Go で作る....",
-              userName: "rinka",
-              userIcon: "",
-              likes: 0,
-              createdAt: "10日前",
-            }}
-          />
-          <Exhibit
-            exhibit={{
-              name: "TypeScriptで作ったアプリ（React + TypeScript）",
-              userName: "rinka",
-              userIcon: "",
-              likes: 0,
-              createdAt: "10日前",
-            }}
-          />
-          {products.map((product, index) => (
-            <Exhibit
-              key={index}
-              exhibit={{
-                name: product.title,
-                userName: product.userName,
-                userIcon: "",
-                likes: 0,
-                createdAt: "10日前",
-              }}
-            />
-          ))}
+          {products.map((product, index) => {
+            console.log(product);
+
+            const data = product.data;
+            return (
+              <Exhibit
+                key={index}
+                exhibit={{
+                  id: product.id,
+                  name: data.title,
+                  userName: data.userName,
+                  userIcon: "",
+                  likes: 0,
+                  createdAt: "10日前",
+                }}
+              />
+            );
+          })}
         </VStack>
       </Flex>
     </Box>
