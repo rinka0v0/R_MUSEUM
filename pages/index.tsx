@@ -21,10 +21,6 @@ const IndexPage: React.VFC = () => {
     db.collection("products")
       .get()
       .then((querySnapshot) => {
-        // const fetchedProducts: Array<
-        //   firebase.firestore.QueryDocumentSnapshot<firebase.firestore.DocumentData>
-        // > = [];
-        // const fetchedProducts: Array<firebase.firestore.DocumentData> = [];
         const fetchedProducts: Array<ProductData> = [];
         querySnapshot.forEach((doc) => {
           fetchedProducts.push({ id: doc.id, data: doc.data() });
