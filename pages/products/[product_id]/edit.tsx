@@ -44,7 +44,7 @@ const Edit: React.VFC = () => {
         .set({
           title: title,
           content: markdown,
-          userName: "rinka",
+          userId: currentUser?.uid,
           sorceCode: sourceCodeUrl,
           tagsIDs: tags,
           open: open,
