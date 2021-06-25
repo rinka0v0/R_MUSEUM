@@ -30,7 +30,7 @@ export const loginWithGoogle = (): void => {
     });
 };
 
-export const loginWithGitHub = () => {
+export const loginWithGitHub = ():void => {
   const provider = new firebase.auth.GithubAuthProvider();
   firebase
     .auth()
