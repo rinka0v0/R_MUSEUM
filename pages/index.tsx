@@ -6,6 +6,7 @@ import Header from "../components/layout/Header";
 import { db } from "../firebase";
 import firebase from "firebase";
 import { useState } from "react";
+// import { timeStamp } from "console";
 
 type ProductData = {
   id: string;
@@ -22,7 +23,6 @@ const IndexPage: React.VFC = () => {
   console.log("レンダリングされました");
 
   const fetchProducts = async () => {
-    console.log("開始");
     const data = await db
       .collection("products")
       .get()
@@ -37,7 +37,6 @@ const IndexPage: React.VFC = () => {
         return fetchedProducts;
       })
       .then(async (fetchedProducts) => {
-        console.log("map開始");
         await Promise.all(
           fetchedProducts.map(async (product, index) => {
             await db
@@ -46,26 +45,17 @@ const IndexPage: React.VFC = () => {
               .get()
               .then((result) => {
                 const user = result.data();
-                console.log(JSON.stringify(user), "ユーザー");
-                console.log(fetchedProducts[index], "index変更前");
-
                 fetchedProducts[index] = {
                   id: product.id,
                   data: product.data,
                   user,
                 };
-                console.log(fetchedProducts[index], "index変更後");
               });
             return;
           })
         );
-        console.log("map終了");
-        console.log(JSON.stringify(fetchedProducts), "中間");
-
-        console.log("終了");
         return fetchedProducts;
       });
-    console.log(JSON.stringify(data), "finaly");
     setProducts(data);
   };
 
@@ -85,6 +75,7 @@ const IndexPage: React.VFC = () => {
             作品一覧
           </Heading>
           {products.map((product, index) => {
+            const date: string = product.data.createdAt.toDate().toString();
             return (
               <Exhibit
                 key={index}
@@ -94,7 +85,7 @@ const IndexPage: React.VFC = () => {
                   userName: product.user.user_name,
                   userIcon: product.user.iconURL,
                   likes: 0,
-                  createdAt: "10日前",
+                  createdAt: date.toString(),
                 }}
               />
             );
