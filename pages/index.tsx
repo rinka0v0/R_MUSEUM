@@ -6,6 +6,7 @@ import Header from "../components/layout/Header";
 import { db } from "../firebase";
 import firebase from "firebase";
 import { useState } from "react";
+import moment from "moment";
 // import { timeStamp } from "console";
 
 type ProductData = {
@@ -85,7 +86,7 @@ const IndexPage: React.VFC = () => {
                   userName: product.user.user_name,
                   userIcon: product.user.iconURL,
                   likes: 0,
-                  createdAt: date.toString(),
+                  createdAt: moment(date).fromNow(),
                 }}
               />
             );
