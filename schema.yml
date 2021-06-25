@@ -9,7 +9,7 @@ products:
   documentId: String
   title: String
   content: String
-  userName: String
+  userId: String
   sorceCode: String
   tagsIDs: [String]
   likes: Number
