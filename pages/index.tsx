@@ -10,6 +10,8 @@ import { useState } from "react";
 type ProductData = {
   id: string;
   data: firebase.firestore.DocumentData;
+  userId?: string;
+  user?: firebase.firestore.DocumentData | undefined;
 };
 
 const IndexPage: React.VFC = () => {
@@ -17,19 +19,56 @@ const IndexPage: React.VFC = () => {
     Array<firebase.firestore.DocumentData>
   >([]);
 
+  console.log("レンダリングされました");
+
   const fetchProducts = async () => {
-    db.collection("products")
+    console.log("開始");
+    const data = await db
+      .collection("products")
       .get()
       .then((querySnapshot) => {
         const fetchedProducts: Array<ProductData> = [];
         querySnapshot.forEach((doc) => {
-          fetchedProducts.push({ id: doc.id, data: doc.data() });
-          console.log(doc.id);
-          console.log(doc.data());
+          fetchedProducts.push({
+            id: doc.id,
+            data: doc.data(),
+          });
         });
-        setProducts(fetchedProducts);
+        return fetchedProducts;
+      })
+      .then(async (fetchedProducts) => {
+        console.log("map開始");
+        await Promise.all(
+          fetchedProducts.map(async (product, index) => {
+            await db
+              .collection("users")
+              .doc(product.data.userId)
+              .get()
+              .then((result) => {
+                const user = result.data();
+                console.log(JSON.stringify(user), "ユーザー");
+                console.log(fetchedProducts[index], "index変更前");
+
+                fetchedProducts[index] = {
+                  id: product.id,
+                  data: product.data,
+                  user,
+                };
+                console.log(fetchedProducts[index], "index変更後");
+              });
+            return;
+          })
+        );
+        console.log("map終了");
+        console.log(JSON.stringify(fetchedProducts), "中間");
+
+        console.log("終了");
+        return fetchedProducts;
       });
+    console.log(JSON.stringify(data), "finaly");
+    setProducts(data);
   };
+
   useEffect(() => {
     fetchProducts();
   }, []);
@@ -46,17 +85,14 @@ const IndexPage: React.VFC = () => {
             作品一覧
           </Heading>
           {products.map((product, index) => {
-            console.log(product);
-
-            const data = product.data;
             return (
               <Exhibit
                 key={index}
                 exhibit={{
                   id: product.id,
-                  name: data.title,
-                  userName: data.userName,
-                  userIcon: "",
+                  name: product.data.title,
+                  userName: product.user.user_name,
+                  userIcon: product.user.iconURL,
                   likes: 0,
                   createdAt: "10日前",
                 }}
