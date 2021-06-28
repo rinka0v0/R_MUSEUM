@@ -5,7 +5,7 @@ type Props = {
   status: "info" | "warning" | "success" | "error";
 };
 
-const useMessage = () => {
+const useMessage = (): { showMessage: (props: Props) => void } => {
   const toast = useToast();
   const showMessage = useCallback(
     (props: Props) => {
