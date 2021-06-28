@@ -21,9 +21,9 @@ const ProductPage: React.VFC = () => {
     db.collection("products")
       .doc(query)
       .get()
-      .then((product) => {
+      .then(async (product) => {
         if (product) {
-          const data = product.data();
+          const data = await product.data();
           console.log(data);
           setProduct(data);
           const html = DOMPurify.sanitize(marked(data?.content));
