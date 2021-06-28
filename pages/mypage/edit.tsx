@@ -7,22 +7,57 @@ import PrimaryButton from "../../components/atoms/button/PrimaryButton";
 import Header from "../../components/layout/Header";
 import Router from "next/router";
 import Loading from "../../components/layout/Loading";
+import { db } from "../../firebase";
+import useMessage from "../../hooks/useMessage";
 
 const EditMyPage: React.VFC = () => {
   const [name, setName] = useState("");
-  const [introduction, setIntroduction] = useState("");
+  const [profile, setProfile] = useState("");
   const [twitter, setTwitter] = useState("");
   const [instagram, setInstagram] = useState("");
   const [gitHub, setGitHub] = useState("");
 
   const { currentUser, signInCheck } = useContext(AuthContext);
+  const { showMessage } = useMessage();
 
-  const onClickBtn = () => {
-    alert("保存！！");
+  console.log("レンダリングされました");
+
+  const fetchUser = async () => {
+    await db
+      .collection("users")
+      .doc(currentUser?.uid)
+      .get()
+      .then(async (userData) => {
+        const user = userData.data();
+        console.log(user);
+        setName(user?.user_name);
+        setProfile(user?.profile);
+        setGitHub(user?.gitHub);
+        setTwitter(user?.twitter);
+        setInstagram(user?.instagram);
+      });
+  };
+
+  const onClickBtn = async () => {
+    await db
+      .collection("users")
+      .doc(currentUser?.uid)
+      .update({
+        user_name: name,
+        profile,
+        gitHub,
+        twitter,
+        instagram,
+      })
+      .then((res) => {
+        Router.push("/mypage");
+        showMessage({ title: "保存しました", status: "success" });
+      });
   };
 
   useEffect(() => {
     !currentUser && Router.push("/");
+    fetchUser();
   }, [currentUser]);
 
   if (!signInCheck || !currentUser) {
@@ -53,9 +88,9 @@ const EditMyPage: React.VFC = () => {
             <Box border="1px solid #ddd" p={3} borderRadius={3}>
               <Text>自己紹介</Text>
               <Textarea
-                value={introduction}
+                value={profile}
                 onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                  setIntroduction(e.target.value)
+                  setProfile(e.target.value)
                 }
                 colorScheme="linkedin"
                 placeholder="自己紹介を書こう"

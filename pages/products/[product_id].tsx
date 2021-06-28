@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Avatar } from "@chakra-ui/avatar";
 import { Box, Flex, Heading } from "@chakra-ui/layout";
 import Header from "../../components/layout/Header";
@@ -9,23 +9,31 @@ import firebase from "firebase";
 import DOMPurify from "dompurify";
 import marked from "marked";
 import "github-markdown-css";
+import { AuthContext } from "../../auth/AuthProvider";
+import PrimaryButton from "../../components/atoms/button/PrimaryButton";
 
 const ProductPage: React.VFC = () => {
+  const router = useRouter()
   const [product, setProduct] =
     useState<firebase.firestore.DocumentData | undefined>();
   const [html, setHTML] = useState("");
 
-  const router = useRouter();
+  const { currentUser } = useContext(AuthContext);
+
+  const onClickEdit = () => {
+    router.push(`/products/${product?.id}/edit`)
+  }
+  
   const query = router.asPath.split("/")[2];
   const fetchProduct = async () => {
     db.collection("products")
       .doc(query)
       .get()
-      .then((product) => {
+      .then(async (product) => {
         if (product) {
-          const data = product.data();
+          const data = await product.data();
           console.log(data);
-          setProduct(data);
+          setProduct({data,id:product.id});
           const html = DOMPurify.sanitize(marked(data?.content));
           setHTML(html);
         }
@@ -44,10 +52,11 @@ const ProductPage: React.VFC = () => {
           <Avatar src="https://bit.ly/broken-link" mr={3} ml={3} />
           <Box> name</Box>
         </Flex>
+        {currentUser?.uid === product?.data.userId ?<PrimaryButton onClick={onClickEdit}>編集</PrimaryButton> : null}
         <Heading my={5}>{product?.title}</Heading>
         <Heading fontSize={20}>使用技術</Heading>
         <Box>
-          {product?.tagsIDs.map((tag: string) => {
+          {product?.data.tagsIDs.map((tag: string) => {
             return (
               <Box
                 key={tag}

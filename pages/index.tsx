@@ -7,7 +7,6 @@ import { db } from "../firebase";
 import firebase from "firebase";
 import { useState } from "react";
 import moment from "moment";
-// import { timeStamp } from "console";
 
 type ProductData = {
   id: string;
