@@ -35,6 +35,9 @@ const AuthProvider: VFC<Props> = ({ children }) => {
             user_name: user.displayName,
             profile: "",
             iconURL: user.photoURL,
+            gitHub: "",
+            twitter: "",
+            instagram: "",
             created_at: firebase.firestore.FieldValue.serverTimestamp(),
           });
         }

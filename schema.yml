@@ -1,8 +1,11 @@
 users: 
   documentId: userID
   name: String
-  iconULR: String?
-  profile: String?
+  iconULR: String
+  profile: String
+  gitHub: String
+  twitter: String
+  instagram: String
   cratedAt: Date
 
 products:
