@@ -46,7 +46,8 @@ const Mypage: React.VFC = () => {
           .then((products) => {
             const productsList: Array<any> = [];
             products.forEach((doc) => {
-              productsList.push(doc.data());
+              const data = { id: doc.id, data: doc.data() };
+              productsList.push(data);
             });
             const userObject = {
               name: user?.user_name,
@@ -112,13 +113,15 @@ const Mypage: React.VFC = () => {
         <Box>
           {user?.products
             ? user?.products.map((product, index) => {
-                const date: string = product.createdAt.toDate().toString();
+                const date: string = product.data.createdAt.toDate().toString();
+                console.log(product);
+
                 return (
                   <Exhibit
                     key={index}
                     exhibit={{
                       id: product.id,
-                      name: product.title,
+                      name: product.data.title,
                       userName: user.name,
                       userIcon: user.iconURL,
                       likes: 0,
