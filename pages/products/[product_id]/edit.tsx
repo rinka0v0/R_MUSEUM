@@ -13,6 +13,8 @@ import TagInput from "../../../components/Input/TagsInput";
 import useMessage from "../../../hooks/useMessage";
 import { db } from "../../../firebase";
 import firebase from "firebase";
+import DOMPurify from "dompurify";
+import marked from "marked";
 
 // クライアント側でインポートする必要がある
 const MarkdownEditor = dynamic(
@@ -36,6 +38,19 @@ const Edit: React.VFC = () => {
 
   const { currentUser, signInCheck } = useContext(AuthContext);
   const { showMessage } = useMessage();
+
+  const fetchProduct = async () => {
+    await db
+      .collection("products")
+      .doc(query)
+      .get()
+      .then(async (product) => {
+        const data = await product.data();
+        setTitle(data?.title)
+        setMarkdown(data?.content)
+        setHTML(DOMPurify.sanitize(marked(data?.content)))
+      });
+  };
 
   const onClickSave = () => {
     if (title && markdown) {
@@ -82,6 +97,7 @@ const Edit: React.VFC = () => {
 
   useEffect(() => {
     !currentUser && Router.push("/");
+    fetchProduct();
   }, [currentUser]);
 
   if (!signInCheck || !currentUser) {
