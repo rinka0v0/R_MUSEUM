@@ -13,7 +13,7 @@ import { AuthContext } from "../../auth/AuthProvider";
 import PrimaryButton from "../../components/atoms/button/PrimaryButton";
 
 const ProductPage: React.VFC = () => {
-  const router = useRouter()
+  const router = useRouter();
   const [product, setProduct] =
     useState<firebase.firestore.DocumentData | undefined>();
   const [html, setHTML] = useState("");
@@ -21,22 +21,27 @@ const ProductPage: React.VFC = () => {
   const { currentUser } = useContext(AuthContext);
 
   const onClickEdit = () => {
-    router.push(`/products/${product?.id}/edit`)
-  }
-  
+    router.push(`/products/${product?.id}/edit`);
+  };
+
   const query = router.asPath.split("/")[2];
+
   const fetchProduct = async () => {
     db.collection("products")
       .doc(query)
       .get()
       .then(async (product) => {
-        if (product) {
-          const data = await product.data();
-          console.log(data);
-          setProduct({data,id:product.id});
-          const html = DOMPurify.sanitize(marked(data?.content));
-          setHTML(html);
-        }
+        const data = await product.data();
+        const html = DOMPurify.sanitize(marked(data?.content));
+        setHTML(html);
+        await db
+          .collection("users")
+          .doc(data?.userId)
+          .get()
+          .then(async (userdoc) => {
+            const user = await userdoc.data();
+            setProduct({ data, id: product.id, user });
+          });
       });
   };
 
@@ -48,11 +53,16 @@ const ProductPage: React.VFC = () => {
     <Box>
       <Header />
       <Flex alignItems="center" flexDirection="column">
+        {currentUser?.uid === product?.data.userId ? (
+          <Box position="absolute" right="30px" top="100px">
+            <PrimaryButton onClick={onClickEdit}>編集</PrimaryButton>
+          </Box>
+        ) : null}
+        <Heading my={5}>{product?.data.title}</Heading>
         <Flex alignItems="center" my={5}>
-          <Avatar src="https://bit.ly/broken-link" mr={3} ml={3} />
-          <Box> name</Box>
+          <Avatar src={product?.user.iconURL} mr={3} ml={3} />
+          <Box>{product?.user.user_name}</Box>
         </Flex>
-        {currentUser?.uid === product?.data.userId ?<PrimaryButton onClick={onClickEdit}>編集</PrimaryButton> : null}
         <Heading my={5}>{product?.title}</Heading>
         <Heading fontSize={20}>使用技術</Heading>
         <Box>
@@ -76,13 +86,43 @@ const ProductPage: React.VFC = () => {
           })}
         </Box>
         <Box></Box>
-        <Box bg="white" minH="300px" className="markdown-body" p={5} w="80%" my={5}>
+        <Box
+          bg="white"
+          minH="300px"
+          className="markdown-body"
+          p={5}
+          w="80%"
+          my={5}
+        >
           <Box
             boxSizing="border-box"
             dangerouslySetInnerHTML={{
               __html: html,
             }}
           ></Box>
+        </Box>
+        <Box bg="white" H="100px" p={5} w="80%">
+          <Heading fontSize="20px">コメント</Heading>
+          <Box
+            bg="white"
+            minH="300px"
+            className="markdown-body"
+            p={5}
+            w="80%"
+            my={5}
+            border="1px solid "
+          >
+            <Flex alignItems="center">
+              <Box>りんか</Box>
+              <Avatar src="https://bit.ly/broken-link" mr={3} ml={3} />
+            </Flex>
+            <Box
+              boxSizing="border-box"
+              dangerouslySetInnerHTML={{
+                __html: html,
+              }}
+            ></Box>
+          </Box>
         </Box>
       </Flex>
     </Box>
