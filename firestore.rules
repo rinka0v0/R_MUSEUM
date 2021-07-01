@@ -1,0 +1,82 @@
+rules_version = '2';
+
+service cloud.firestore {
+    match /databases/{database}/documents {
+
+        function isAuthenticated () {
+            return request.auth != null;
+        }
+        function isUserAuthenticated (userId) {
+            return isAuthenticated() && userId == request.auth.uid;
+        }
+        function isValidUser (user) {
+            return user.size() == 7
+            && "createdAt" in user && user.createdAt is timestamp 
+            && "gitHub" in user && user.gitHub is string
+            && "iconURL" in user && user.iconURL is string
+            && "instagram" in user && user.instagram is string
+            && "profile" in user && user.profile is string
+            && "twitter" in user && user.twitter is string
+            && "userId" in user && user.user_name is string
+        }
+        function isValidProduct(product) {
+            return product.size() == 7
+            && "content" in product && product.content is string
+            && "createdAt" in product && product.createdAt is timestamp
+            && "open" in product && product.content is bool
+            && "sorceCode" in product && product.sorceCode is list
+            && "title" in product && product.title is string
+            && "userId" in product && product.userId is string
+
+        }
+        match /users/{userId} {
+            allow read: if isAuthenticated();
+
+            allow delete: if isUserAuthenticated();
+            
+            allow create: if isUserAuthenticated(userId)
+            && isValidUser(request.resource.data)
+            && request.resource.data.createdAt == request.time
+            && request.resource.data.gitHub.size() < 100
+            && request.resource.data.instagram.size() < 100
+            && request.resource.data.twitter.size() < 100
+            && request.resource.data.iconURL.size() < 100
+            && request.resource.data.profile.size() < 100
+            && (request.resource.data.user_name.size() < 10
+            && request.resource.data.user_name.size() > 1
+            )
+
+            allow update: if isUserAuthenticated(userId)
+            && isValidUser(request.resource.data)
+            && request.resource.data.gitHub.size() < 100
+            && request.resource.data.instagram.size() < 100
+            && request.resource.data.twitter.size() < 100
+            && request.resource.data.iconURL.size() < 100
+            && request.resource.data.profile.size() < 100
+            && (request.resource.data.user_name.size() < 10
+            && request.resource.data.user_name.size() > 1
+            )
+            && request.resource.data.createdAt == resource.data.createdAt;
+        }
+        match /products/{productId} {
+            allow read: if isAuthenticated();
+
+            allow delete: if isUserAuthenticated(request.resource.data.userId);
+
+            allow create: if isUserAuthenticated(request.resource.data.userId) 
+            && isValidProduct(request.resource.data)
+            && request.resource.data.content.size() > 0
+            && (request.resource.data.title.size() > 0
+            && request.resource.data.title.size() < 30
+            )
+
+            allow update: if isUserAuthenticated(request.resource.data.userId)
+            && isValidProduct(request.resource.data)
+            && request.resource.data.content.size() > 0
+            && (request.resource.data.title.size() > 0 
+            && request.resource.data.title.size() < 30
+            )
+        }
+
+  }
+}
