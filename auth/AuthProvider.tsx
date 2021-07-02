@@ -38,7 +38,7 @@ const AuthProvider: VFC<Props> = ({ children }) => {
             gitHub: "",
             twitter: "",
             instagram: "",
-            created_at: firebase.firestore.FieldValue.serverTimestamp(),
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
           });
         }
         setSignInCheck(true);
