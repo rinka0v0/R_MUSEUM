@@ -16,6 +16,11 @@
       "rules"
     ]
   },
+  "transform": {
+    "\\.jsx?$": "babel-jest",
+    "^.+\\.ts$": "ts-jest",
+    "\\.tsx?$": "ts-jest"
+  },
   "dependencies": {
     "@chakra-ui/icons": "^1.0.13",
     "@chakra-ui/react": "^1.6.3",
@@ -41,6 +46,8 @@
     "react-simplemde-editor": "^5.0.1"
   },
   "devDependencies": {
+    "@babel/plugin-transform-modules-commonjs": "^7.14.5",
+    "@babel/preset-env": "^7.14.7",
     "@firebase/testing": "^0.20.11",
     "@types/jest": "^26.0.23",
     "@types/node": "^12.20.13",
@@ -48,6 +55,7 @@
     "@types/react-dom": "^17.0.1",
     "@typescript-eslint/eslint-plugin": "^4.26.0",
     "@typescript-eslint/parser": "^4.26.0",
+    "babel-jest": "^27.0.6",
     "eslint": "^7.27.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-react": "^7.24.0",
