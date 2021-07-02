@@ -8,7 +8,7 @@
 * firebase
     * Authentication
     * Cloud Firestore
-* Jest firestore rulesのテストに使用
+* Jest (firestore rulesのテストに使用)
 
 ## 概要
 ポートフォリオや個人開発で作ったwebアプリケーションなどの製作物を紹介できるアプリです。  
