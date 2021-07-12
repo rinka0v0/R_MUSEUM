@@ -65,7 +65,7 @@ service cloud.firestore {
         match /products/{productId} {
             allow read: if isAuthenticated();
 
-            allow delete: if isUserAuthenticated(request.resource.data.userId);
+            allow delete: if isAuthenticated();
 
             allow create: if isUserAuthenticated(request.resource.data.userId) 
             && isValidProduct(request.resource.data)

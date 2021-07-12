@@ -169,12 +169,6 @@ describe("Firestore rulesのテスト", () => {
       );
     });
 
-    test("他の人の投稿の削除", async () => {
-      const db = getFirestoreWithAuth();
-      const doc = db.collection("products").doc("alice");
-      await firebase.assertFails(doc.delete());
-    });
-
     test("自分の投稿の削除", async () => {
       const db = getFirestoreWithAuth();
       const doc = db.collection("products").doc("test");
