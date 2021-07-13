@@ -17,8 +17,7 @@
     ]
   },
   "transform": {
-    "^.+\\.ts$": "ts-jest",
-    "\\.tsx?$": "ts-jest"
+    "^.+\\.ts$": "ts-jest"
   },
   "dependencies": {
     "@chakra-ui/icons": "^1.0.13",
@@ -45,9 +44,6 @@
     "react-simplemde-editor": "^5.0.1"
   },
   "devDependencies": {
-    "@babel/highlight": "^7.14.5",
-    "@babel/plugin-transform-modules-commonjs": "^7.14.5",
-    "@babel/preset-env": "^7.14.7",
     "@firebase/testing": "^0.20.11",
     "@types/jest": "^26.0.23",
     "@types/node": "^12.20.13",
