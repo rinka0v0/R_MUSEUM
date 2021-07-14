@@ -45,10 +45,12 @@ const Edit: React.VFC = () => {
       .doc(query)
       .get()
       .then(async (product) => {
-        const data = await product.data();
-        setTitle(data?.title)
-        setMarkdown(data?.content)
-        setHTML(DOMPurify.sanitize(marked(data?.content)))
+        if (product.data() !== undefined) {
+          const data = await product.data();
+          setTitle(data?.title);
+          setMarkdown(data?.content);
+          setHTML(DOMPurify.sanitize(marked(data?.content)));
+        }
       });
   };
 
