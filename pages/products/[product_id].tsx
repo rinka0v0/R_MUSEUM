@@ -11,12 +11,25 @@ import marked from "marked";
 import "github-markdown-css";
 import { AuthContext } from "../../auth/AuthProvider";
 import PrimaryButton from "../../components/atoms/button/PrimaryButton";
+import CommentEditor from "../../components/editor/CommentEditor";
+
+type CommentData = {
+  userId: string;
+  content: firebase.firestore.DocumentData;
+  createdAt: string;
+  likes: number;
+};
 
 const ProductPage: React.VFC = () => {
   const router = useRouter();
   const [product, setProduct] =
     useState<firebase.firestore.DocumentData | undefined>();
   const [html, setHTML] = useState("");
+  const [commentHTML, setCommentHTML] = useState("");
+  const [commentMarkdown, setCommentMarkdown] = useState("");
+  const [comments, setComments] = useState<
+    Array<firebase.firestore.DocumentData>
+  >([]);
 
   const { currentUser } = useContext(AuthContext);
 
@@ -45,8 +58,28 @@ const ProductPage: React.VFC = () => {
       });
   };
 
+  const fetchComments = () => {
+    const fetchedComments: Array<CommentData> = [];
+    db.collection("products")
+      .doc(query)
+      .collection("comments")
+      .get()
+      .then((comments) => {
+        comments.forEach((comment) => {
+          fetchedComments.push({
+            content: comment.data().content,
+            likes: comment.data().likes,
+            createdAt: comment.data().createdAt,
+            userId: comment.data().userId,
+          });
+          setComments(fetchedComments)
+        });
+      });
+  };
+
   useEffect(() => {
     fetchProduct();
+    fetchComments();
   }, []);
 
   return (
@@ -103,17 +136,18 @@ const ProductPage: React.VFC = () => {
         </Box>
         <Box bg="white" H="100px" p={5} w="80%">
           <Heading fontSize="20px">コメント</Heading>
+          {comments.length ? <div>コメントを表示するコンポーネントを作って渡す</div>: null}
           <Box
             bg="white"
             minH="300px"
             className="markdown-body"
             p={5}
-            w="80%"
+            w="100%"
             my={5}
-            border="1px solid "
+            border="1px solid"
           >
             <Flex alignItems="center">
-              <Box>りんか</Box>
+              <Box>Rinka</Box>
               <Avatar src="https://bit.ly/broken-link" mr={3} ml={3} />
             </Flex>
             <Box
@@ -123,6 +157,13 @@ const ProductPage: React.VFC = () => {
               }}
             ></Box>
           </Box>
+          <CommentEditor
+            markdown={commentMarkdown}
+            HTML={commentHTML}
+            setMarkdown={setCommentMarkdown}
+            setHTML={setCommentHTML}
+            productId={query}
+          />
         </Box>
       </Flex>
     </Box>
