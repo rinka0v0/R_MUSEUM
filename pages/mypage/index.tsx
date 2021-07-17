@@ -11,6 +11,7 @@ import { useState } from "react";
 import { db } from "../../firebase";
 import Exhibit from "../../components/card/Exhibit";
 import moment from "moment";
+import { Stack } from "@chakra-ui/react";
 
 type User = {
   name: string;
@@ -110,12 +111,10 @@ const Mypage: React.VFC = () => {
         <Heading fontSize={24} textAlign="center">
           {currentUser.displayName}さんの作品
         </Heading>
-        <Box>
+        <Stack spacing={5}>
           {user?.products
             ? user?.products.map((product, index) => {
                 const date: string = product.data.createdAt.toDate().toString();
-                console.log(product);
-
                 return (
                   <Exhibit
                     key={index}
@@ -131,7 +130,7 @@ const Mypage: React.VFC = () => {
                 );
               })
             : null}
-        </Box>
+        </Stack>
       </Flex>
       <></>
     </>
