@@ -12,6 +12,8 @@ import "github-markdown-css";
 import { AuthContext } from "../../auth/AuthProvider";
 import PrimaryButton from "../../components/atoms/button/PrimaryButton";
 import CommentEditor from "../../components/editor/CommentEditor";
+import Comment from "../../components/card/Comment";
+import moment from "moment";
 
 type CommentData = {
   userId: string;
@@ -72,7 +74,7 @@ const ProductPage: React.VFC = () => {
             createdAt: comment.data().createdAt,
             userId: comment.data().userId,
           });
-          setComments(fetchedComments)
+          setComments(fetchedComments);
         });
       });
   };
@@ -80,6 +82,7 @@ const ProductPage: React.VFC = () => {
   useEffect(() => {
     fetchProduct();
     fetchComments();
+    console.log(comments);
   }, []);
 
   return (
@@ -118,7 +121,7 @@ const ProductPage: React.VFC = () => {
             );
           })}
         </Box>
-        <Box></Box>
+
         <Box
           bg="white"
           minH="300px"
@@ -134,29 +137,24 @@ const ProductPage: React.VFC = () => {
             }}
           ></Box>
         </Box>
+
         <Box bg="white" H="100px" p={5} w="80%">
           <Heading fontSize="20px">コメント</Heading>
-          {comments.length ? <div>コメントを表示するコンポーネントを作って渡す</div>: null}
-          <Box
-            bg="white"
-            minH="300px"
-            className="markdown-body"
-            p={5}
-            w="100%"
-            my={5}
-            border="1px solid"
-          >
-            <Flex alignItems="center">
-              <Box>Rinka</Box>
-              <Avatar src="https://bit.ly/broken-link" mr={3} ml={3} />
-            </Flex>
-            <Box
-              boxSizing="border-box"
-              dangerouslySetInnerHTML={{
-                __html: html,
-              }}
-            ></Box>
-          </Box>
+          {comments.length
+            ? comments.map((comment, index) => {
+                const date: string = comment.createdAt.toDate().toString();
+                return (
+                  <Comment
+                    key={index}
+                    userId={comment.userId}
+                    content={comment.content}
+                    likes={comment.likes}
+                    createdAt={moment(date).fromNow()}
+                  />
+                );
+              })
+            : null}
+
           <CommentEditor
             markdown={commentMarkdown}
             HTML={commentHTML}
