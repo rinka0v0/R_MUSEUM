@@ -37,7 +37,7 @@ const Comment: React.VFC<Props> = (props) => {
 
   return (
     <>
-      <Flex w="100%" alignItems="center">
+      <Flex w="100%" >
         <Box my="1.5em" cursor="pointer">
           <Link href={`/${userId}`}>
             <Avatar src={user?.iconURL} mb={2} />
