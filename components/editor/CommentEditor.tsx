@@ -65,7 +65,7 @@ const CommentEditor: React.VFC<Props> = (props) => {
           createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         })
         .then(() => {
-          setMarkdown('')
+          setMarkdown("");
           showMessage({ title: "コメントしました！", status: "success" });
         });
     } else {
@@ -82,37 +82,73 @@ const CommentEditor: React.VFC<Props> = (props) => {
   //   }
   // };
   return (
-    <Box>
-      <Flex>
-        <PrimaryButton onClick={onclickPrewview}>Preview</PrimaryButton>
-        <PrimaryButton onClick={onclickMarkdown}>Markdown</PrimaryButton>
-      </Flex>
-      {isMarkdown ? (
-        <Box w="100%">
-          <SimpleMDE
-            value={markdown}
-            placeholder="コメントを書いてみよう"
-            onChange={(e: string) => {
-              setMarkdown(e);
-              setHTML(DOMPurify.sanitize(marked(e)));
-            }}
-            // events={{ drop: handleDrop }}
-          />
-          <PrimaryButton onClick={postComment}>投稿</PrimaryButton>
-        </Box>
-      ) : (
-        <Box w="100%" borderRadius={5} minH="330px" border="1px solid ">
-          <Box bg="white" minH="300px" className="markdown-body" p={5}>
-            <Box
-              boxSizing="border-box"
-              dangerouslySetInnerHTML={{
-                __html: HTML,
+    <>
+      <Box>
+        {isMarkdown ? (
+          <Box w="100%">
+            <Box mb={3}>
+              <Button
+                onClick={onclickMarkdown}
+                borderRadius={999}
+                backgroundColor="#E4FBFF"
+                _hover={{ backgroundColor: "#E4FBFF" }}
+              >
+                Markdown
+              </Button>
+              <Button
+                onClick={onclickPrewview}
+                borderRadius={999}
+                backgroundColor="transparent"
+                _hover={{ backgroundColor: "transparent" }}
+              >
+                Preview
+              </Button>
+            </Box>
+            <SimpleMDE
+              value={markdown}
+              placeholder="コメントを書いてみよう"
+              onChange={(e: string) => {
+                setMarkdown(e);
+                setHTML(DOMPurify.sanitize(marked(e)));
               }}
-            ></Box>
+              // events={{ drop: handleDrop }}
+            />
           </Box>
-        </Box>
-      )}
-    </Box>
+        ) : (
+          <Box>
+            <Box mb={3}>
+              <Button
+                onClick={onclickMarkdown}
+                borderRadius={999}
+                backgroundColor="transparent"
+                _hover={{ backgroundColor: "transparent" }}
+              >
+                Markdown
+              </Button>
+              <Button
+                onClick={onclickPrewview}
+                borderRadius={999}
+                backgroundColor="#E4FBFF"
+                _hover={{ backgroundColor: "#E4FBFF" }}
+              >
+                Preview
+              </Button>
+            </Box>
+            <Box w="100%" borderRadius={5} minH="330px" border="1px solid ">
+              <Box bg="white" minH="300px" className="markdown-body" p={5}>
+                <Box
+                  boxSizing="border-box"
+                  dangerouslySetInnerHTML={{
+                    __html: HTML,
+                  }}
+                ></Box>
+              </Box>
+            </Box>
+          </Box>
+        )}
+        <PrimaryButton onClick={postComment}>コメントする</PrimaryButton>
+      </Box>
+    </>
   );
 };
 
