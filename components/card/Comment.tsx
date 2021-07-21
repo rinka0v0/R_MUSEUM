@@ -7,6 +7,7 @@ import { useState } from "react";
 import { db } from "../../firebase";
 import DOMPurify from "dompurify";
 import marked from "marked";
+import "github-markdown-css";
 
 type Props = {
   userId: string;
@@ -51,6 +52,7 @@ const Comment: React.VFC<Props> = (props) => {
             p="17px 13px"
             borderRadius="12px"
             background="#d7ebfe"
+            className="markdown-body"
             _after={{
               content: '""',
               position: "absolute",
