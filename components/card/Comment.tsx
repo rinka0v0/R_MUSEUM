@@ -35,33 +35,45 @@ const Comment: React.VFC<Props> = (props) => {
   }, []);
 
   return (
-    <Box
-      bg="white"
-      minH="300px"
-      className="markdown-body"
-      p={5}
-      w="100%"
-      border="1px solid"
-      borderRadius={4}
-    >
-      <Flex alignItems="center" mb={5}>
-        <Box cursor="pointer" mr={4}>
+    <>
+      <Flex w="100%" alignItems="center">
+        <Box my="1.5em" cursor="pointer">
           <Link href={`/${userId}`}>
-            <Flex alignItems="center">
-              <Avatar src={user?.iconURL} mr={3} ml={3} />
-              <Box>{user?.user_name}</Box>
-            </Flex>
+            <Avatar src={user?.iconURL} mb={2} />
           </Link>
         </Box>
-        {createdAt}
+        <Box w="100%">
+          <Box
+            width="100%"
+            display="inline-block"
+            position="relative"
+            ml="2em"
+            p="17px 13px"
+            borderRadius="12px"
+            background="#d7ebfe"
+            _after={{
+              content: '""',
+              position: "absolute",
+              top: "36px",
+              left: "-24px",
+              border: "12px solid transparent",
+              borderRight: "12px solid #d7ebfe",
+            }}
+          >
+            <Flex mb={3}>
+              <Box mr="2em">{user?.user_name}</Box>
+              <Box>{createdAt}</Box>
+            </Flex>
+            <Box
+              boxSizing="border-box"
+              dangerouslySetInnerHTML={{
+                __html: DOMPurify.sanitize(marked(content)),
+              }}
+            ></Box>
+          </Box>
+        </Box>
       </Flex>
-      <Box
-        boxSizing="border-box"
-        dangerouslySetInnerHTML={{
-          __html: DOMPurify.sanitize(marked(content)),
-        }}
-      ></Box>
-    </Box>
+    </>
   );
 };
 
