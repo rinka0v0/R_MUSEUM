@@ -140,20 +140,22 @@ const ProductPage: React.VFC = () => {
 
         <Box bg="white" H="100px" p={5} w="80%">
           <Heading fontSize="20px">コメント</Heading>
-          {comments.length
-            ? comments.map((comment, index) => {
-                const date: string = comment.createdAt.toDate().toString();
-                return (
-                  <Comment
-                    key={index}
-                    userId={comment.userId}
-                    content={comment.content}
-                    likes={comment.likes}
-                    createdAt={moment(date).fromNow()}
-                  />
-                );
-              })
-            : null}
+          <Box w='80%' m='0 auto'>
+            {comments.length
+              ? comments.map((comment, index) => {
+                  const date: string = comment.createdAt.toDate().toString();
+                  return (
+                    <Box key={index} mb={4}> 
+                      <Comment
+                        userId={comment.userId}
+                        content={comment.content}
+                        likes={comment.likes}
+                        createdAt={moment(date).fromNow()}
+                      /></Box>
+                  );
+                })
+              : null}
+          </Box>
 
           <CommentEditor
             markdown={commentMarkdown}
