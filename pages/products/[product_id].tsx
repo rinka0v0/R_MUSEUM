@@ -25,13 +25,9 @@ const ProductPage: React.VFC = () => {
   const [html, setHTML] = useState("");
   const [commentHTML, setCommentHTML] = useState("");
   const [commentMarkdown, setCommentMarkdown] = useState("");
-  const [comments, setComments] = useState<
-    Array<firebase.firestore.DocumentData>
-  >([]);
 
   const { currentUser } = useContext(AuthContext);
   const { commentsData, isError, isLoading } = useCommentFetch(query);
-  console.log(commentsData, "data");
 
   const onClickEdit = () => {
     router.push(`/products/${product?.id}/edit`);
