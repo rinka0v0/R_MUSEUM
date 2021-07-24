@@ -14,16 +14,12 @@ import PrimaryButton from "../../components/atoms/button/PrimaryButton";
 import CommentEditor from "../../components/editor/CommentEditor";
 import Comment from "../../components/card/Comment";
 import moment from "moment";
-
-type CommentData = {
-  userId: string;
-  content: firebase.firestore.DocumentData;
-  createdAt: string;
-  likes: number;
-};
+import useCommentFetch from "../../hooks/useFetchComment";
 
 const ProductPage: React.VFC = () => {
   const router = useRouter();
+  const query = router.asPath.split("/")[2];
+
   const [product, setProduct] =
     useState<firebase.firestore.DocumentData | undefined>();
   const [html, setHTML] = useState("");
@@ -34,12 +30,12 @@ const ProductPage: React.VFC = () => {
   >([]);
 
   const { currentUser } = useContext(AuthContext);
+  const { commentsData, isError, isLoading } = useCommentFetch(query);
+  console.log(commentsData, "data");
 
   const onClickEdit = () => {
     router.push(`/products/${product?.id}/edit`);
   };
-
-  const query = router.asPath.split("/")[2];
 
   const fetchProduct = async () => {
     db.collection("products")
@@ -60,29 +56,8 @@ const ProductPage: React.VFC = () => {
       });
   };
 
-  const fetchComments = () => {
-    const fetchedComments: Array<CommentData> = [];
-    db.collection("products")
-      .doc(query)
-      .collection("comments")
-      .get()
-      .then((comments) => {
-        comments.forEach((comment) => {
-          fetchedComments.push({
-            content: comment.data().content,
-            likes: comment.data().likes,
-            createdAt: comment.data().createdAt,
-            userId: comment.data().userId,
-          });
-          setComments(fetchedComments);
-        });
-      });
-  };
-
   useEffect(() => {
     fetchProduct();
-    fetchComments();
-    console.log(comments);
   }, []);
 
   return (
@@ -137,26 +112,28 @@ const ProductPage: React.VFC = () => {
             }}
           ></Box>
         </Box>
-
         <Box bg="white" H="100px" p={5} w="80%">
-          <Heading fontSize="20px">コメント</Heading>
-          <Box w='80%' m='0 auto'>
-            {comments.length
-              ? comments.map((comment, index) => {
-                  const date: string = comment.createdAt.toDate().toString();
+          <Heading fontSize="20px" textAlign="center" my="2em">
+            コメント
+          </Heading>
+          <Box w="80%" m="0 auto">
+            {isLoading ? <Box>Loading...</Box> : null}
+            {isError ? <Box>コメントを読み込めませんでした🙇‍♂️</Box> : null}
+            {commentsData && commentsData.length
+              ? commentsData.map((comment, index) => {
                   return (
-                    <Box key={index} mb={4}> 
+                    <Box key={index} mb={4}>
                       <Comment
                         userId={comment.userId}
                         content={comment.content}
                         likes={comment.likes}
-                        createdAt={moment(date).fromNow()}
-                      /></Box>
+                        createdAt={moment(comment.createdAt).fromNow()}
+                      />
+                    </Box>
                   );
                 })
               : null}
           </Box>
-
           <CommentEditor
             markdown={commentMarkdown}
             HTML={commentHTML}
