@@ -25,6 +25,7 @@ const IndexPage: React.VFC = () => {
   const fetchProducts = async () => {
     const data = await db
       .collection("products")
+      .where("open", "==", true)
       .get()
       .then((querySnapshot) => {
         const fetchedProducts: Array<ProductData> = [];
