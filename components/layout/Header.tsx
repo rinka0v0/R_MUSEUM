@@ -1,13 +1,12 @@
-import React, { useCallback, useContext } from "react";
+import React, { useCallback, useContext, VFC } from "react";
 import NextLink from "next/link";
-import Router from "next/router";
+import { useRouter } from "next/router";
 import { IconButton } from "@chakra-ui/button";
 import { SearchIcon } from "@chakra-ui/icons";
 import { Box, Flex, Stack } from "@chakra-ui/layout";
 import { Avatar } from "@chakra-ui/avatar";
 import PrimaryButton from "../atoms/button/PrimaryButton";
 import Link from "next/link";
-
 import { nanoid } from "nanoid";
 import {
   Popover,
@@ -26,16 +25,19 @@ import {
   ModalHeader,
   ModalOverlay,
 } from "@chakra-ui/modal";
-import { loginWithGitHub, loginWithGoogle, logout } from "../../firebase";
+import { db, loginWithGitHub, loginWithGoogle, logout } from "../../firebase";
 import { AuthContext } from "../../auth/AuthProvider";
 import useMessage from "../../hooks/useMessage";
+import firebase from "firebase";
 
-const Header: React.VFC = () => {
+const Header: VFC = () => {
   const { currentUser } = useContext(AuthContext);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  const router = useRouter();
+
   const pushSignIn = useCallback(() => {
-    Router.push("/signIn");
+    router.push("/signIn");
   }, []);
 
   const { showMessage } = useMessage();
@@ -54,6 +56,26 @@ const Header: React.VFC = () => {
       showMessage({ title: err.message, status: "error" });
     }
   };
+
+  const postProduct = (id: string) => {
+    db.collection("products").doc(id).set({
+      title: " ",
+      content: " ",
+      userId: currentUser?.uid,
+      sorceCode: " ",
+      tagsIDs: [],
+      open: false,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+  };
+
+  const onClickPost = useCallback(async () => {
+    const id = nanoid();
+    await postProduct(id);
+    router.push({
+      pathname: `/products/${id}/edit`,
+    });
+  }, []);
 
   return (
     <Flex
@@ -78,7 +100,7 @@ const Header: React.VFC = () => {
         {currentUser ? (
           <>
             <NextLink href={`/products/${nanoid()}/edit`}>
-              <PrimaryButton>寄贈する</PrimaryButton>
+              <PrimaryButton onClick={onClickPost}>寄贈する</PrimaryButton>
             </NextLink>
 
             <Popover>
