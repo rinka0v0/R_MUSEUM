@@ -45,6 +45,10 @@ const Edit: React.VFC = () => {
       .doc(query)
       .get()
       .then(async (product) => {
+        if (product.exists === false) {
+          showMessage({title: '作品が見つかりませんでした',status:'error'});
+          router.push("/");
+        }
         if (product.data() !== undefined) {
           const data = await product.data();
           setTitle(data?.title);
