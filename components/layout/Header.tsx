@@ -120,10 +120,31 @@ const Header: VFC = () => {
                 <PopoverHeader>Menu</PopoverHeader>
                 <PopoverBody p={0}>
                   <Box border="1px solid #ddd" h="30px">
-                    <Link href="/mypage">マイページ</Link>
+                    <Link href="/mypage">
+                      <a
+                        style={{
+                          height: "100%",
+                          width: "100%",
+                          display: "block",
+                        }}
+                      >
+                        マイページ
+                      </a>
+                    </Link>
                   </Box>
                   <Box border="1px solid #ddd" h="30px">
-                    <Link href="/dashboard">作品の管理</Link>
+                    <Link href="/dashboard">
+                      <a
+                        style={{
+                          height: "100%",
+                          width: "100%",
+                          display: "block",
+                        }}
+                      >
+                        {" "}
+                        作品の管理
+                      </a>
+                    </Link>
                   </Box>
                   <Box border="1px solid #ddd" h="30px">
                     <Box onClick={logout} cursor="pointer">
