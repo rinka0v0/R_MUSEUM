@@ -20,7 +20,7 @@ const Exhibit: React.VFC<Props> = (props) => {
   return (
     <Link href={`/products/${exhibit.id}`}>
       <Box
-        w={350}
+        w="350px"
         backgroundColor="white"
         borderRadius="lg"
         p={3}

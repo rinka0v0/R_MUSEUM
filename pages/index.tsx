@@ -7,6 +7,7 @@ import { db } from "../firebase";
 import firebase from "firebase";
 import { useState } from "react";
 import moment from "moment";
+import { calc, Grid } from "@chakra-ui/react";
 
 type ProductData = {
   id: string;
@@ -25,7 +26,7 @@ const IndexPage: React.VFC = () => {
   const fetchProducts = async () => {
     const data = await db
       .collection("products")
-      .where("open", "==", true)
+      // .where("open", "==", true)
       .get()
       .then((querySnapshot) => {
         const fetchedProducts: Array<ProductData> = [];
@@ -68,30 +69,48 @@ const IndexPage: React.VFC = () => {
     <Box>
       <Header />
       <Flex align="center" justify="center" flexDirection="column">
-        <VStack w="100%" spacing={8}>
-          <Box w="80%" mt={10}>
-            <TrendLanguage languages={["TypeScript", "Go", "React"]} />
-          </Box>
-          <Heading as="h2" textAlign="center">
-            作品一覧
-          </Heading>
+        <Box w="80%" mt={10}>
+          <TrendLanguage languages={["TypeScript", "Go", "React"]} />
+        </Box>
+        <Heading as="h2" textAlign="center">
+          作品一覧
+        </Heading>
+        <Flex
+          // position="relative"
+          m="2em 0"
+          maxW="960px"
+          w="100%"
+          flexWrap="wrap"
+          justify="space-between"
+          alignItems="center"
+          _after={{ content: "''", width: "calc(100% / 3)" }}
+        >
           {products.map((product, index) => {
             const date: string = product.data.createdAt.toDate().toString();
             return (
-              <Exhibit
+              // <Box key={index} overflow="auto" minW="0">
+              <Box
                 key={index}
-                exhibit={{
-                  id: product.id,
-                  name: product.data.title,
-                  userName: product.user.user_name,
-                  userIcon: product.user.iconURL,
-                  likes: 0,
-                  createdAt: moment(date).fromNow(),
-                }}
-              />
+                m={{ md: "0.5em auto", base: "0.5em auto" }}
+                p="0"
+                w={{ md: " calc(100%/2)", base: "100%" }}
+              >
+                <Box m="0 auto" w='350px'>
+                  <Exhibit
+                    exhibit={{
+                      id: product.id,
+                      name: product.data.title,
+                      userName: product.user.user_name,
+                      userIcon: product.user.iconURL,
+                      likes: 0,
+                      createdAt: moment(date).fromNow(),
+                    }}
+                  />
+                </Box>
+              </Box>
             );
           })}
-        </VStack>
+        </Flex>
       </Flex>
     </Box>
   );
