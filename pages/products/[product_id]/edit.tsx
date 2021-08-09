@@ -25,6 +25,8 @@ const MarkdownEditor = dynamic(
 );
 
 const Edit: React.VFC = () => {
+  console.log("editページがレンダリングしました");
+
   const router = useRouter();
   // product_idを文字列として取り出す
   const query = router.asPath.split("/")[2];
@@ -44,13 +46,17 @@ const Edit: React.VFC = () => {
       .collection("products")
       .doc(query)
       .get()
-      .then(async (product) => {
+      .then((product) => {
+        console.log(product, product.exists);
         if (product.exists === false) {
-          showMessage({title: '作品が見つかりませんでした',status:'error'});
+          showMessage({
+            title: `exists is ${product.exists}`,
+            status: "error",
+          });
           router.push("/");
         }
         if (product.data() !== undefined) {
-          const data = await product.data();
+          const data = product.data();
           setTitle(data?.title);
           setMarkdown(data?.content);
           setHTML(DOMPurify.sanitize(marked(data?.content)));
@@ -103,7 +109,12 @@ const Edit: React.VFC = () => {
 
   useEffect(() => {
     !currentUser && Router.push("/");
-    fetchProduct();
+    const fetchProductData = async () => {
+      await fetchProduct();
+    };
+    console.log("fetchProductData start");
+    fetchProductData();
+    console.log("fetchProductData end  ");
   }, [currentUser]);
 
   if (!signInCheck || !currentUser) {

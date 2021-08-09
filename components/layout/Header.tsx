@@ -57,25 +57,32 @@ const Header: VFC = () => {
     }
   };
 
-  const postProduct = (id: string) => {
-    db.collection("products").doc(id).set({
-      title: " ",
-      content: " ",
-      userId: currentUser?.uid,
-      sorceCode: " ",
-      tagsIDs: [],
-      open: false,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-    });
+  const redirectEditPage = (id: string) => {
+    db.collection("products")
+      .doc(id)
+      .set({
+        title: " ",
+        content: " ",
+        userId: currentUser?.uid,
+        sorceCode: " ",
+        tagsIDs: [],
+        open: false,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      })
+      .then(() => {
+        router.push({
+          pathname: `/products/${id}/edit`,
+        });
+      });
   };
 
-  const onClickPost = useCallback(async () => {
+  const onClickPost = async () => {
     const id = nanoid();
-    await postProduct(id);
-    router.push({
-      pathname: `/products/${id}/edit`,
-    });
-  }, []);
+    const postProductData = async (id: string) => {
+      await redirectEditPage(id);
+    };
+    await postProductData(id);
+  };
 
   return (
     <Flex
@@ -99,10 +106,7 @@ const Header: VFC = () => {
         </NextLink>
         {currentUser ? (
           <>
-            <NextLink href={`/products/${nanoid()}/edit`}>
-              <PrimaryButton onClick={onClickPost}>寄贈する</PrimaryButton>
-            </NextLink>
-
+            <PrimaryButton onClick={onClickPost}>寄贈する</PrimaryButton>
             <Popover>
               <PopoverTrigger>
                 <Avatar

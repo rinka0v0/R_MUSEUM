@@ -20,7 +20,7 @@ const IndexPage: React.VFC = () => {
     Array<firebase.firestore.DocumentData>
   >([]);
 
-  console.log("レンダリングされました");
+  console.log("indexページがレンダリングされました");
 
   const fetchProducts = async () => {
     const data = await db
@@ -93,16 +93,16 @@ const IndexPage: React.VFC = () => {
                 w={{ md: " calc(96%/2)", base: "96%" }}
               >
                 <Box m="0 auto" w="350px">
-                <Exhibit
-                  exhibit={{
-                    id: product.id,
-                    name: product.data.title,
-                    userName: product.user.user_name,
-                    userIcon: product.user.iconURL,
-                    likes: 0,
-                    createdAt: moment(date).fromNow(),
-                  }}
-                />
+                  <Exhibit
+                    exhibit={{
+                      id: product.id,
+                      name: product.data.title,
+                      userName: product.user.user_name,
+                      userIcon: product.user.iconURL,
+                      likes: 0,
+                      createdAt: moment(date).fromNow(),
+                    }}
+                  />
                 </Box>
               </Box>
             );
