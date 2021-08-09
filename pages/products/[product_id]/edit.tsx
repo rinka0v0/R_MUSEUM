@@ -15,6 +15,9 @@ import { db } from "../../../firebase";
 import firebase from "firebase";
 import DOMPurify from "dompurify";
 import marked from "marked";
+import { Switch } from "@chakra-ui/react";
+import { ArrowBackIcon } from "@chakra-ui/icons";
+import Link from "next/link";
 
 // クライアント側でインポートする必要がある
 const MarkdownEditor = dynamic(
@@ -112,9 +115,7 @@ const Edit: React.VFC = () => {
     const fetchProductData = async () => {
       await fetchProduct();
     };
-    console.log("fetchProductData start");
     fetchProductData();
-    console.log("fetchProductData end  ");
   }, [currentUser]);
 
   if (!signInCheck || !currentUser) {
@@ -124,16 +125,46 @@ const Edit: React.VFC = () => {
   return (
     <>
       <Header />
-      <HStack spacing={3} mt={5}>
-        <Button colorScheme="red" onClick={onClickDelete}>
-          {" "}
-          削除
-        </Button>
-        <PrimaryButton onClick={onClickSave}>保存</PrimaryButton>
-        <PrimaryButton onClick={onClickOpen}>
-          {open ? "非公開" : "公開"}
-        </PrimaryButton>
-      </HStack>
+      <Flex alignItems="center" justify="space-between" my={5}>
+        <Link href="/dashboard">
+          <Flex alignItems="center" ml={5} _hover={{ cursor: "pointer" }}>
+            <ArrowBackIcon h={8} w={8} />
+            <Box ml={2} textDecoration="none">
+              戻る
+            </Box>
+          </Flex>
+        </Link>
+        <HStack spacing={3} mr={5}>
+          <Button colorScheme="red" onClick={onClickDelete}>
+            {" "}
+            削除
+          </Button>
+
+          {open ? (
+            <PrimaryButton onClick={onClickSave}>公開する</PrimaryButton>
+          ) : (
+            <PrimaryButton onClick={onClickSave}>下書きを保存</PrimaryButton>
+          )}
+
+          {open ? (
+            <HStack>
+              <Box color="gray">非公開</Box>
+              <Switch size="lg" onChange={onClickOpen} isChecked={open} />
+              <Box color="blue" fontWeight="bold">
+                公開
+              </Box>
+            </HStack>
+          ) : (
+            <HStack>
+              <Box color="blue" fontWeight="bold">
+                非公開
+              </Box>
+              <Switch size="lg" onChange={onClickOpen} isChecked={open} />
+              <Box color="gray">公開</Box>
+            </HStack>
+          )}
+        </HStack>
+      </Flex>
 
       <Flex flexDirection="column" align="center" w="100%">
         <Heading fontSize={20} mt={5} mb={3}>
