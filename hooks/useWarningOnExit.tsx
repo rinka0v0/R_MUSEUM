@@ -10,8 +10,6 @@ export const useWarningOnExit = (
   useEffect(() => {
     let isWarned = false;
 
-    console.log(Router.asPath,'Router');
-
     const routeChangeStart = (url: string) => {
       if (Router.asPath !== url && shouldWarn && !isWarned) {
         isWarned = true;

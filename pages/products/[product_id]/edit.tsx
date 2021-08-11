@@ -18,6 +18,7 @@ import marked from "marked";
 import { Switch } from "@chakra-ui/react";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import Link from "next/link";
+import { useWarningOnExit } from "../../../hooks/useWarningOnExit";
 
 // クライアント側でインポートする必要がある
 const MarkdownEditor = dynamic(
@@ -43,6 +44,9 @@ const Edit: React.VFC = () => {
 
   const { currentUser, signInCheck } = useContext(AuthContext);
   const { showMessage } = useMessage();
+
+  const [warningExit, setWarningExit] = useState(true);
+  useWarningOnExit(warningExit, "ページを離れてもいいですか？");
 
   const fetchProduct = async () => {
     await db
@@ -97,6 +101,7 @@ const Edit: React.VFC = () => {
         .doc(query)
         .delete()
         .then(() => {
+          setWarningExit(false);
           router.push("/");
           showMessage({ title: "削除しました", status: "success" });
         })
@@ -111,7 +116,11 @@ const Edit: React.VFC = () => {
   }, []);
 
   useEffect(() => {
-    !currentUser && Router.push("/");
+    if (!currentUser) {
+      setWarningExit(false);
+      Router.push("/");
+      // !currentUser && Router.push("/");
+    }
     const fetchProductData = async () => {
       await fetchProduct();
     };
