@@ -106,7 +106,7 @@ const Header: VFC = () => {
         </NextLink>
         {currentUser ? (
           <>
-            <PrimaryButton onClick={onClickPost}>寄贈する</PrimaryButton>
+            <PrimaryButton onClick={onClickPost}>投稿する</PrimaryButton>
             <Popover>
               <PopoverTrigger>
                 <Avatar
