@@ -1,18 +1,19 @@
 import React, { useContext, useState } from "react";
 import dynamic from "next/dynamic";
-import { Box, Heading } from "@chakra-ui/layout";
+import { Box } from "@chakra-ui/layout";
 import "easymde/dist/easymde.min.css";
 import DOMPurify from "dompurify";
 import marked from "marked";
 import highlightjs from "highlight.js";
 import "highlight.js/styles/github.css";
 import "github-markdown-css";
-import { Button, Flex } from "@chakra-ui/react";
+import { Button } from "@chakra-ui/react";
 import PrimaryButton from "../atoms/button/PrimaryButton";
 import { db } from "../../firebase";
 import firebase from "firebase";
 import { AuthContext } from "../../auth/AuthProvider";
 import useMessage from "../../hooks/useMessage";
+import useFetchComment from "../../hooks/useFetchComment";
 
 // クライアント側でインポートする必要がある
 const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
@@ -44,6 +45,7 @@ const CommentEditor: React.VFC<Props> = (props) => {
 
   const { currentUser } = useContext(AuthContext);
   const { showMessage } = useMessage();
+  const { mutate } = useFetchComment(productId);
 
   const onclickMarkdown = () => {
     setIsMarkdown(true);
@@ -66,6 +68,7 @@ const CommentEditor: React.VFC<Props> = (props) => {
         })
         .then(() => {
           setMarkdown("");
+          mutate();
           showMessage({ title: "コメントしました！", status: "success" });
         });
     } else {

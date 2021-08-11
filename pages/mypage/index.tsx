@@ -11,7 +11,6 @@ import { useState } from "react";
 import { db } from "../../firebase";
 import Exhibit from "../../components/card/Exhibit";
 import moment from "moment";
-import { Stack } from "@chakra-ui/react";
 
 type User = {
   name: string;
@@ -102,7 +101,9 @@ const Mypage: React.VFC = () => {
             {/* <Button>アイコンの変更</Button> */}
           </Box>
           <Box width="70%">
-            <Box fontSize={30}>{currentUser.displayName}</Box>
+            <Box fontSize={{ base: "1.5em", md: "2em" }} fontWeight="bold">
+              {currentUser.displayName}
+            </Box>
             <Box as="p" fontSize={{ base: ".95em", md: "16px" }}>
               {user?.profile}
             </Box>
@@ -111,26 +112,45 @@ const Mypage: React.VFC = () => {
         <Heading fontSize={24} textAlign="center">
           {currentUser.displayName}さんの作品
         </Heading>
-        <Stack spacing={5}>
-          {user?.products
-            ? user?.products.map((product, index) => {
-                const date: string = product.data.createdAt.toDate().toString();
-                return (
-                  <Exhibit
-                    key={index}
-                    exhibit={{
-                      id: product.id,
-                      name: product.data.title,
-                      userName: user.name,
-                      userIcon: user.iconURL,
-                      likes: 0,
-                      createdAt: moment(date).fromNow(),
-                    }}
-                  />
-                );
-              })
-            : null}
-        </Stack>
+        <Flex
+          position="relative"
+          m="2em 0"
+          maxW="960px"
+          w="100%"
+          flexWrap="wrap"
+          justify="space-between"
+          _after={{ content: "''", display: "block", width: "calc(100% / 2)" }}
+        >
+          {user?.products ? (
+            user?.products.map((product, index) => {
+              const date: string = product.data.createdAt.toDate().toString();
+              return (
+                <Box
+                  key={index}
+                  m={{ md: "0.5em auto", base: "0.5em auto" }}
+                  p="0"
+                  w={{ md: " calc(96%/2)", base: "96%" }}
+                >
+                  <Box m="0 auto" w="350px">
+                    <Exhibit
+                      key={index}
+                      exhibit={{
+                        id: product.id,
+                        name: product.data.title,
+                        userName: user.name,
+                        userIcon: user.iconURL,
+                        likes: 0,
+                        createdAt: moment(date).fromNow(),
+                      }}
+                    />
+                  </Box>
+                </Box>
+              );
+            })
+          ) : (
+            <Box>まだ投稿はありません</Box>
+          )}
+        </Flex>
       </Flex>
       <></>
     </>

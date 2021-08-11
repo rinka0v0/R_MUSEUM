@@ -25,13 +25,10 @@ const ProductPage: React.VFC = () => {
   const [html, setHTML] = useState("");
   const [commentHTML, setCommentHTML] = useState("");
   const [commentMarkdown, setCommentMarkdown] = useState("");
-  const [comments, setComments] = useState<
-    Array<firebase.firestore.DocumentData>
-  >([]);
+  const [error, setError] = useState(false);
 
   const { currentUser } = useContext(AuthContext);
   const { commentsData, isError, isLoading } = useCommentFetch(query);
-  console.log(commentsData, "data");
 
   const onClickEdit = () => {
     router.push(`/products/${product?.id}/edit`);
@@ -42,17 +39,24 @@ const ProductPage: React.VFC = () => {
       .doc(query)
       .get()
       .then(async (product) => {
-        const data = await product.data();
-        const html = DOMPurify.sanitize(marked(data?.content));
-        setHTML(html);
-        await db
-          .collection("users")
-          .doc(data?.userId)
-          .get()
-          .then(async (userdoc) => {
-            const user = await userdoc.data();
-            setProduct({ data, id: product.id, user });
-          });
+        if (!product.exists) {
+          console.log("データがありません");
+          const error = "投稿がみつかりませんでした";
+          const html = DOMPurify.sanitize(marked(error));
+          setHTML(html);
+        } else {
+          const data = await product.data();
+          const html = DOMPurify.sanitize(marked(data?.content));
+          setHTML(html);
+          await db
+            .collection("users")
+            .doc(data?.userId)
+            .get()
+            .then(async (userdoc) => {
+              const user = await userdoc.data();
+              setProduct({ data, id: product.id, user });
+            });
+        }
       });
   };
 

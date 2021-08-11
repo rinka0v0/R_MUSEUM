@@ -15,6 +15,10 @@ import { db } from "../../../firebase";
 import firebase from "firebase";
 import DOMPurify from "dompurify";
 import marked from "marked";
+import { Switch } from "@chakra-ui/react";
+import { ArrowBackIcon } from "@chakra-ui/icons";
+import Link from "next/link";
+import { useWarningOnExit } from "../../../hooks/useWarningOnExit";
 
 // クライアント側でインポートする必要がある
 const MarkdownEditor = dynamic(
@@ -25,6 +29,8 @@ const MarkdownEditor = dynamic(
 );
 
 const Edit: React.VFC = () => {
+  console.log("editページがレンダリングしました");
+
   const router = useRouter();
   // product_idを文字列として取り出す
   const query = router.asPath.split("/")[2];
@@ -39,14 +45,26 @@ const Edit: React.VFC = () => {
   const { currentUser, signInCheck } = useContext(AuthContext);
   const { showMessage } = useMessage();
 
+  const [warningExit, setWarningExit] = useState(true);
+  useWarningOnExit(warningExit, "ページを離れてもいいですか？");
+
   const fetchProduct = async () => {
     await db
       .collection("products")
       .doc(query)
       .get()
-      .then(async (product) => {
+      .then((product) => {
+        console.log(product, product.exists);
+        if (product.exists === false) {
+          showMessage({
+            title: `exists is ${product.exists}`,
+            status: "error",
+          });
+          setWarningExit(false);
+          router.push("/");
+        }
         if (product.data() !== undefined) {
-          const data = await product.data();
+          const data = product.data();
           setTitle(data?.title);
           setMarkdown(data?.content);
           setHTML(DOMPurify.sanitize(marked(data?.content)));
@@ -84,6 +102,7 @@ const Edit: React.VFC = () => {
         .doc(query)
         .delete()
         .then(() => {
+          setWarningExit(false);
           router.push("/");
           showMessage({ title: "削除しました", status: "success" });
         })
@@ -98,8 +117,15 @@ const Edit: React.VFC = () => {
   }, []);
 
   useEffect(() => {
-    !currentUser && Router.push("/");
-    fetchProduct();
+    if (!currentUser) {
+      setWarningExit(false);
+      Router.push("/");
+      // !currentUser && Router.push("/");
+    }
+    const fetchProductData = async () => {
+      await fetchProduct();
+    };
+    fetchProductData();
   }, [currentUser]);
 
   if (!signInCheck || !currentUser) {
@@ -109,16 +135,46 @@ const Edit: React.VFC = () => {
   return (
     <>
       <Header />
-      <HStack spacing={3} mt={5}>
-        <Button colorScheme="red" onClick={onClickDelete}>
-          {" "}
-          削除
-        </Button>
-        <PrimaryButton onClick={onClickSave}>保存</PrimaryButton>
-        <PrimaryButton onClick={onClickOpen}>
-          {open ? "非公開" : "公開"}
-        </PrimaryButton>
-      </HStack>
+      <Flex alignItems="center" justify="space-between" my={5}>
+        <Link href="/dashboard">
+          <Flex alignItems="center" ml={5} _hover={{ cursor: "pointer" }}>
+            <ArrowBackIcon h={8} w={8} />
+            <Box ml={2} textDecoration="none">
+              戻る
+            </Box>
+          </Flex>
+        </Link>
+        <HStack spacing={3} mr={5}>
+          <Button colorScheme="red" onClick={onClickDelete}>
+            {" "}
+            削除
+          </Button>
+
+          {open ? (
+            <PrimaryButton onClick={onClickSave}>公開する</PrimaryButton>
+          ) : (
+            <PrimaryButton onClick={onClickSave}>下書きを保存</PrimaryButton>
+          )}
+
+          {open ? (
+            <HStack>
+              <Box color="gray">非公開</Box>
+              <Switch size="lg" onChange={onClickOpen} isChecked={open} />
+              <Box color="blue" fontWeight="bold">
+                公開
+              </Box>
+            </HStack>
+          ) : (
+            <HStack>
+              <Box color="blue" fontWeight="bold">
+                非公開
+              </Box>
+              <Switch size="lg" onChange={onClickOpen} isChecked={open} />
+              <Box color="gray">公開</Box>
+            </HStack>
+          )}
+        </HStack>
+      </Flex>
 
       <Flex flexDirection="column" align="center" w="100%">
         <Heading fontSize={20} mt={5} mb={3}>

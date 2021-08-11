@@ -9,6 +9,7 @@ import Router from "next/router";
 import Loading from "../../components/layout/Loading";
 import { db } from "../../firebase";
 import useMessage from "../../hooks/useMessage";
+import { useWarningOnExit } from "../../hooks/useWarningOnExit";
 
 const EditMyPage: React.VFC = () => {
   const [name, setName] = useState("");
@@ -20,7 +21,10 @@ const EditMyPage: React.VFC = () => {
   const { currentUser, signInCheck } = useContext(AuthContext);
   const { showMessage } = useMessage();
 
-  console.log("レンダリングされました");
+  console.log("mypage edit page レンダリングされました");
+
+  const [warningExit, setWarningExit] = useState(true);
+  useWarningOnExit(warningExit, "ページを離れてもいいですか？");
 
   const fetchUser = async () => {
     await db
@@ -49,14 +53,19 @@ const EditMyPage: React.VFC = () => {
         twitter,
         instagram,
       })
-      .then((res) => {
+      .then(() => {
+        setWarningExit(false);
         Router.push("/mypage");
         showMessage({ title: "保存しました", status: "success" });
       });
   };
 
   useEffect(() => {
-    !currentUser && Router.push("/");
+    if (!currentUser) {
+      setWarningExit(false);
+      Router.push("/");
+      // !currentUser && Router.push("/");
+    }
     fetchUser();
   }, [currentUser]);
 

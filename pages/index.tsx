@@ -20,11 +20,12 @@ const IndexPage: React.VFC = () => {
     Array<firebase.firestore.DocumentData>
   >([]);
 
-  console.log("レンダリングされました");
+  console.log("indexページがレンダリングされました");
 
   const fetchProducts = async () => {
     const data = await db
       .collection("products")
+      // .where("open", "==", true)
       .get()
       .then((querySnapshot) => {
         const fetchedProducts: Array<ProductData> = [];
@@ -67,30 +68,46 @@ const IndexPage: React.VFC = () => {
     <Box>
       <Header />
       <Flex align="center" justify="center" flexDirection="column">
-        <VStack w="100%" spacing={8}>
-          <Box w="80%" mt={10}>
-            <TrendLanguage languages={["TypeScript", "Go", "React"]} />
-          </Box>
-          <Heading as="h2" textAlign="center">
-            作品一覧
-          </Heading>
+        <Box w="80%" mt={10}>
+          <TrendLanguage languages={["TypeScript", "Go", "React"]} />
+        </Box>
+        <Heading as="h2" textAlign="center">
+          作品一覧
+        </Heading>
+        <Flex
+          position="relative"
+          m="2em 0"
+          maxW="960px"
+          w="100%"
+          flexWrap="wrap"
+          justify="space-between"
+          _after={{ content: "''", display: "block", width: "calc(100% / 2)" }}
+        >
           {products.map((product, index) => {
             const date: string = product.data.createdAt.toDate().toString();
             return (
-              <Exhibit
+              <Box
                 key={index}
-                exhibit={{
-                  id: product.id,
-                  name: product.data.title,
-                  userName: product.user.user_name,
-                  userIcon: product.user.iconURL,
-                  likes: 0,
-                  createdAt: moment(date).fromNow(),
-                }}
-              />
+                m={{ md: "0.5em auto", base: "0.5em auto" }}
+                p="0"
+                w={{ md: " calc(96%/2)", base: "96%" }}
+              >
+                <Box m="0 auto" w="350px">
+                  <Exhibit
+                    exhibit={{
+                      id: product.id,
+                      name: product.data.title,
+                      userName: product.user.user_name,
+                      userIcon: product.user.iconURL,
+                      likes: 0,
+                      createdAt: moment(date).fromNow(),
+                    }}
+                  />
+                </Box>
+              </Box>
             );
           })}
-        </VStack>
+        </Flex>
       </Flex>
     </Box>
   );

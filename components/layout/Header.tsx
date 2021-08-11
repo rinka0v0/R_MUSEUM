@@ -1,13 +1,12 @@
-import React, { useCallback, useContext } from "react";
+import React, { useCallback, useContext, VFC } from "react";
 import NextLink from "next/link";
-import Router from "next/router";
+import { useRouter } from "next/router";
 import { IconButton } from "@chakra-ui/button";
 import { SearchIcon } from "@chakra-ui/icons";
 import { Box, Flex, Stack } from "@chakra-ui/layout";
 import { Avatar } from "@chakra-ui/avatar";
 import PrimaryButton from "../atoms/button/PrimaryButton";
 import Link from "next/link";
-
 import { nanoid } from "nanoid";
 import {
   Popover,
@@ -26,16 +25,19 @@ import {
   ModalHeader,
   ModalOverlay,
 } from "@chakra-ui/modal";
-import { loginWithGitHub, loginWithGoogle, logout } from "../../firebase";
+import { db, loginWithGitHub, loginWithGoogle, logout } from "../../firebase";
 import { AuthContext } from "../../auth/AuthProvider";
 import useMessage from "../../hooks/useMessage";
+import firebase from "firebase";
 
-const Header: React.VFC = () => {
+const Header: VFC = () => {
   const { currentUser } = useContext(AuthContext);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  const router = useRouter();
+
   const pushSignIn = useCallback(() => {
-    Router.push("/signIn");
+    router.push("/signIn");
   }, []);
 
   const { showMessage } = useMessage();
@@ -53,6 +55,33 @@ const Header: React.VFC = () => {
     } catch (err) {
       showMessage({ title: err.message, status: "error" });
     }
+  };
+
+  const redirectEditPage = (id: string) => {
+    db.collection("products")
+      .doc(id)
+      .set({
+        title: " ",
+        content: " ",
+        userId: currentUser?.uid,
+        sorceCode: " ",
+        tagsIDs: [],
+        open: false,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      })
+      .then(() => {
+        router.push({
+          pathname: `/products/${id}/edit`,
+        });
+      });
+  };
+
+  const onClickPost = async () => {
+    const id = nanoid();
+    const postProductData = async (id: string) => {
+      await redirectEditPage(id);
+    };
+    await postProductData(id);
   };
 
   return (
@@ -77,10 +106,7 @@ const Header: React.VFC = () => {
         </NextLink>
         {currentUser ? (
           <>
-            <NextLink href={`/products/${nanoid()}/edit`}>
-              <PrimaryButton>寄贈する</PrimaryButton>
-            </NextLink>
-
+            <PrimaryButton onClick={onClickPost}>投稿する</PrimaryButton>
             <Popover>
               <PopoverTrigger>
                 <Avatar
@@ -98,10 +124,31 @@ const Header: React.VFC = () => {
                 <PopoverHeader>Menu</PopoverHeader>
                 <PopoverBody p={0}>
                   <Box border="1px solid #ddd" h="30px">
-                    <Link href="/mypage">マイページ</Link>
+                    <Link href="/mypage">
+                      <a
+                        style={{
+                          height: "100%",
+                          width: "100%",
+                          display: "block",
+                        }}
+                      >
+                        マイページ
+                      </a>
+                    </Link>
                   </Box>
                   <Box border="1px solid #ddd" h="30px">
-                    <Link href="/dashboard">作品の管理</Link>
+                    <Link href="/dashboard">
+                      <a
+                        style={{
+                          height: "100%",
+                          width: "100%",
+                          display: "block",
+                        }}
+                      >
+                        {" "}
+                        作品の管理
+                      </a>
+                    </Link>
                   </Box>
                   <Box border="1px solid #ddd" h="30px">
                     <Box onClick={logout} cursor="pointer">
