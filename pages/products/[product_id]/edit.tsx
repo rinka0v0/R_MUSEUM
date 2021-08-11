@@ -60,6 +60,7 @@ const Edit: React.VFC = () => {
             title: `exists is ${product.exists}`,
             status: "error",
           });
+          setWarningExit(false);
           router.push("/");
         }
         if (product.data() !== undefined) {
