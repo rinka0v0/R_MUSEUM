@@ -26,10 +26,11 @@ service cloud.firestore {
             && user.user_name is string
         }
         function isValidProduct(product) {
-            return product.size() == 7
+            return product.size() == 8
             && "content" in product && product.content is string
             && "createdAt" in product && product.createdAt is timestamp
             && "open" in product && product.open is bool
+            && 'saved' in product && product.saved is bool
             && "sorceCode" in product && product.sorceCode is string
             && "tagsIDs" in product && product.tagsIDs is list
             && "title" in product && product.title is string

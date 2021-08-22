@@ -61,12 +61,13 @@ const Header: VFC = () => {
     db.collection("products")
       .doc(id)
       .set({
-        title: " ",
-        content: " ",
+        title: "",
+        content: "",
         userId: currentUser?.uid,
-        sorceCode: " ",
+        sorceCode: "",
         tagsIDs: [],
         open: false,
+        saved: false,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       })
       .then(() => {

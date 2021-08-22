@@ -83,10 +83,17 @@ const Edit: React.VFC = () => {
           sorceCode: sourceCodeUrl,
           tagsIDs: tags,
           open: open,
+          saved: true,
           createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         })
         .then(() => {
           showMessage({ title: "保存しました", status: "success" });
+          setWarningExit(false);
+          if (open) {
+            router.push(`/products/${query}`);
+          } else {
+            router.push("/dashboard");
+          }
         });
     } else {
       showMessage({
