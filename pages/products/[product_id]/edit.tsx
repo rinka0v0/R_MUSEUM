@@ -54,7 +54,6 @@ const Edit: React.VFC = () => {
       .doc(query)
       .get()
       .then((product) => {
-        console.log(product, product.exists);
         if (product.exists === false) {
           showMessage({
             title: `exists is ${product.exists}`,
@@ -68,12 +67,67 @@ const Edit: React.VFC = () => {
           setTitle(data?.title);
           setMarkdown(data?.content);
           setHTML(DOMPurify.sanitize(marked(data?.content)));
+          // タグを取得してステートに設定する
+          const tagNames: Array<string> = [];
+          console.log(data?.tagsIDs);
+
+          if (data?.tagsIDs.length) {
+            Promise.all(
+              data?.tagsIDs.map(async (tagId: string) => {
+                await db
+                  .collection("tags")
+                  .doc(tagId)
+                  .get()
+                  .then((doc) => {
+                    if (doc.exists) {
+                      tagNames.push(doc.data()?.name);
+                      console.log("データ取得完了");
+                    }
+                  });
+              })
+            ).then(() => {
+              console.log("set state");
+              setTags(tagNames);
+            });
+          }
+          // setTags(data?.tagsIDs);
         }
       });
   };
 
-  const onClickSave = () => {
+  const onClickSave = async () => {
     if (title && markdown) {
+      // タグ付けの機能を追加
+      const tagsDocumentId: Array<string> = [];
+      if (tags.length) {
+        // タグがつけられている場合の処理
+        await Promise.all(
+          tags.map(async (tagName) => {
+            const tagsRef = await db.collection("tags");
+            const tagData = await tagsRef.where("name", "==", tagName).get();
+            if (tagData.empty) {
+              // create tag document
+              await db
+                .collection("tags")
+                .add({
+                  name: tagName,
+                  createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                })
+                .then((res) => {
+                  res.id;
+                  console.log(res);
+                  tagsDocumentId.push(res.id);
+                });
+            } else {
+              tagData.forEach((doc) => {
+                tagsDocumentId.push(doc.id);
+              });
+            }
+          })
+        );
+        console.log("タグID取得完了", tagsDocumentId);
+      }
+
       db.collection("products")
         .doc(query)
         .set({
@@ -81,7 +135,7 @@ const Edit: React.VFC = () => {
           content: markdown,
           userId: currentUser?.uid,
           sorceCode: sourceCodeUrl,
-          tagsIDs: tags,
+          tagsIDs: tagsDocumentId,
           open: open,
           saved: true,
           createdAt: firebase.firestore.FieldValue.serverTimestamp(),
