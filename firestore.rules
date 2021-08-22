@@ -76,8 +76,8 @@ service cloud.firestore {
 
             allow create: if isUserAuthenticated(request.resource.data.userId) 
             && isValidProduct(request.resource.data)
-            && request.resource.data.content.size() > 0
-            && request.resource.data.title.size() > 0
+            // && request.resource.data.content.size() > 0
+            // && request.resource.data.title.size() > 0
             && request.resource.data.title.size() < 30
 
             allow update: if isUserAuthenticated(request.resource.data.userId)
