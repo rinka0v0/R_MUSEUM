@@ -82,9 +82,10 @@ const ProductPage: React.VFC = () => {
           })
         );
       }
+
       setProduct({
         data: productData,
-        id: productData?.id,
+        id: fetchedProduct?.id,
         user,
         tags: tagNames,
       });
