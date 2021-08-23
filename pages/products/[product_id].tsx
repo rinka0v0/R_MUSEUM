@@ -35,29 +35,60 @@ const ProductPage: React.VFC = () => {
   };
 
   const fetchProduct = async () => {
-    db.collection("products")
-      .doc(query)
-      .get()
-      .then(async (product) => {
-        if (!product.exists) {
-          console.log("データがありません");
-          const error = "投稿がみつかりませんでした";
-          const html = DOMPurify.sanitize(marked(error));
-          setHTML(html);
-        } else {
-          const data = await product.data();
-          const html = DOMPurify.sanitize(marked(data?.content));
-          setHTML(html);
-          await db
-            .collection("users")
-            .doc(data?.userId)
-            .get()
-            .then(async (userdoc) => {
-              const user = await userdoc.data();
-              setProduct({ data, id: product.id, user });
-            });
-        }
+    // db.collection("products")
+    //   .doc(query)
+    //   .get()
+    //   .then(async (product) => {
+    //     if (!product.exists) {
+    //       const error = "投稿がみつかりませんでした";
+    //       const html = DOMPurify.sanitize(marked(error));
+    //       setHTML(html);
+    //     } else {
+    //       const data = await product.data();
+    //       const html = DOMPurify.sanitize(marked(data?.content));
+    //       setHTML(html);
+    //       await db
+    //         .collection("users")
+    //         .doc(data?.userId)
+    //         .get()
+    //         .then(async (userdoc) => {
+    //           const user = await userdoc.data();
+    //           setProduct({ data, id: product.id, user });
+    //         });
+    //     }
+    //   });
+
+    const fetchedProduct = await db.collection("products").doc(query).get();
+    if (!fetchedProduct.exists) {
+      const html = DOMPurify.sanitize(marked("投稿がみつかりませんでした"));
+      setHTML(html);
+    } else {
+      const productData = await fetchedProduct.data();
+      const html = DOMPurify.sanitize(marked(productData?.content));
+      setHTML(html);
+      const fetchedUser = await db
+        .collection("users")
+        .doc(productData?.userId)
+        .get();
+      const user = await fetchedUser.data();
+      const tagNames: Array<string> = [];
+      if (productData?.tagsIDs.length) {
+        //タグずけされている場合はクライアントサイドジョインする
+        await Promise.all(
+          productData?.tagsIDs.map(async (tagId: string) => {
+            const fetchedTag = await db.collection("tags").doc(tagId).get();
+            const tagData = await fetchedTag.data();
+            tagNames.push(tagData?.name);
+          })
+        );
+      }
+      setProduct({
+        data: productData,
+        id: productData?.id,
+        user,
+        tags: tagNames,
       });
+    }
   };
 
   useEffect(() => {
@@ -81,7 +112,7 @@ const ProductPage: React.VFC = () => {
         <Heading my={5}>{product?.title}</Heading>
         <Heading fontSize={20}>使用技術</Heading>
         <Box>
-          {product?.data.tagsIDs.map((tag: string) => {
+          {product?.tags.map((tag: string) => {
             return (
               <Box
                 key={tag}

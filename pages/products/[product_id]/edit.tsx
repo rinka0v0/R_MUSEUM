@@ -85,12 +85,12 @@ const Edit: React.VFC = () => {
                     }
                   });
               })
+              
             ).then(() => {
               console.log("set state");
               setTags(tagNames);
             });
           }
-          // setTags(data?.tagsIDs);
         }
       });
   };
