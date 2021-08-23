@@ -56,7 +56,7 @@ const Edit: React.VFC = () => {
       .then((product) => {
         if (product.exists === false) {
           showMessage({
-            title: `exists is ${product.exists}`,
+            title: `作品が存在しません`,
             status: "error",
           });
           setWarningExit(false);
