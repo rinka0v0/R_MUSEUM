@@ -9,6 +9,8 @@
     * Authentication
     * Cloud Firestore
 * Jest (firestore rulesのテストに使用)
+* prettier
+* eslint
 
 ## 概要
 ポートフォリオや個人開発で作ったwebアプリケーションなどの製作物を紹介できるアプリです。  
