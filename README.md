@@ -8,6 +8,7 @@
 * firebase
     * Authentication
     * Cloud Firestore
+    * Cloud Storage
 * Jest (firestore rulesのテストに使用)
 * prettier
 * eslint
