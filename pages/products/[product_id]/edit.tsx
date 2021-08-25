@@ -181,7 +181,6 @@ const Edit: React.VFC = () => {
     if (!currentUser) {
       setWarningExit(false);
       Router.push("/");
-      // !currentUser && Router.push("/");
     }
     const fetchProductData = async () => {
       await fetchProduct();
@@ -277,6 +276,7 @@ const Edit: React.VFC = () => {
             html={html}
             setMarkdown={setMarkdown}
             setHTML={setHTML}
+            productId={query}
           />
         </Box>
       </Flex>
