@@ -19,9 +19,7 @@ const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
 
 type Props = {
   markdown: string;
-  html: string;
   setMarkdown: React.Dispatch<React.SetStateAction<string>>;
-  setHTML: React.Dispatch<React.SetStateAction<string>>;
   productId: string;
 };
 
@@ -29,15 +27,10 @@ marked.setOptions({
   highlight: (code, lang) => {
     return highlightjs.highlightAuto(code, [lang]).value;
   },
-  pedantic: false,
-  gfm: true,
-  breaks: true,
-  sanitize: true,
-  silent: false,
 });
 
 const MarkdownEditor: React.VFC<Props> = (props) => {
-  const { markdown, html, setMarkdown, setHTML, productId } = props;
+  const { markdown, setMarkdown, productId } = props;
   const { showMessage } = useMessage();
 
   const imageUploadFunction = (file: any) => {
@@ -60,10 +53,6 @@ const MarkdownEditor: React.VFC<Props> = (props) => {
           setMarkdown((preMardown) => {
             return preMardown + `![image](${downloadURL})`;
           });
-          setHTML(
-            (prevHTML) =>
-              prevHTML + DOMPurify.sanitize(marked(`![image](${downloadURL})`))
-          );
         });
       }
     );
@@ -86,9 +75,7 @@ const MarkdownEditor: React.VFC<Props> = (props) => {
           value={markdown}
           onChange={(e: string) => {
             setMarkdown(e);
-            setHTML(DOMPurify.sanitize(marked(e)));
           }}
-          // events={{ drop: handleDrop }}
           options={autoUploadImage}
         />
       </Box>
@@ -99,7 +86,7 @@ const MarkdownEditor: React.VFC<Props> = (props) => {
           <Box
             boxSizing="border-box"
             dangerouslySetInnerHTML={{
-              __html: html,
+              __html: DOMPurify.sanitize(marked(markdown)),
             }}
           ></Box>
         </Box>

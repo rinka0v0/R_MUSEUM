@@ -13,8 +13,6 @@ import TagInput from "../../../components/Input/TagsInput";
 import useMessage from "../../../hooks/useMessage";
 import { db } from "../../../firebase";
 import firebase from "firebase";
-import DOMPurify from "dompurify";
-import marked from "marked";
 import { Switch } from "@chakra-ui/react";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import Link from "next/link";
@@ -37,7 +35,6 @@ const Edit: React.VFC = () => {
 
   const [title, setTitle] = useState("");
   const [markdown, setMarkdown] = useState("");
-  const [html, setHTML] = useState("");
   const [sourceCodeUrl, setSourceCodeUrl] = useState("");
   const [tags, setTags] = useState<Array<string>>([]);
   const [open, setOpen] = useState(false);
@@ -66,7 +63,6 @@ const Edit: React.VFC = () => {
           const data = product.data();
           setTitle(data?.title);
           setMarkdown(data?.content);
-          setHTML(DOMPurify.sanitize(marked(data?.content)));
           // タグを取得してステートに設定する
           const tagNames: Array<string> = [];
           console.log(data?.tagsIDs);
@@ -85,7 +81,6 @@ const Edit: React.VFC = () => {
                     }
                   });
               })
-              
             ).then(() => {
               console.log("set state");
               setTags(tagNames);
@@ -273,9 +268,7 @@ const Edit: React.VFC = () => {
         <Box w="100%" mb="1em">
           <MarkdownEditor
             markdown={markdown}
-            html={html}
             setMarkdown={setMarkdown}
-            setHTML={setHTML}
             productId={query}
           />
         </Box>
