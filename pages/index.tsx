@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import TrendLanguage from "../components/card/TrendLanguage";
 import Exhibit from "../components/card/Exhibit";
-import { Box, Flex, Heading, VStack } from "@chakra-ui/layout";
+import { Box, Flex, Heading } from "@chakra-ui/layout";
 import Header from "../components/layout/Header";
 import { db } from "../firebase";
 import firebase from "firebase";
@@ -25,6 +25,7 @@ const IndexPage: React.VFC = () => {
   const fetchProducts = async () => {
     const data = await db
       .collection("products")
+      .orderBy("createdAt",'desc')
       // .where("open", "==", true)
       .get()
       .then((querySnapshot) => {
@@ -57,6 +58,8 @@ const IndexPage: React.VFC = () => {
         );
         return fetchedProducts;
       });
+    console.log(data);
+
     setProducts(data);
   };
 
@@ -71,8 +74,8 @@ const IndexPage: React.VFC = () => {
         <Box w="80%" mt={10}>
           <TrendLanguage languages={["TypeScript", "Go", "React"]} />
         </Box>
-        <Heading as="h2" textAlign="center">
-          作品一覧
+        <Heading as="h2" textAlign="center" mt={5}>
+          新しい作品
         </Heading>
         <Flex
           position="relative"
