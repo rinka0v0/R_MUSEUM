@@ -6,7 +6,6 @@ import DOMPurify from "dompurify";
 import marked from "marked";
 import highlightjs from "highlight.js";
 import "highlight.js/styles/github.css";
-import "github-markdown-css";
 import { useMemo } from "react";
 import { Box, Flex, Heading } from "@chakra-ui/react";
 import { nanoid } from "nanoid";

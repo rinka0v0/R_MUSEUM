@@ -8,7 +8,6 @@ import PrimaryButton from "../../../components/atoms/button/PrimaryButton";
 import Header from "../../../components/layout/Header";
 import { AuthContext } from "../../../auth/AuthProvider";
 import Loading from "../../../components/layout/Loading";
-import "github-markdown-css";
 import TagInput from "../../../components/Input/TagsInput";
 import useMessage from "../../../hooks/useMessage";
 import { db } from "../../../firebase";
