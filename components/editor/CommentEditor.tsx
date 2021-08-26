@@ -6,7 +6,6 @@ import DOMPurify from "dompurify";
 import marked from "marked";
 import highlightjs from "highlight.js";
 import "highlight.js/styles/github.css";
-import "github-markdown-css";
 import { Button } from "@chakra-ui/react";
 import PrimaryButton from "../atoms/button/PrimaryButton";
 import { db } from "../../firebase";

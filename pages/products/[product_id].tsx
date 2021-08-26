@@ -8,7 +8,6 @@ import { useEffect } from "react";
 import firebase from "firebase";
 import DOMPurify from "dompurify";
 import marked from "marked";
-import "github-markdown-css";
 import { AuthContext } from "../../auth/AuthProvider";
 import PrimaryButton from "../../components/atoms/button/PrimaryButton";
 import CommentEditor from "../../components/editor/CommentEditor";
@@ -35,29 +34,6 @@ const ProductPage: React.VFC = () => {
   };
 
   const fetchProduct = async () => {
-    // db.collection("products")
-    //   .doc(query)
-    //   .get()
-    //   .then(async (product) => {
-    //     if (!product.exists) {
-    //       const error = "投稿がみつかりませんでした";
-    //       const html = DOMPurify.sanitize(marked(error));
-    //       setHTML(html);
-    //     } else {
-    //       const data = await product.data();
-    //       const html = DOMPurify.sanitize(marked(data?.content));
-    //       setHTML(html);
-    //       await db
-    //         .collection("users")
-    //         .doc(data?.userId)
-    //         .get()
-    //         .then(async (userdoc) => {
-    //           const user = await userdoc.data();
-    //           setProduct({ data, id: product.id, user });
-    //         });
-    //     }
-    //   });
-
     const fetchedProduct = await db.collection("products").doc(query).get();
     if (!fetchedProduct.exists) {
       const html = DOMPurify.sanitize(marked("投稿がみつかりませんでした"));

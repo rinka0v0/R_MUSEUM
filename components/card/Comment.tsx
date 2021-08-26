@@ -7,7 +7,6 @@ import { useState } from "react";
 import { db } from "../../firebase";
 import DOMPurify from "dompurify";
 import marked from "marked";
-import "github-markdown-css";
 
 type Props = {
   userId: string;
@@ -37,7 +36,7 @@ const Comment: React.VFC<Props> = (props) => {
 
   return (
     <>
-      <Flex w="100%" >
+      <Flex w="100%">
         <Box my="1.5em" cursor="pointer">
           <Link href={`/${userId}`}>
             <Avatar src={user?.iconURL} mb={2} />
