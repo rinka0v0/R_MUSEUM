@@ -14,6 +14,7 @@ import CommentEditor from "../../components/editor/CommentEditor";
 import Comment from "../../components/card/Comment";
 import moment from "moment";
 import useCommentFetch from "../../hooks/useFetchComment";
+import Link from "next/link";
 
 const ProductPage: React.VFC = () => {
   const router = useRouter();
@@ -47,6 +48,7 @@ const ProductPage: React.VFC = () => {
         .doc(productData?.userId)
         .get();
       const user = await fetchedUser.data();
+
       const tagNames: Array<string> = [];
       if (productData?.tagsIDs.length) {
         //タグずけされている場合はクライアントサイドジョインする
@@ -63,6 +65,7 @@ const ProductPage: React.VFC = () => {
         data: productData,
         id: fetchedProduct?.id,
         user,
+        userId: fetchedUser.id,
         tags: tagNames,
       });
     }
@@ -81,13 +84,23 @@ const ProductPage: React.VFC = () => {
             <PrimaryButton onClick={onClickEdit}>編集</PrimaryButton>
           </Box>
         ) : null}
-        <Heading my={5}>{product?.data.title}</Heading>
-        <Flex alignItems="center" my={5}>
-          <Avatar src={product?.user.iconURL} mr={3} ml={3} />
-          <Box>{product?.user.user_name}</Box>
+        <Flex
+          alignItems="center"
+          my={5}
+          ml="1em"
+          mr="auto"
+          mt="40px"
+          cursor="pointer"
+        >
+          <Link href={`/${product?.userId}`}>
+            <>
+              <Avatar src={product?.user.iconURL} mr={3} ml={3} />
+              <Box>{product?.user.user_name}</Box>
+            </>
+          </Link>
         </Flex>
+        <Heading my={5}>{product?.data.title}</Heading>
         <Heading my={5}>{product?.title}</Heading>
-        <Heading fontSize={20}>使用技術</Heading>
         <Box>
           {product?.tags.map((tag: string) => {
             return (
