@@ -25,7 +25,7 @@ const IndexPage: React.VFC = () => {
   const fetchProducts = async () => {
     const data = await db
       .collection("products")
-      .orderBy("createdAt",'desc')
+      .orderBy("createdAt", "desc")
       // .where("open", "==", true)
       .get()
       .then((querySnapshot) => {

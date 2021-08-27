@@ -29,10 +29,17 @@ import { db, loginWithGitHub, loginWithGoogle, logout } from "../../firebase";
 import { AuthContext } from "../../auth/AuthProvider";
 import useMessage from "../../hooks/useMessage";
 import firebase from "firebase";
+import { useState } from "react";
+type Props = {
+  isEditPage?: boolean;
+};
 
-const Header: VFC = () => {
+const Header: VFC<Props> = (props) => {
+  const { isEditPage = false } = props;
   const { currentUser } = useContext(AuthContext);
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const [loading, setLoading] = useState(false);
 
   const router = useRouter();
 
@@ -76,8 +83,8 @@ const Header: VFC = () => {
         });
       });
   };
-
   const onClickPost = async () => {
+    setLoading(true);
     const id = nanoid();
     const postProductData = async (id: string) => {
       await redirectEditPage(id);
@@ -107,7 +114,11 @@ const Header: VFC = () => {
         </NextLink>
         {currentUser ? (
           <>
-            <PrimaryButton onClick={onClickPost}>投稿する</PrimaryButton>
+            {isEditPage ? null : (
+              <PrimaryButton onClick={onClickPost} isLoading={loading}>
+                投稿する
+              </PrimaryButton>
+            )}
             <Popover>
               <PopoverTrigger>
                 <Avatar

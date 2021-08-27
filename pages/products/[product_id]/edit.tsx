@@ -188,7 +188,7 @@ const Edit: React.VFC = () => {
 
   return (
     <>
-      <Header />
+      <Header isEditPage={true}/>
       <Flex alignItems="center" justify="space-between" my={5}>
         <Link href="/dashboard">
           <Flex alignItems="center" ml={5} _hover={{ cursor: "pointer" }}>
