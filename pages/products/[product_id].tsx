@@ -26,6 +26,7 @@ const ProductPage: React.VFC = () => {
   const [commentHTML, setCommentHTML] = useState("");
   const [commentMarkdown, setCommentMarkdown] = useState("");
   const [error, setError] = useState(false);
+  const [isliked, setIsLiked] = useState(false);
 
   const { currentUser } = useContext(AuthContext);
   const { commentsData, isError, isLoading } = useCommentFetch(query);
@@ -71,6 +72,49 @@ const ProductPage: React.VFC = () => {
     }
   };
 
+  const onClickLiked = async (isliked: boolean) => {
+    const postRef = db.collection("products").doc(product?.id);
+    const currentUserRef = db.collection("users").doc(currentUser?.uid);
+    if (isliked) {
+      const batch = db.batch();
+      batch.delete(
+        db.doc(postRef.path).collection("likedUsers").doc(currentUserRef.id)
+      );
+      batch.delete(
+        db.doc(currentUserRef.path).collection("likedPosts").doc(postRef.id)
+      );
+      await batch.commit();
+      setIsLiked(false);
+    } else {
+      const batch = db.batch();
+      batch.set(
+        db
+          .collection("products")
+          .doc(product?.id)
+          .collection("likedUsers")
+          .doc(currentUser?.uid),
+        {
+          id: currentUser?.uid,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        }
+      );
+      batch.set(
+        db
+          .collection("users")
+          .doc(currentUser?.uid)
+          .collection("likedPosts")
+          .doc(product?.id),
+        {
+          id: postRef.id,
+          postRef,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        }
+      );
+      await batch.commit();
+      setIsLiked(true);
+    }
+  };
+
   useEffect(() => {
     fetchProduct();
   }, []);
@@ -99,6 +143,10 @@ const ProductPage: React.VFC = () => {
             </>
           </Link>
         </Flex>
+        <Box onClick={() => onClickLiked(isliked)} cursor="pointer">
+          {isliked ? "unlike" : "lilke"}
+        </Box>
+
         <Heading my={5}>{product?.data.title}</Heading>
         <Heading my={5}>{product?.title}</Heading>
         <Box>
