@@ -21,7 +21,9 @@ type User = {
 
 const Mypage: React.VFC = () => {
   const { currentUser, signInCheck } = useContext(AuthContext);
-  console.log(currentUser?.uid);
+
+  const [mode, setMode] = useState("products");
+
   const [user, setUser] = useState<User | undefined>({
     name: "",
     iconURL: "",
@@ -58,6 +60,13 @@ const Mypage: React.VFC = () => {
             setUser(userObject);
           });
       });
+  };
+
+  const onClickProducts = () => {
+    setMode("products");
+  };
+  const onClickLikes = () => {
+    setMode("likes");
   };
 
   useEffect(() => {
@@ -109,9 +118,30 @@ const Mypage: React.VFC = () => {
             </Box>
           </Box>
         </Flex>
-        <Heading fontSize={24} textAlign="center">
+
+        <Flex fontSize="20px" ml="10%" mr="auto">
+          <Box
+            mx={5}
+            cursor="pointer"
+            onClick={onClickProducts}
+            color={mode === "products" ? "inherit" : "gray.400"}
+          >
+            作品
+          </Box>
+          <Box
+            mx={5}
+            cursor="pointer"
+            onClick={onClickLikes}
+            color={mode === "likes" ? "inherit" : "gray.400"}
+          >
+            いいね
+          </Box>
+        </Flex>
+
+        {/* <Heading fontSize={24} textAlign="center">
           {currentUser.displayName}さんの作品
-        </Heading>
+        </Heading> */}
+
         <Flex
           position="relative"
           m="2em 0"
