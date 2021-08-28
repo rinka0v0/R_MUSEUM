@@ -9,7 +9,7 @@ service cloud.firestore {
             return isAuthenticated() && userId == request.auth.uid;
         }
         function isValidUser (user) {
-            return user.size() == 7
+            return user.size() == 7 
             && "createdAt" in user 
             && user.createdAt is timestamp  
             && "gitHub" in user 
@@ -48,6 +48,33 @@ service cloud.firestore {
             && 'name' in tag && tag.name is string
             && 'createdAt' in tag && tag.createdAt is timestamp
         }
+
+        function documentPath(paths) {
+            return path([
+                ['databases', database, 'documents'].join('/'),
+                paths.join('/')
+            ].join('/'));
+        }
+
+        function isRequestedTime(time) {
+        return time == request.time;
+        }
+
+        function incomingData() {
+        return request.resource.data;
+        }
+
+        function existingData() {
+        return resource.data;
+        }
+
+        function getData(path) {
+        return get(path).data;
+        }
+
+        function getAfterData(path) {
+        return getAfter(path).data;
+        }
         match /users/{userId} {
             allow read: if isAuthenticated();
 
@@ -74,6 +101,29 @@ service cloud.firestore {
             && request.resource.data.user_name.size() < 10
             && request.resource.data.user_name.size() > 1
             && request.resource.data.createdAt == resource.data.createdAt;
+
+            match /likedPosts/{likedPostId} {
+                allow read: if true
+
+                allow create: if isUserAuthenticated(userId)
+                && incomingData().id == likedPostId
+                && isRequestedTime(incomingData().createdAt)
+                && !exists(likedUserPath(userId, incomingData()))
+                && getAfterData(likedUserPath(userId, incomingData())).id == userId;
+
+                allow update:  if isUserAuthenticated(userId)
+                && incomingData().id == likedPostId
+                && isRequestedTime(incomingData().createdAt)
+                && !exists(likedUserPath(userId, incomingData()))
+                && getAfterData(likedUserPath(userId, incomingData())).id == userId;
+
+                allow delete: if isUserAuthenticated(userId)
+                && exists(likedUserPath(userId,existingData()))
+
+                function likedUserPath(userId, data) {
+                    return documentPath(['products', get(data.postRef).id ,'likedUsers', userId]);
+                }
+            }
         }
         match /products/{productId} {
             allow read: if isAuthenticated();
@@ -90,6 +140,30 @@ service cloud.firestore {
             && (request.resource.data.title.size() > 0 
             && request.resource.data.title.size() < 30
             )
+
+            match /likedUsers/{likedUserId} {
+                allow read: if true
+
+                allow create: if isUserAuthenticated(likedUserId)
+                && incomingData().id == likedUserId
+                && isRequestedTime(incomingData().createdAt)
+                && !exists(likedPostPath(productId))
+                && getAfterData(likedPostPath(productId)).id == productId;
+
+                allow update:  if isUserAuthenticated(likedUserId)
+                && incomingData().id == likedUserId
+                && isRequestedTime(incomingData().createdAt) 
+                && !exists(likedPostPath(productId))
+                && getAfterData(likedPostPath(productId)).id == productId
+
+                allow delete: if isUserAuthenticated(likedUserId)
+                && exists(likedPostPath(productId))
+                && !existsAfter(likedPostPath(productId))
+
+                function likedPostPath(productId) {
+                    return documentPath(['users', likedUserId, 'likedPosts', productId]);
+                }
+            }
 
             match /comments/{commentId} {
                 allow read: if isAuthenticated();
