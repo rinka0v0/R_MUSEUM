@@ -1,5 +1,5 @@
 import { Avatar } from "@chakra-ui/avatar";
-import { Box, Flex, Heading } from "@chakra-ui/layout";
+import { Box, Flex } from "@chakra-ui/layout";
 import Router from "next/router";
 import Link from "next/link";
 import React, { useContext, useEffect } from "react";
@@ -20,10 +20,11 @@ type User = {
 };
 
 const Mypage: React.VFC = () => {
+  console.log("マイページがレンダリングされました");
+
   const { currentUser, signInCheck } = useContext(AuthContext);
 
   const [mode, setMode] = useState("products");
-
   const [user, setUser] = useState<User | undefined>({
     name: "",
     iconURL: "",
@@ -62,17 +63,38 @@ const Mypage: React.VFC = () => {
       });
   };
 
-  const onClickProducts = () => {
-    setMode("products");
-  };
-  const onClickLikes = () => {
-    setMode("likes");
+  const [likedProducts, setLikedProducts]: Array<any> = useState([]);
+
+  const fetchLikedProducts = async () => {
+    const likedProductsDocs = await db
+      .collection("users")
+      .doc(currentUser?.uid)
+      .collection("likedPosts")
+      .get();
+
+    const likedProductsDataArray: Array<any> = [];
+    await likedProductsDocs.forEach(async (likedProductDoc) => {
+      const likedProductRef = await likedProductDoc.data().postRef;
+      const productRef = await likedProductRef.get();
+      const authorId = productRef.data().userId;
+      const authorDoc = await db.collection("users").doc(authorId).get();
+      const authorData = await authorDoc.data();
+      likedProductsDataArray.push({
+        authorName: authorData?.name,
+        authorIcon: authorData?.iconURL,
+        authorId,
+        productId: productRef.id,
+        productData: await productRef.data(),
+      });
+    });
+    setLikedProducts(likedProductsDataArray);
   };
 
   useEffect(() => {
     !currentUser && Router.push("/");
     fetchUser();
-    console.log(user, "useEffect");
+    fetchLikedProducts();
+    console.log(likedProducts, "likedPosts");
   }, [currentUser]);
 
   if (!signInCheck || !currentUser) {
@@ -119,11 +141,11 @@ const Mypage: React.VFC = () => {
           </Box>
         </Flex>
 
-        <Flex fontSize="20px" ml="10%" mr="auto">
+        <Flex fontSize="20px" ml="20%" mr="auto">
           <Box
             mx={5}
             cursor="pointer"
-            onClick={onClickProducts}
+            onClick={() => setMode("products")}
             color={mode === "products" ? "inherit" : "gray.400"}
           >
             作品
@@ -131,17 +153,12 @@ const Mypage: React.VFC = () => {
           <Box
             mx={5}
             cursor="pointer"
-            onClick={onClickLikes}
+            onClick={() => setMode("likes")}
             color={mode === "likes" ? "inherit" : "gray.400"}
           >
             いいね
           </Box>
         </Flex>
-
-        {/* <Heading fontSize={24} textAlign="center">
-          {currentUser.displayName}さんの作品
-        </Heading> */}
-
         <Flex
           position="relative"
           m="2em 0"
@@ -151,7 +168,7 @@ const Mypage: React.VFC = () => {
           justify="space-between"
           _after={{ content: "''", display: "block", width: "calc(100% / 2)" }}
         >
-          {user?.products ? (
+          {mode === "products" && user?.products ? (
             user?.products.map((product, index) => {
               const date: string = product.data.createdAt.toDate().toString();
               return (
