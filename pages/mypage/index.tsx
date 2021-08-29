@@ -11,12 +11,17 @@ import { useState } from "react";
 import { db } from "../../firebase";
 import Exhibit from "../../components/card/Exhibit";
 import moment from "moment";
+import firebase from "firebase";
 
 type User = {
-  name: string;
-  iconURL: string;
-  profile: string;
-  products?: Array<any>;
+  userId: string;
+  userData: firebase.firestore.DocumentData | undefined;
+  products: Array<Products> | undefined;
+};
+
+type Products = {
+  productId: string;
+  productData: firebase.firestore.DocumentData | undefined;
 };
 
 const Mypage: React.VFC = () => {
@@ -25,45 +30,28 @@ const Mypage: React.VFC = () => {
   const { currentUser, signInCheck } = useContext(AuthContext);
 
   const [mode, setMode] = useState("products");
-  const [user, setUser] = useState<User | undefined>({
-    name: "",
-    iconURL: "",
-    profile: "",
-    products: [],
-  });
+  const [likedProducts, setLikedProducts]: Array<any> = useState([]);
+  const [user, setUser] = useState<User | undefined>();
 
   const fetchUser = async () => {
-    await db
-      .collection("users")
-      .doc(currentUser?.uid)
-      .get()
-      .then(async (userData) => {
-        const user = await userData.data();
-        return user;
-      })
-      .then(async (user) => {
-        await db
-          .collection("products")
-          .where("userId", "==", currentUser?.uid)
-          .get()
-          .then((products) => {
-            const productsList: Array<any> = [];
-            products.forEach((doc) => {
-              const data = { id: doc.id, data: doc.data() };
-              productsList.push(data);
-            });
-            const userObject = {
-              name: user?.user_name,
-              iconURL: user?.iconURL,
-              profile: user?.profile,
-              products: productsList,
-            };
-            setUser(userObject);
-          });
+    const userRef = await db.collection("users").doc(currentUser?.uid).get();
+    const productsRef = await db
+      .collection("products")
+      .where("userId", "==", currentUser?.uid)
+      .get();
+    const userProducts: Array<Products> = [];
+    await productsRef.forEach(async (productRef) => {
+      userProducts.push({
+        productId: productRef.id,
+        productData: await productRef.data(),
       });
+    });
+    setUser({
+      userId: userRef.id,
+      userData: userRef.data(),
+      products: userProducts,
+    });
   };
-
-  const [likedProducts, setLikedProducts]: Array<any> = useState([]);
 
   const fetchLikedProducts = async () => {
     const likedProductsDocs = await db
@@ -81,7 +69,7 @@ const Mypage: React.VFC = () => {
       const authorData = await authorDoc.data();
       likedProductsDataArray.push({
         authorName: authorData?.name,
-        authorIcon: authorData?.iconURL,
+        authorIconURL: authorData?.iconURL,
         authorId,
         productId: productRef.id,
         productData: await productRef.data(),
@@ -94,7 +82,6 @@ const Mypage: React.VFC = () => {
     !currentUser && Router.push("/");
     fetchUser();
     fetchLikedProducts();
-    console.log(likedProducts, "likedPosts");
   }, [currentUser]);
 
   if (!signInCheck || !currentUser) {
@@ -136,7 +123,7 @@ const Mypage: React.VFC = () => {
               {currentUser.displayName}
             </Box>
             <Box as="p" fontSize={{ base: ".95em", md: "16px" }}>
-              {user?.profile}
+              {user?.userData?.name}
             </Box>
           </Box>
         </Flex>
@@ -168,35 +155,58 @@ const Mypage: React.VFC = () => {
           justify="space-between"
           _after={{ content: "''", display: "block", width: "calc(100% / 2)" }}
         >
-          {mode === "products" && user?.products ? (
-            user?.products.map((product, index) => {
-              const date: string = product.data.createdAt.toDate().toString();
-              return (
-                <Box
-                  key={index}
-                  m={{ md: "0.5em auto", base: "0.5em auto" }}
-                  p="0"
-                  w={{ md: " calc(96%/2)", base: "96%" }}
-                >
-                  <Box m="0 auto" w="350px">
-                    <Exhibit
-                      key={index}
-                      exhibit={{
-                        id: product.id,
-                        name: product.data.title,
-                        userName: user.name,
-                        userIcon: user.iconURL,
-                        likes: 0,
-                        createdAt: moment(date).fromNow(),
-                      }}
-                    />
+          {mode === "products" && user?.products
+            ? user?.products.map((product, index) => {
+                const date: string = product.productData?.createdAt
+                  .toDate()
+                  .toString();
+                return (
+                  <Box
+                    key={index}
+                    m={{ md: "0.5em auto", base: "0.5em auto" }}
+                    p="0"
+                    w={{ md: " calc(96%/2)", base: "96%" }}
+                  >
+                    <Box m="0 auto" w="350px">
+                      <Exhibit
+                        exhibit={{
+                          id: product.productId,
+                          name: product.productData?.title,
+                          userName: user.userData?.name,
+                          userIcon: user.userData?.iconURL,
+                          likes: 0,
+                          createdAt: moment(date).fromNow(),
+                        }}
+                      />
+                    </Box>
                   </Box>
-                </Box>
-              );
-            })
-          ) : (
-            <Box>まだ投稿はありません</Box>
-          )}
+                );
+              })
+            : likedProducts.map((likedProduct: any, index: string) => {
+                const createdAtString: string =
+                  likedProduct.productData.createdAt.toDate().toString();
+                return (
+                  <Box
+                    key={index}
+                    m={{ md: "0.5em auto", base: "0.5em auto" }}
+                    p="0"
+                    w={{ md: " calc(96%/2)", base: "96%" }}
+                  >
+                    <Box m="0 auto" w="350px">
+                      <Exhibit
+                        exhibit={{
+                          id: likedProduct.id,
+                          name: likedProduct.productData.title,
+                          userName: likedProduct.authorName,
+                          userIcon: likedProduct.authorIconURL,
+                          likes: 0,
+                          createdAt: moment(createdAtString).fromNow(),
+                        }}
+                      />
+                    </Box>
+                  </Box>
+                );
+              })}
         </Flex>
       </Flex>
       <></>
