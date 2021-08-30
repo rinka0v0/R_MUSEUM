@@ -29,12 +29,23 @@ const ProductPage: React.VFC = () => {
   const [commentMarkdown, setCommentMarkdown] = useState("");
   const [error, setError] = useState(false);
   const [isliked, setIsLiked] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const { currentUser } = useContext(AuthContext);
   const { commentsData, isError, isLoading } = useCommentFetch(query);
 
   const onClickEdit = () => {
     router.push(`/products/${product?.id}/edit`);
+  };
+
+  const fetchIsLiked = async () => {
+    const isLikedDoc = await db
+      .collection("users")
+      .doc(currentUser?.uid)
+      .collection("likedPosts")
+      .doc(product?.id)
+      .get();
+    setIsLiked(isLikedDoc.exists);
   };
 
   const fetchProduct = async () => {
@@ -64,6 +75,15 @@ const ProductPage: React.VFC = () => {
         );
       }
 
+      const isLikedDoc = await db
+        .collection("users")
+        .doc(currentUser?.uid)
+        .collection("likedPosts")
+        .doc(fetchedProduct?.id)
+        .get();
+
+      setIsLiked(isLikedDoc.exists);
+
       setProduct({
         data: productData,
         id: fetchedProduct?.id,
@@ -75,6 +95,10 @@ const ProductPage: React.VFC = () => {
   };
 
   const onClickLiked = async (isliked: boolean) => {
+    if (loading) {
+      return;
+    }
+    setLoading(true);
     const postRef = db.collection("products").doc(product?.id);
     const currentUserRef = db.collection("users").doc(currentUser?.uid);
     if (isliked) {
@@ -115,10 +139,12 @@ const ProductPage: React.VFC = () => {
       await batch.commit();
       setIsLiked(true);
     }
+    setLoading(false);
   };
 
   useEffect(() => {
     fetchProduct();
+    fetchIsLiked();
   }, []);
 
   return (
@@ -145,7 +171,13 @@ const ProductPage: React.VFC = () => {
             </>
           </Link>
         </Flex>
-        <Box onClick={() => onClickLiked(isliked)} cursor="pointer">
+
+        <Box
+          onClick={() => onClickLiked(isliked)}
+          cursor="pointer"
+          mr="30px"
+          ml="auto"
+        >
           <IconContext.Provider
             value={{ color: isliked ? "red" : "gray", size: "3em" }}
           >
