@@ -16,6 +16,8 @@ import { Switch } from "@chakra-ui/react";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import Link from "next/link";
 import { useWarningOnExit } from "../../../hooks/useWarningOnExit";
+import "github-markdown-css";
+
 
 // クライアント側でインポートする必要がある
 const MarkdownEditor = dynamic(
