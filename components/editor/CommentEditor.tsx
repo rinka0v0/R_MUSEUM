@@ -21,37 +21,23 @@ const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
 
 type Props = {
   markdown: string;
-  HTML: string;
   productId: string;
   setMarkdown: React.Dispatch<React.SetStateAction<string>>;
-  setHTML: React.Dispatch<React.SetStateAction<string>>;
 };
 
 marked.setOptions({
   highlight: (code, lang) => {
     return highlightjs.highlightAuto(code, [lang]).value;
   },
-  pedantic: false,
-  gfm: true,
-  breaks: true,
-  sanitize: true,
-  silent: false,
 });
 
 const CommentEditor: React.VFC<Props> = (props) => {
-  const { markdown, HTML, setMarkdown, setHTML, productId } = props;
+  const { markdown, setMarkdown, productId } = props;
   const [isMarkdown, setIsMarkdown] = useState(true);
 
   const { currentUser } = useContext(AuthContext);
   const { showMessage } = useMessage();
   const { mutate } = useFetchComment(productId);
-
-  const onclickMarkdown = () => {
-    setIsMarkdown(true);
-  };
-  const onclickPrewview = () => {
-    setIsMarkdown(false);
-  };
 
   const postComment = () => {
     if (markdown) {
@@ -75,79 +61,55 @@ const CommentEditor: React.VFC<Props> = (props) => {
     }
   };
 
-  // const handleDrop = (data: CodeMirror.Editor, e: DragEvent) => {
-  //   const files = e.dataTransfer?.files;
-  //   if (files && files?.length > 0) {
-  //     const file = files[0];
-  //     alert("FileName :" + file.name);
-  //     console.log(file);
-  //   }
-  // };
   return (
     <>
       <Box>
-        {isMarkdown ? (
-          <Box w="100%">
-            <Box mb={3}>
-              <Button
-                onClick={onclickMarkdown}
-                borderRadius={999}
-                backgroundColor="#E4FBFF"
-                _hover={{ backgroundColor: "#E4FBFF" }}
-              >
-                Markdown
-              </Button>
-              <Button
-                onClick={onclickPrewview}
-                borderRadius={999}
-                backgroundColor="transparent"
-                _hover={{ backgroundColor: "transparent" }}
-              >
-                Preview
-              </Button>
-            </Box>
+        <Box w="100%">
+          <Box mb={3}>
+            <Button
+              onClick={() => setIsMarkdown(true)}
+              borderRadius={999}
+              backgroundColor={isMarkdown ? "#E4FBFF" : "transparent"}
+              _hover={{
+                backgroundColor: isMarkdown ? "#E4FBFF" : "transparent",
+              }}
+            >
+              Markdown
+            </Button>
+            <Button
+              onClick={() => setIsMarkdown(false)}
+              borderRadius={999}
+              backgroundColor={isMarkdown ? "transparent" : "#E4FBFF"}
+              _hover={{
+                backgroundColor: isMarkdown ? "transparent" : "#E4FBFF",
+              }}
+            >
+              Preview
+            </Button>
+          </Box>
+          {isMarkdown ? (
             <SimpleMDE
               value={markdown}
               placeholder="コメントを書いてみよう"
               onChange={(e: string) => {
                 setMarkdown(e);
-                setHTML(DOMPurify.sanitize(marked(e)));
               }}
-              // events={{ drop: handleDrop }}
             />
-          </Box>
-        ) : (
-          <Box>
-            <Box mb={3}>
-              <Button
-                onClick={onclickMarkdown}
-                borderRadius={999}
-                backgroundColor="transparent"
-                _hover={{ backgroundColor: "transparent" }}
-              >
-                Markdown
-              </Button>
-              <Button
-                onClick={onclickPrewview}
-                borderRadius={999}
-                backgroundColor="#E4FBFF"
-                _hover={{ backgroundColor: "#E4FBFF" }}
-              >
-                Preview
-              </Button>
-            </Box>
+          ) : (
             <Box w="100%" borderRadius={5} minH="330px" border="1px solid ">
               <Box bg="white" minH="300px" className="markdown-body" p={5}>
                 <Box
                   boxSizing="border-box"
                   dangerouslySetInnerHTML={{
-                    __html: HTML,
+                    __html: DOMPurify.sanitize(marked(markdown)),
                   }}
                 ></Box>
               </Box>
             </Box>
-          </Box>
-        )}
+          )}
+        </Box>
+      </Box>
+      <Box>
         <PrimaryButton onClick={postComment}>コメントする</PrimaryButton>
       </Box>
     </>

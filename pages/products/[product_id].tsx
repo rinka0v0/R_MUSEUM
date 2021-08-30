@@ -17,6 +17,7 @@ import useCommentFetch from "../../hooks/useFetchComment";
 import Link from "next/link";
 import { AiFillHeart } from "react-icons/ai";
 import { IconContext } from "react-icons/lib";
+import "github-markdown-css";
 
 const ProductPage: React.VFC = () => {
   const router = useRouter();
@@ -24,8 +25,7 @@ const ProductPage: React.VFC = () => {
 
   const [product, setProduct] =
     useState<firebase.firestore.DocumentData | undefined>();
-  const [html, setHTML] = useState("");
-  const [commentHTML, setCommentHTML] = useState("");
+
   const [commentMarkdown, setCommentMarkdown] = useState("");
   const [error, setError] = useState(false);
   const [isliked, setIsLiked] = useState(false);
@@ -51,12 +51,9 @@ const ProductPage: React.VFC = () => {
   const fetchProduct = async () => {
     const fetchedProduct = await db.collection("products").doc(query).get();
     if (!fetchedProduct.exists) {
-      const html = DOMPurify.sanitize(marked("投稿がみつかりませんでした"));
-      setHTML(html);
+      setProduct({ data: { content: "投稿が見つかりませんでした" } });
     } else {
       const productData = await fetchedProduct.data();
-      const html = DOMPurify.sanitize(marked(productData?.content));
-      setHTML(html);
       const fetchedUser = await db
         .collection("users")
         .doc(productData?.userId)
@@ -219,7 +216,9 @@ const ProductPage: React.VFC = () => {
           <Box
             boxSizing="border-box"
             dangerouslySetInnerHTML={{
-              __html: html,
+              __html: DOMPurify.sanitize(
+                marked(product ? product.data.content : "Loading...")
+              ),
             }}
           ></Box>
         </Box>
@@ -247,9 +246,7 @@ const ProductPage: React.VFC = () => {
           </Box>
           <CommentEditor
             markdown={commentMarkdown}
-            HTML={commentHTML}
             setMarkdown={setCommentMarkdown}
-            setHTML={setCommentHTML}
             productId={query}
           />
         </Box>
