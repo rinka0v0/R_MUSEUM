@@ -15,6 +15,8 @@ import Comment from "../../components/card/Comment";
 import moment from "moment";
 import useCommentFetch from "../../hooks/useFetchComment";
 import Link from "next/link";
+import { AiFillHeart } from "react-icons/ai";
+import { IconContext } from "react-icons/lib";
 
 const ProductPage: React.VFC = () => {
   const router = useRouter();
@@ -144,7 +146,11 @@ const ProductPage: React.VFC = () => {
           </Link>
         </Flex>
         <Box onClick={() => onClickLiked(isliked)} cursor="pointer">
-          {isliked ? "unlike" : "lilke"}
+          <IconContext.Provider
+            value={{ color: isliked ? "red" : "gray", size: "3em" }}
+          >
+            <AiFillHeart />
+          </IconContext.Provider>
         </Box>
 
         <Heading my={5}>{product?.data.title}</Heading>
