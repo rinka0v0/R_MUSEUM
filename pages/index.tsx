@@ -102,7 +102,7 @@ const IndexPage: React.VFC = () => {
                       name: product.data.title,
                       userName: product.user.user_name,
                       userIcon: product.user.iconURL,
-                      likes: 0,
+                      likes: product.data.likeCount,
                       createdAt: moment(date).fromNow(),
                     }}
                   />
