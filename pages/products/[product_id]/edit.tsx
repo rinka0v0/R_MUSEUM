@@ -8,17 +8,16 @@ import PrimaryButton from "../../../components/atoms/button/PrimaryButton";
 import Header from "../../../components/layout/Header";
 import { AuthContext } from "../../../auth/AuthProvider";
 import Loading from "../../../components/layout/Loading";
-import "github-markdown-css";
 import TagInput from "../../../components/Input/TagsInput";
 import useMessage from "../../../hooks/useMessage";
 import { db } from "../../../firebase";
 import firebase from "firebase";
-import DOMPurify from "dompurify";
-import marked from "marked";
 import { Switch } from "@chakra-ui/react";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import Link from "next/link";
 import { useWarningOnExit } from "../../../hooks/useWarningOnExit";
+import "github-markdown-css";
+
 
 // クライアント側でインポートする必要がある
 const MarkdownEditor = dynamic(
@@ -37,7 +36,6 @@ const Edit: React.VFC = () => {
 
   const [title, setTitle] = useState("");
   const [markdown, setMarkdown] = useState("");
-  const [html, setHTML] = useState("");
   const [sourceCodeUrl, setSourceCodeUrl] = useState("");
   const [tags, setTags] = useState<Array<string>>([]);
   const [open, setOpen] = useState(false);
@@ -54,10 +52,9 @@ const Edit: React.VFC = () => {
       .doc(query)
       .get()
       .then((product) => {
-        console.log(product, product.exists);
         if (product.exists === false) {
           showMessage({
-            title: `exists is ${product.exists}`,
+            title: `作品が存在しません`,
             status: "error",
           });
           setWarningExit(false);
@@ -67,13 +64,66 @@ const Edit: React.VFC = () => {
           const data = product.data();
           setTitle(data?.title);
           setMarkdown(data?.content);
-          setHTML(DOMPurify.sanitize(marked(data?.content)));
+          // タグを取得してステートに設定する
+          const tagNames: Array<string> = [];
+          console.log(data?.tagsIDs);
+
+          if (data?.tagsIDs.length) {
+            Promise.all(
+              data?.tagsIDs.map(async (tagId: string) => {
+                await db
+                  .collection("tags")
+                  .doc(tagId)
+                  .get()
+                  .then((doc) => {
+                    if (doc.exists) {
+                      tagNames.push(doc.data()?.name);
+                      console.log("データ取得完了");
+                    }
+                  });
+              })
+            ).then(() => {
+              console.log("set state");
+              setTags(tagNames);
+            });
+          }
         }
       });
   };
 
-  const onClickSave = () => {
+  const onClickSave = async () => {
     if (title && markdown) {
+      // タグ付けの機能を追加
+      const tagsDocumentId: Array<string> = [];
+      if (tags.length) {
+        // タグがつけられている場合の処理
+        await Promise.all(
+          tags.map(async (tagName) => {
+            const tagsRef = await db.collection("tags");
+            const tagData = await tagsRef.where("name", "==", tagName).get();
+            if (tagData.empty) {
+              // create tag document
+              await db
+                .collection("tags")
+                .add({
+                  name: tagName,
+                  createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                })
+                .then((res) => {
+                  res.id;
+                  console.log(res);
+                  tagsDocumentId.push(res.id);
+                });
+            } else {
+              tagData.forEach((doc) => {
+                tagsDocumentId.push(doc.id);
+              });
+            }
+          })
+        );
+        console.log("タグID取得完了", tagsDocumentId);
+      }
+
       db.collection("products")
         .doc(query)
         .set({
@@ -81,12 +131,19 @@ const Edit: React.VFC = () => {
           content: markdown,
           userId: currentUser?.uid,
           sorceCode: sourceCodeUrl,
-          tagsIDs: tags,
+          tagsIDs: tagsDocumentId,
           open: open,
+          saved: true,
           createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         })
         .then(() => {
           showMessage({ title: "保存しました", status: "success" });
+          setWarningExit(false);
+          if (open) {
+            router.push(`/products/${query}`);
+          } else {
+            router.push("/dashboard");
+          }
         });
     } else {
       showMessage({
@@ -120,7 +177,6 @@ const Edit: React.VFC = () => {
     if (!currentUser) {
       setWarningExit(false);
       Router.push("/");
-      // !currentUser && Router.push("/");
     }
     const fetchProductData = async () => {
       await fetchProduct();
@@ -134,7 +190,7 @@ const Edit: React.VFC = () => {
 
   return (
     <>
-      <Header />
+      <Header isEditPage={true}/>
       <Flex alignItems="center" justify="space-between" my={5}>
         <Link href="/dashboard">
           <Flex alignItems="center" ml={5} _hover={{ cursor: "pointer" }}>
@@ -213,9 +269,8 @@ const Edit: React.VFC = () => {
         <Box w="100%" mb="1em">
           <MarkdownEditor
             markdown={markdown}
-            html={html}
             setMarkdown={setMarkdown}
-            setHTML={setHTML}
+            productId={query}
           />
         </Box>
       </Flex>

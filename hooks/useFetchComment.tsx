@@ -9,7 +9,7 @@ type CommentData = {
 };
 
 const useFetchComment = (query: string) => {
-  const { data, error,mutate } = useSWR(
+  const { data, error, mutate } = useSWR(
     `firesote/comment/${query}`,
     () => fetchComments(query),
     {
@@ -18,7 +18,12 @@ const useFetchComment = (query: string) => {
     }
   );
 
-  return { commentsData:data, isLoading: !error && !data, isError: error,mutate };
+  return {
+    commentsData: data,
+    isLoading: !error && !data,
+    isError: error,
+    mutate,
+  };
 };
 
 const fetchComments = async (query: string) => {
@@ -27,6 +32,7 @@ const fetchComments = async (query: string) => {
     .collection("products")
     .doc(query)
     .collection("comments")
+    .orderBy("createdAt")
     .get();
 
   doc.forEach((comment) => {

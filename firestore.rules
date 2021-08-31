@@ -9,7 +9,7 @@ service cloud.firestore {
             return isAuthenticated() && userId == request.auth.uid;
         }
         function isValidUser (user) {
-            return user.size() == 7
+            return user.size() == 7 
             && "createdAt" in user 
             && user.createdAt is timestamp  
             && "gitHub" in user 
@@ -26,10 +26,11 @@ service cloud.firestore {
             && user.user_name is string
         }
         function isValidProduct(product) {
-            return product.size() == 7
+            return product.size() == 8
             && "content" in product && product.content is string
             && "createdAt" in product && product.createdAt is timestamp
             && "open" in product && product.open is bool
+            && 'saved' in product && product.saved is bool
             && "sorceCode" in product && product.sorceCode is string
             && "tagsIDs" in product && product.tagsIDs is list
             && "title" in product && product.title is string
@@ -41,6 +42,38 @@ service cloud.firestore {
             && "createdAt" in comment && comment.createdAt is timestamp
             && "userId" in comment && comment.userId is string
             && "likes" in comment && comment.likes is number
+        }
+        function isValidTag(tag) {
+            return tag.size() == 2
+            && 'name' in tag && tag.name is string
+            && 'createdAt' in tag && tag.createdAt is timestamp
+        }
+
+        function documentPath(paths) {
+            return path([
+                ['databases', database, 'documents'].join('/'),
+                paths.join('/')
+            ].join('/'));
+        }
+
+        function isRequestedTime(time) {
+        return time == request.time;
+        }
+
+        function incomingData() {
+        return request.resource.data;
+        }
+
+        function existingData() {
+        return resource.data;
+        }
+
+        function getData(path) {
+        return get(path).data;
+        }
+
+        function getAfterData(path) {
+        return getAfter(path).data;
         }
         match /users/{userId} {
             allow read: if isAuthenticated();
@@ -68,6 +101,29 @@ service cloud.firestore {
             && request.resource.data.user_name.size() < 10
             && request.resource.data.user_name.size() > 1
             && request.resource.data.createdAt == resource.data.createdAt;
+
+            match /likedPosts/{likedPostId} {
+                allow read: if true
+
+                allow create: if isUserAuthenticated(userId)
+                && incomingData().id == likedPostId
+                && isRequestedTime(incomingData().createdAt)
+                && !exists(likedUserPath(userId, incomingData()))
+                && getAfterData(likedUserPath(userId, incomingData())).id == userId;
+
+                allow update:  if isUserAuthenticated(userId)
+                && incomingData().id == likedPostId
+                && isRequestedTime(incomingData().createdAt)
+                && !exists(likedUserPath(userId, incomingData()))
+                && getAfterData(likedUserPath(userId, incomingData())).id == userId;
+
+                allow delete: if isUserAuthenticated(userId)
+                && exists(likedUserPath(userId,existingData()))
+
+                function likedUserPath(userId, data) {
+                    return documentPath(['products', get(data.postRef).id ,'likedUsers', userId]);
+                }
+            }
         }
         match /products/{productId} {
             allow read: if isAuthenticated();
@@ -76,8 +132,6 @@ service cloud.firestore {
 
             allow create: if isUserAuthenticated(request.resource.data.userId) 
             && isValidProduct(request.resource.data)
-            && request.resource.data.content.size() > 0
-            && request.resource.data.title.size() > 0
             && request.resource.data.title.size() < 30
 
             allow update: if isUserAuthenticated(request.resource.data.userId)
@@ -86,6 +140,30 @@ service cloud.firestore {
             && (request.resource.data.title.size() > 0 
             && request.resource.data.title.size() < 30
             )
+
+            match /likedUsers/{likedUserId} {
+                allow read: if true
+
+                allow create: if isUserAuthenticated(likedUserId)
+                && incomingData().id == likedUserId
+                && isRequestedTime(incomingData().createdAt)
+                && !exists(likedPostPath(productId))
+                && getAfterData(likedPostPath(productId)).id == productId;
+
+                allow update:  if isUserAuthenticated(likedUserId)
+                && incomingData().id == likedUserId
+                && isRequestedTime(incomingData().createdAt) 
+                && !exists(likedPostPath(productId))
+                && getAfterData(likedPostPath(productId)).id == productId
+
+                allow delete: if isUserAuthenticated(likedUserId)
+                && exists(likedPostPath(productId))
+                && !existsAfter(likedPostPath(productId))
+
+                function likedPostPath(productId) {
+                    return documentPath(['users', likedUserId, 'likedPosts', productId]);
+                }
+            }
 
             match /comments/{commentId} {
                 allow read: if isAuthenticated();
@@ -99,6 +177,14 @@ service cloud.firestore {
                 && isValidComment(request.resource.data)
             }
         }
+        match /tags/{tagId} {
+            allow read: if true
 
+            allow delete: if isAuthenticated()
+
+            allow create: if isAuthenticated() && isValidTag(request.resource.data)
+
+            allow update: if isAuthenticated() && isValidTag(request.resource.data)
+        }
   }
 }

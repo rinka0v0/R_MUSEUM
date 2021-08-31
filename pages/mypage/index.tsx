@@ -1,5 +1,5 @@
 import { Avatar } from "@chakra-ui/avatar";
-import { Box, Flex, Heading } from "@chakra-ui/layout";
+import { Box, Flex } from "@chakra-ui/layout";
 import Router from "next/router";
 import Link from "next/link";
 import React, { useContext, useEffect } from "react";
@@ -11,59 +11,77 @@ import { useState } from "react";
 import { db } from "../../firebase";
 import Exhibit from "../../components/card/Exhibit";
 import moment from "moment";
+import firebase from "firebase";
 
 type User = {
-  name: string;
-  iconURL: string;
-  profile: string;
-  products?: Array<any>;
+  userId: string;
+  userData: firebase.firestore.DocumentData | undefined;
+  products: Array<Products> | undefined;
+};
+
+type Products = {
+  productId: string;
+  productData: firebase.firestore.DocumentData | undefined;
 };
 
 const Mypage: React.VFC = () => {
+  console.log("マイページがレンダリングされました");
+
   const { currentUser, signInCheck } = useContext(AuthContext);
-  console.log(currentUser?.uid);
-  const [user, setUser] = useState<User | undefined>({
-    name: "",
-    iconURL: "",
-    profile: "",
-    products: [],
-  });
+
+  const [mode, setMode] = useState("products");
+  const [likedProducts, setLikedProducts]: Array<any> = useState([]);
+  const [user, setUser] = useState<User | undefined>();
 
   const fetchUser = async () => {
-    await db
+    const userRef = await db.collection("users").doc(currentUser?.uid).get();
+    const productsRef = await db
+      .collection("products")
+      .where("userId", "==", currentUser?.uid)
+      .get();
+    const userProducts: Array<Products> = [];
+    await productsRef.forEach(async (productRef) => {
+      userProducts.push({
+        productId: productRef.id,
+        productData: await productRef.data(),
+      });
+    });
+    setUser({
+      userId: userRef.id,
+      userData: userRef.data(),
+      products: userProducts,
+    });
+  };
+
+  const fetchLikedProducts = async () => {
+    const likedProductsDocs = await db
       .collection("users")
       .doc(currentUser?.uid)
-      .get()
-      .then(async (userData) => {
-        const user = await userData.data();
-        return user;
-      })
-      .then(async (user) => {
-        await db
-          .collection("products")
-          .where("userId", "==", currentUser?.uid)
-          .get()
-          .then((products) => {
-            const productsList: Array<any> = [];
-            products.forEach((doc) => {
-              const data = { id: doc.id, data: doc.data() };
-              productsList.push(data);
-            });
-            const userObject = {
-              name: user?.user_name,
-              iconURL: user?.iconURL,
-              profile: user?.profile,
-              products: productsList,
-            };
-            setUser(userObject);
-          });
+      .collection("likedPosts")
+      .get();
+
+    const likedProductsDataArray: Array<any> = [];
+    await likedProductsDocs.forEach(async (likedProductDoc) => {
+      const likedProductRef = await likedProductDoc.data().postRef;
+      const productRef = await likedProductRef.get();
+      const authorId = productRef.data().userId;
+      const authorDoc = await db.collection("users").doc(authorId).get();
+      const authorData = await authorDoc.data();
+      likedProductsDataArray.push({
+        authorName: authorData?.name,
+        authorIconURL: authorData?.iconURL,
+        authorId,
+        productId: productRef.id,
+        productData: await productRef.data(),
       });
+    });
+    setLikedProducts(likedProductsDataArray);
   };
 
   useEffect(() => {
     !currentUser && Router.push("/");
     fetchUser();
-    console.log(user, "useEffect");
+    fetchLikedProducts();
   }, [currentUser]);
 
   if (!signInCheck || !currentUser) {
@@ -105,13 +123,29 @@ const Mypage: React.VFC = () => {
               {currentUser.displayName}
             </Box>
             <Box as="p" fontSize={{ base: ".95em", md: "16px" }}>
-              {user?.profile}
+              {user?.userData?.name}
             </Box>
           </Box>
         </Flex>
-        <Heading fontSize={24} textAlign="center">
-          {currentUser.displayName}さんの作品
-        </Heading>
+
+        <Flex fontSize="20px" ml="20%" mr="auto">
+          <Box
+            mx={5}
+            cursor="pointer"
+            onClick={() => setMode("products")}
+            color={mode === "products" ? "inherit" : "gray.400"}
+          >
+            作品
+          </Box>
+          <Box
+            mx={5}
+            cursor="pointer"
+            onClick={() => setMode("likes")}
+            color={mode === "likes" ? "inherit" : "gray.400"}
+          >
+            いいね
+          </Box>
+        </Flex>
         <Flex
           position="relative"
           m="2em 0"
@@ -121,35 +155,58 @@ const Mypage: React.VFC = () => {
           justify="space-between"
           _after={{ content: "''", display: "block", width: "calc(100% / 2)" }}
         >
-          {user?.products ? (
-            user?.products.map((product, index) => {
-              const date: string = product.data.createdAt.toDate().toString();
-              return (
-                <Box
-                  key={index}
-                  m={{ md: "0.5em auto", base: "0.5em auto" }}
-                  p="0"
-                  w={{ md: " calc(96%/2)", base: "96%" }}
-                >
-                  <Box m="0 auto" w="350px">
-                    <Exhibit
-                      key={index}
-                      exhibit={{
-                        id: product.id,
-                        name: product.data.title,
-                        userName: user.name,
-                        userIcon: user.iconURL,
-                        likes: 0,
-                        createdAt: moment(date).fromNow(),
-                      }}
-                    />
+          {mode === "products" && user?.products
+            ? user?.products.map((product, index) => {
+                const date: string = product.productData?.createdAt
+                  .toDate()
+                  .toString();
+                return (
+                  <Box
+                    key={index}
+                    m={{ md: "0.5em auto", base: "0.5em auto" }}
+                    p="0"
+                    w={{ md: " calc(96%/2)", base: "96%" }}
+                  >
+                    <Box m="0 auto" w="350px">
+                      <Exhibit
+                        exhibit={{
+                          id: product.productId,
+                          name: product.productData?.title,
+                          userName: user.userData?.name,
+                          userIcon: user.userData?.iconURL,
+                          likes: 0,
+                          createdAt: moment(date).fromNow(),
+                        }}
+                      />
+                    </Box>
                   </Box>
-                </Box>
-              );
-            })
-          ) : (
-            <Box>まだ投稿はありません</Box>
-          )}
+                );
+              })
+            : likedProducts.map((likedProduct: any, index: string) => {
+                const createdAtString: string =
+                  likedProduct.productData.createdAt.toDate().toString();
+                return (
+                  <Box
+                    key={index}
+                    m={{ md: "0.5em auto", base: "0.5em auto" }}
+                    p="0"
+                    w={{ md: " calc(96%/2)", base: "96%" }}
+                  >
+                    <Box m="0 auto" w="350px">
+                      <Exhibit
+                        exhibit={{
+                          id: likedProduct.id,
+                          name: likedProduct.productData.title,
+                          userName: likedProduct.authorName,
+                          userIcon: likedProduct.authorIconURL,
+                          likes: 0,
+                          createdAt: moment(createdAtString).fromNow(),
+                        }}
+                      />
+                    </Box>
+                  </Box>
+                );
+              })}
         </Flex>
       </Flex>
       <></>

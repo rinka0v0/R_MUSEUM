@@ -8,13 +8,16 @@ import { useEffect } from "react";
 import firebase from "firebase";
 import DOMPurify from "dompurify";
 import marked from "marked";
-import "github-markdown-css";
 import { AuthContext } from "../../auth/AuthProvider";
 import PrimaryButton from "../../components/atoms/button/PrimaryButton";
 import CommentEditor from "../../components/editor/CommentEditor";
 import Comment from "../../components/card/Comment";
 import moment from "moment";
 import useCommentFetch from "../../hooks/useFetchComment";
+import Link from "next/link";
+import { AiFillHeart } from "react-icons/ai";
+import { IconContext } from "react-icons/lib";
+import "github-markdown-css";
 
 const ProductPage: React.VFC = () => {
   const router = useRouter();
@@ -22,10 +25,11 @@ const ProductPage: React.VFC = () => {
 
   const [product, setProduct] =
     useState<firebase.firestore.DocumentData | undefined>();
-  const [html, setHTML] = useState("");
-  const [commentHTML, setCommentHTML] = useState("");
+
   const [commentMarkdown, setCommentMarkdown] = useState("");
   const [error, setError] = useState(false);
+  const [isliked, setIsLiked] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const { currentUser } = useContext(AuthContext);
   const { commentsData, isError, isLoading } = useCommentFetch(query);
@@ -34,34 +38,110 @@ const ProductPage: React.VFC = () => {
     router.push(`/products/${product?.id}/edit`);
   };
 
+  const fetchIsLiked = async () => {
+    const isLikedDoc = await db
+      .collection("users")
+      .doc(currentUser?.uid)
+      .collection("likedPosts")
+      .doc(product?.id)
+      .get();
+    setIsLiked(isLikedDoc.exists);
+  };
+
   const fetchProduct = async () => {
-    db.collection("products")
-      .doc(query)
-      .get()
-      .then(async (product) => {
-        if (!product.exists) {
-          console.log("データがありません");
-          const error = "投稿がみつかりませんでした";
-          const html = DOMPurify.sanitize(marked(error));
-          setHTML(html);
-        } else {
-          const data = await product.data();
-          const html = DOMPurify.sanitize(marked(data?.content));
-          setHTML(html);
-          await db
-            .collection("users")
-            .doc(data?.userId)
-            .get()
-            .then(async (userdoc) => {
-              const user = await userdoc.data();
-              setProduct({ data, id: product.id, user });
-            });
-        }
+    const fetchedProduct = await db.collection("products").doc(query).get();
+    if (!fetchedProduct.exists) {
+      setProduct({ data: { content: "投稿が見つかりませんでした" } });
+    } else {
+      const productData = await fetchedProduct.data();
+      const fetchedUser = await db
+        .collection("users")
+        .doc(productData?.userId)
+        .get();
+      const user = await fetchedUser.data();
+
+      const tagNames: Array<string> = [];
+      if (productData?.tagsIDs.length) {
+        //タグずけされている場合はクライアントサイドジョインする
+        await Promise.all(
+          productData?.tagsIDs.map(async (tagId: string) => {
+            const fetchedTag = await db.collection("tags").doc(tagId).get();
+            const tagData = await fetchedTag.data();
+            tagNames.push(tagData?.name);
+          })
+        );
+      }
+
+      const isLikedDoc = await db
+        .collection("users")
+        .doc(currentUser?.uid)
+        .collection("likedPosts")
+        .doc(fetchedProduct?.id)
+        .get();
+
+      setIsLiked(isLikedDoc.exists);
+
+      setProduct({
+        data: productData,
+        id: fetchedProduct?.id,
+        user,
+        userId: fetchedUser.id,
+        tags: tagNames,
       });
+    }
+  };
+
+  const onClickLiked = async (isliked: boolean) => {
+    if (loading) {
+      return;
+    }
+    setLoading(true);
+    const postRef = db.collection("products").doc(product?.id);
+    const currentUserRef = db.collection("users").doc(currentUser?.uid);
+    if (isliked) {
+      const batch = db.batch();
+      batch.delete(
+        db.doc(postRef.path).collection("likedUsers").doc(currentUserRef.id)
+      );
+      batch.delete(
+        db.doc(currentUserRef.path).collection("likedPosts").doc(postRef.id)
+      );
+      await batch.commit();
+      setIsLiked(false);
+    } else {
+      const batch = db.batch();
+      batch.set(
+        db
+          .collection("products")
+          .doc(product?.id)
+          .collection("likedUsers")
+          .doc(currentUser?.uid),
+        {
+          id: currentUser?.uid,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        }
+      );
+      batch.set(
+        db
+          .collection("users")
+          .doc(currentUser?.uid)
+          .collection("likedPosts")
+          .doc(product?.id),
+        {
+          id: postRef.id,
+          postRef,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        }
+      );
+      await batch.commit();
+      setIsLiked(true);
+    }
+    setLoading(false);
   };
 
   useEffect(() => {
     fetchProduct();
+    fetchIsLiked();
   }, []);
 
   return (
@@ -73,15 +153,39 @@ const ProductPage: React.VFC = () => {
             <PrimaryButton onClick={onClickEdit}>編集</PrimaryButton>
           </Box>
         ) : null}
-        <Heading my={5}>{product?.data.title}</Heading>
-        <Flex alignItems="center" my={5}>
-          <Avatar src={product?.user.iconURL} mr={3} ml={3} />
-          <Box>{product?.user.user_name}</Box>
+        <Flex
+          alignItems="center"
+          my={5}
+          ml="1em"
+          mr="auto"
+          mt="40px"
+          cursor="pointer"
+        >
+          <Link href={`/${product?.userId}`}>
+            <>
+              <Avatar src={product?.user.iconURL} mr={3} ml={3} />
+              <Box>{product?.user.user_name}</Box>
+            </>
+          </Link>
         </Flex>
+
+        <Box
+          onClick={() => onClickLiked(isliked)}
+          cursor="pointer"
+          mr="30px"
+          ml="auto"
+        >
+          <IconContext.Provider
+            value={{ color: isliked ? "red" : "gray", size: "3em" }}
+          >
+            <AiFillHeart />
+          </IconContext.Provider>
+        </Box>
+
+        <Heading my={5}>{product?.data.title}</Heading>
         <Heading my={5}>{product?.title}</Heading>
-        <Heading fontSize={20}>使用技術</Heading>
         <Box>
-          {product?.data.tagsIDs.map((tag: string) => {
+          {product?.tags.map((tag: string) => {
             return (
               <Box
                 key={tag}
@@ -112,7 +216,9 @@ const ProductPage: React.VFC = () => {
           <Box
             boxSizing="border-box"
             dangerouslySetInnerHTML={{
-              __html: html,
+              __html: DOMPurify.sanitize(
+                marked(product ? product.data.content : "Loading...")
+              ),
             }}
           ></Box>
         </Box>
@@ -140,9 +246,7 @@ const ProductPage: React.VFC = () => {
           </Box>
           <CommentEditor
             markdown={commentMarkdown}
-            HTML={commentHTML}
             setMarkdown={setCommentMarkdown}
-            setHTML={setCommentHTML}
             productId={query}
           />
         </Box>
