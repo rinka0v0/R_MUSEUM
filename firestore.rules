@@ -68,12 +68,24 @@ service cloud.firestore {
         return resource.data;
         }
 
-        function getData(path) {
-        return get(path).data;
-        }
+        // function getData(path) {
+        // return get(path).data;
+        // }
 
         function getAfterData(path) {
         return getAfter(path).data;
+        }
+
+        function isNotChanged(key) {
+        return incomingData()[key] == existingData()[key];
+        }
+
+        function isIncremented(after, before, key, number) {
+        return after[key] == before[key] + number;
+        }
+
+        function isIncrementedField(key, number) {
+        return isIncremented(incomingData(), existingData(), key, number);
         }
         match /users/{userId} {
             allow read: if isAuthenticated();
@@ -111,11 +123,7 @@ service cloud.firestore {
                 && !exists(likedUserPath(userId, incomingData()))
                 && getAfterData(likedUserPath(userId, incomingData())).id == userId;
 
-                allow update:  if isUserAuthenticated(userId)
-                && incomingData().id == likedPostId
-                && isRequestedTime(incomingData().createdAt)
-                && !exists(likedUserPath(userId, incomingData()))
-                && getAfterData(likedUserPath(userId, incomingData())).id == userId;
+                allow update:  if isAuthenticated()
 
                 allow delete: if isUserAuthenticated(userId)
                 && exists(likedUserPath(userId,existingData()))
@@ -134,12 +142,25 @@ service cloud.firestore {
             && isValidProduct(request.resource.data)
             && request.resource.data.title.size() < 30
 
-            allow update: if isUserAuthenticated(request.resource.data.userId)
+            allow update: if (isUserAuthenticated(request.resource.data.userId)
             && isValidProduct(request.resource.data)
             && request.resource.data.content.size() > 0
-            && (request.resource.data.title.size() > 0 
-            && request.resource.data.title.size() < 30
-            )
+            && request.resource.data.title.size() > 0 
+            && request.resource.data.title.size() < 30) 
+            || isUpdatingOnlyLikeCount()
+
+            function likedPostPath() {
+            return documentPath(['users', request.auth.uid, 'likedPosts', productId]);
+            }
+
+            function isUpdatingOnlyLikeCount() {
+                return isAuthenticated() 
+                && (
+                    (isIncrementedField('likeCount', 1)  && (!exists(likedPostPath()) && existsAfter(likedPostPath()))) 
+                    || (isIncrementedField('likeCount', -1) && (exists(likedPostPath()) && !existsAfter(likedPostPath())))
+                )
+                && isNotChanged('createdAt')
+            }            
 
             match /likedUsers/{likedUserId} {
                 allow read: if true
@@ -150,11 +171,7 @@ service cloud.firestore {
                 && !exists(likedPostPath(productId))
                 && getAfterData(likedPostPath(productId)).id == productId;
 
-                allow update:  if isUserAuthenticated(likedUserId)
-                && incomingData().id == likedUserId
-                && isRequestedTime(incomingData().createdAt) 
-                && !exists(likedPostPath(productId))
-                && getAfterData(likedPostPath(productId)).id == productId
+                allow update:  if isAuthenticated()
 
                 allow delete: if isUserAuthenticated(likedUserId)
                 && exists(likedPostPath(productId))
