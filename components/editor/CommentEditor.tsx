@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { Box } from "@chakra-ui/layout";
 import "easymde/dist/easymde.min.css";
@@ -13,6 +13,7 @@ import firebase from "firebase";
 import { AuthContext } from "../../auth/AuthProvider";
 import useMessage from "../../hooks/useMessage";
 import useFetchComment from "../../hooks/useFetchComment";
+import { nanoid } from "nanoid";
 
 // クライアント側でインポートする必要がある
 const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
@@ -61,6 +62,38 @@ const CommentEditor: React.VFC<Props> = (props) => {
     }
   };
 
+  const imageUploadFunction = (file: any) => {
+    // 画像をアップロードする処理
+    const storage = firebase.storage();
+    const storageRef = storage.ref(`images/${productId}/comments`);
+    const imagesRef = storageRef.child(file.name + nanoid(5));
+    const upLoadTask = imagesRef.put(file);
+    upLoadTask.on(
+      "state_changed",
+      (snapshot) => {
+        console.log("snapshot", snapshot);
+      },
+      (error) => {
+        showMessage({ title: "エラーが発生しました", status: "error" });
+        console.log("エラーが発生しました", error);
+      },
+      () => {
+        upLoadTask.snapshot.ref.getDownloadURL().then((downloadURL: string) => {
+          setMarkdown((preMardown) => {
+            return preMardown + `![image](${downloadURL})`;
+          });
+        });
+      }
+    );
+  };
+
+  const autoUploadImage = useMemo(() => {
+    return {
+      uploadImage: true,
+      imageUploadFunction,
+    };
+  }, []);
+
   return (
     <>
       <Box>
@@ -94,6 +127,7 @@ const CommentEditor: React.VFC<Props> = (props) => {
               onChange={(e: string) => {
                 setMarkdown(e);
               }}
+              options={autoUploadImage}
             />
           ) : (
             <Box w="100%" borderRadius={5} minH="330px" border="1px solid ">
