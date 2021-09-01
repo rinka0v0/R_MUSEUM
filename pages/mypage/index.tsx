@@ -40,10 +40,10 @@ const Mypage: React.VFC = () => {
       .where("userId", "==", currentUser?.uid)
       .get();
     const userProducts: Array<Products> = [];
-    await productsRef.forEach(async (productRef) => {
+     productsRef.forEach(async (productRef) => {
       userProducts.push({
         productId: productRef.id,
-        productData: await productRef.data(),
+        productData:  productRef.data(),
       });
     });
     setUser({
@@ -61,12 +61,12 @@ const Mypage: React.VFC = () => {
       .get();
 
     const likedProductsDataArray: Array<any> = [];
-    await likedProductsDocs.forEach(async (likedProductDoc) => {
+     likedProductsDocs.forEach(async (likedProductDoc) => {
       const likedProductRef = await likedProductDoc.data().postRef;
       const productRef = await likedProductRef.get();
       const authorId = productRef.data().userId;
       const authorDoc = await db.collection("users").doc(authorId).get();
-      const authorData = await authorDoc.data();
+      const authorData =  authorDoc.data();
       likedProductsDataArray.push({
         authorName: authorData?.name,
         authorIconURL: authorData?.iconURL,
