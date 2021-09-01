@@ -175,7 +175,7 @@ const Mypage: React.VFC = () => {
                           name: product.productData?.title,
                           userName: user.userData?.name,
                           userIcon: user.userData?.iconURL,
-                          likes: 0,
+                          likes: product.productData?.likeCount,
                           createdAt: moment(date).fromNow(),
                         }}
                       />
@@ -205,7 +205,7 @@ const Mypage: React.VFC = () => {
                         name: likedProduct.productData.title,
                         userName: likedProduct.authorName,
                         userIcon: likedProduct.authorIconURL,
-                        likes: 0,
+                        likes: likedProduct.productData.likeCount,
                         createdAt: moment(createdAtString).fromNow(),
                       }}
                     />
@@ -214,7 +214,7 @@ const Mypage: React.VFC = () => {
               );
             })
           ) : (
-            <Box ml="20px">いいねした投稿はありません</Box>
+            <Box ml="20px">投稿はありません</Box>
           )}
         </Flex>
       </Flex>
