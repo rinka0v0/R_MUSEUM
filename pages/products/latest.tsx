@@ -52,8 +52,8 @@ const LatestPage: VFC = () => {
     );
 
     setNewProducts(popularProductsDataArray);
-    if (newProductsDocs.docs[newProductsDocs.docs.length - 1]) {
-      setNextDoc(newProductsDocs.docs[newProductsDocs.docs.length - 1]);
+    if (newProductsDocs.docs[perPage - 1]) {
+      setNextDoc(newProductsDocs.docs[perPage - 1]);
     } else {
       setEmpty(true);
     }
@@ -100,8 +100,8 @@ const LatestPage: VFC = () => {
 
     setNewProducts((prev: any) => [...prev, ...popularProductsDataArray]);
 
-    if (newProductsDocs.docs[newProductsDocs.docs.length - 1]) {
-      setNextDoc(newProductsDocs.docs[newProductsDocs.docs.length - 1]);
+    if (newProductsDocs.docs[perPage - 1]) {
+      setNextDoc(newProductsDocs.docs[perPage - 1]);
     } else {
       setEmpty(true);
     }
@@ -113,51 +113,53 @@ const LatestPage: VFC = () => {
   }, []);
 
   return (
-    <>
+    <Box>
       <Header />
-      <Flex
-        position="relative"
-        m="2em 0"
-        maxW="960px"
-        w="100%"
-        flexWrap="wrap"
-        justify="space-between"
-        _after={{ content: "''", display: "block", width: "calc(100% / 2)" }}
-      >
-        {newProducts.map((product: any, index: number) => {
-          const date: string = product.createdAt.toDate().toString();
-          return (
-            <Box
-              key={index}
-              m={{ md: "0.5em auto", base: "0.5em auto" }}
-              p="0"
-              w={{ md: " calc(96%/2)", base: "96%" }}
-            >
-              <Box m="0 auto" w="350px">
-                <Exhibit
-                  exhibit={{
-                    id: product.productId,
-                    name: product.title,
-                    userName: product.authorName,
-                    userIcon: product.authorIconURL,
-                    likes: product.likeCount,
-                    createdAt: moment(date).fromNow(),
-                  }}
-                />
-              </Box>
-            </Box>
-          );
-        })}
-      </Flex>
-      {empty ? null : (
-        <PrimaryButton
-          onClick={() => getNextSnapshot(nextDoc, perPage)}
-          isLoading={fetching}
+      <Flex align="center" justify="center" flexDirection="column">
+        <Flex
+          position="relative"
+          m="2em 0"
+          maxW="960px"
+          w="100%"
+          flexWrap="wrap"
+          justify="space-between"
+          _after={{ content: "''", display: "block", width: "calc(100% / 2)" }}
         >
-          もっと見る
-        </PrimaryButton>
-      )}
-    </>
+          {newProducts.map((product: any, index: number) => {
+            const date: string = product.createdAt.toDate().toString();
+            return (
+              <Box
+                key={index}
+                m={{ md: "0.5em auto", base: "0.5em auto" }}
+                p="0"
+                w={{ md: " calc(96%/2)", base: "96%" }}
+              >
+                <Box m="0 auto" w="350px">
+                  <Exhibit
+                    exhibit={{
+                      id: product.productId,
+                      name: product.title,
+                      userName: product.authorName,
+                      userIcon: product.authorIconURL,
+                      likes: product.likeCount,
+                      createdAt: moment(date).fromNow(),
+                    }}
+                  />
+                </Box>
+              </Box>
+            );
+          })}
+        </Flex>
+        {empty ? null : (
+          <PrimaryButton
+            onClick={() => getNextSnapshot(nextDoc, perPage)}
+            isLoading={fetching}
+          >
+            もっと見る
+          </PrimaryButton>
+        )}
+      </Flex>
+    </Box>
   );
 };
 
