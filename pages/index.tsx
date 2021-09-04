@@ -7,6 +7,8 @@ import { db } from "../firebase";
 import firebase from "firebase";
 import { useState } from "react";
 import moment from "moment";
+import PrimaryButton from "../components/atoms/button/PrimaryButton";
+import router from "next/router";
 
 type ProductData = {
   id: string;
@@ -71,6 +73,7 @@ const IndexPage: React.VFC = () => {
       .orderBy("likeCount")
       .limit(6)
       .get();
+
     const popularProductsDataArray: Array<any> = [];
     productsRef.forEach((productRef) => {
       const productData = productRef.data();
@@ -90,10 +93,6 @@ const IndexPage: React.VFC = () => {
           .doc(productData.authorId)
           .get();
         const authorData = authorDoc.data();
-        console.log(authorDoc.data());
-
-        console.log(authorData, "authordata");
-
         popularProductsDataArray[index] = {
           ...productData,
           authorName: authorData?.user_name,
@@ -108,7 +107,6 @@ const IndexPage: React.VFC = () => {
   useEffect(() => {
     fetchProducts();
     fetchPopularProducts();
-    console.log(JSON.stringify(popularProducts), "popular");
   }, []);
 
   return (
@@ -155,6 +153,9 @@ const IndexPage: React.VFC = () => {
             );
           })}
         </Flex>
+        <PrimaryButton onClick={() => router.push("/products/latest")}>
+          もっと見る
+        </PrimaryButton>
         <Heading as="h2" textAlign="center" mt={5}>
           人気の作品（過去1週間）
         </Heading>
@@ -192,6 +193,9 @@ const IndexPage: React.VFC = () => {
             );
           })}
         </Flex>
+        <PrimaryButton onClick={() => router.push("/products/popular")}>
+          もっと見る
+        </PrimaryButton>
       </Flex>
     </Box>
   );
