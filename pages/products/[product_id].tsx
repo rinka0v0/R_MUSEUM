@@ -96,16 +96,21 @@ const ProductPage: React.VFC = () => {
       return;
     }
     setLoading(true);
-    const postRef = db.collection("products").doc(product?.id);
+    const productRef = db.collection("products").doc(product?.id);
     const currentUserRef = db.collection("users").doc(currentUser?.uid);
     if (isliked) {
       const batch = db.batch();
       batch.delete(
-        db.doc(postRef.path).collection("likedUsers").doc(currentUserRef.id)
+        db.doc(productRef.path).collection("likedUsers").doc(currentUserRef.id)
       );
       batch.delete(
-        db.doc(currentUserRef.path).collection("likedPosts").doc(postRef.id)
+        db.doc(currentUserRef.path).collection("likedPosts").doc(productRef.id)
       );
+
+      batch.update(productRef, {
+        likeCount: firebase.firestore.FieldValue.increment(-1),
+      });
+
       await batch.commit();
       setIsLiked(false);
     } else {
@@ -128,11 +133,16 @@ const ProductPage: React.VFC = () => {
           .collection("likedPosts")
           .doc(product?.id),
         {
-          id: postRef.id,
-          postRef,
+          id: productRef.id,
+          postRef: productRef,
           createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         }
       );
+
+      batch.update(productRef, {
+        likeCount: firebase.firestore.FieldValue.increment(1),
+      });
+
       await batch.commit();
       setIsLiked(true);
     }

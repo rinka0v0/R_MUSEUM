@@ -75,6 +75,7 @@ const Header: VFC<Props> = (props) => {
         tagsIDs: [],
         open: false,
         saved: false,
+        likeCount: 0,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       })
       .then(() => {

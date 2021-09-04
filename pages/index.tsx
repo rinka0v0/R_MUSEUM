@@ -20,6 +20,8 @@ const IndexPage: React.VFC = () => {
     Array<firebase.firestore.DocumentData>
   >([]);
 
+  const [popularProducts, setPopularProducts]: Array<any> = useState([]);
+
   console.log("indexページがレンダリングされました");
 
   const fetchProducts = async () => {
@@ -27,6 +29,7 @@ const IndexPage: React.VFC = () => {
       .collection("products")
       .orderBy("createdAt", "desc")
       // .where("open", "==", true)
+      .limit(6)
       .get()
       .then((querySnapshot) => {
         const fetchedProducts: Array<ProductData> = [];
@@ -58,13 +61,54 @@ const IndexPage: React.VFC = () => {
         );
         return fetchedProducts;
       });
-    console.log(data);
-
     setProducts(data);
+  };
+
+  const fetchPopularProducts = async () => {
+    const productsRef = await db
+      .collection("products")
+      .where("open", "==", true)
+      .orderBy("likeCount")
+      .limit(6)
+      .get();
+    const popularProductsDataArray: Array<any> = [];
+    productsRef.forEach((productRef) => {
+      const productData = productRef.data();
+      popularProductsDataArray.push({
+        productId: productRef.id,
+        title: productData.title,
+        likes: productData.likeCount,
+        createdAt: productData.createdAt,
+        authorId: productData.userId,
+      });
+    });
+
+    await Promise.all(
+      popularProductsDataArray.map(async (productData, index: number) => {
+        const authorDoc = await db
+          .collection("users")
+          .doc(productData.authorId)
+          .get();
+        const authorData = authorDoc.data();
+        console.log(authorDoc.data());
+
+        console.log(authorData, "authordata");
+
+        popularProductsDataArray[index] = {
+          ...productData,
+          authorName: authorData?.user_name,
+          authorIconURL: authorData?.iconURL,
+        };
+        return;
+      })
+    );
+    setPopularProducts(popularProductsDataArray);
   };
 
   useEffect(() => {
     fetchProducts();
+    fetchPopularProducts();
+    console.log(JSON.stringify(popularProducts), "popular");
   }, []);
 
   return (
@@ -102,7 +146,44 @@ const IndexPage: React.VFC = () => {
                       name: product.data.title,
                       userName: product.user.user_name,
                       userIcon: product.user.iconURL,
-                      likes: 0,
+                      likes: product.data.likeCount,
+                      createdAt: moment(date).fromNow(),
+                    }}
+                  />
+                </Box>
+              </Box>
+            );
+          })}
+        </Flex>
+        <Heading as="h2" textAlign="center" mt={5}>
+          人気の作品（過去1週間）
+        </Heading>
+        <Flex
+          position="relative"
+          m="2em 0"
+          maxW="960px"
+          w="100%"
+          flexWrap="wrap"
+          justify="space-between"
+          _after={{ content: "''", display: "block", width: "calc(100% / 2)" }}
+        >
+          {popularProducts.map((product: any, index: string) => {
+            const date: string = product.createdAt.toDate().toString();
+            return (
+              <Box
+                key={index}
+                m={{ md: "0.5em auto", base: "0.5em auto" }}
+                p="0"
+                w={{ md: " calc(96%/2)", base: "96%" }}
+              >
+                <Box m="0 auto" w="350px">
+                  <Exhibit
+                    exhibit={{
+                      id: product.productId,
+                      name: product.title,
+                      userName: product.authorName,
+                      userIcon: product.authorIconURL,
+                      likes: product.likes,
                       createdAt: moment(date).fromNow(),
                     }}
                   />

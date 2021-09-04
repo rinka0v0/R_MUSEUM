@@ -18,7 +18,6 @@ import Link from "next/link";
 import { useWarningOnExit } from "../../../hooks/useWarningOnExit";
 import "github-markdown-css";
 
-
 // クライアント側でインポートする必要がある
 const MarkdownEditor = dynamic(
   () => import("../../../components/editor/MarkdownEditor"),
@@ -126,16 +125,19 @@ const Edit: React.VFC = () => {
 
       db.collection("products")
         .doc(query)
-        .set({
-          title: title,
-          content: markdown,
-          userId: currentUser?.uid,
-          sorceCode: sourceCodeUrl,
-          tagsIDs: tagsDocumentId,
-          open: open,
-          saved: true,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        })
+        .set(
+          {
+            title: title,
+            content: markdown,
+            userId: currentUser?.uid,
+            sorceCode: sourceCodeUrl,
+            tagsIDs: tagsDocumentId,
+            open: open,
+            saved: true,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          },
+          { merge: true }
+        )
         .then(() => {
           showMessage({ title: "保存しました", status: "success" });
           setWarningExit(false);
@@ -190,7 +192,7 @@ const Edit: React.VFC = () => {
 
   return (
     <>
-      <Header isEditPage={true}/>
+      <Header isEditPage={true} />
       <Flex alignItems="center" justify="space-between" my={5}>
         <Link href="/dashboard">
           <Flex alignItems="center" ml={5} _hover={{ cursor: "pointer" }}>

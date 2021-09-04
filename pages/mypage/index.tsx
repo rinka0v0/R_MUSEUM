@@ -40,10 +40,10 @@ const Mypage: React.VFC = () => {
       .where("userId", "==", currentUser?.uid)
       .get();
     const userProducts: Array<Products> = [];
-    await productsRef.forEach(async (productRef) => {
+    productsRef.forEach(async (productRef) => {
       userProducts.push({
         productId: productRef.id,
-        productData: await productRef.data(),
+        productData: productRef.data(),
       });
     });
     setUser({
@@ -59,14 +59,15 @@ const Mypage: React.VFC = () => {
       .doc(currentUser?.uid)
       .collection("likedPosts")
       .get();
+      
 
     const likedProductsDataArray: Array<any> = [];
-    await likedProductsDocs.forEach(async (likedProductDoc) => {
+     likedProductsDocs.forEach(async (likedProductDoc) => {
       const likedProductRef = await likedProductDoc.data().postRef;
       const productRef = await likedProductRef.get();
       const authorId = productRef.data().userId;
       const authorDoc = await db.collection("users").doc(authorId).get();
-      const authorData = await authorDoc.data();
+      const authorData = authorDoc.data();
       likedProductsDataArray.push({
         authorName: authorData?.name,
         authorIconURL: authorData?.iconURL,
@@ -155,8 +156,9 @@ const Mypage: React.VFC = () => {
           justify="space-between"
           _after={{ content: "''", display: "block", width: "calc(100% / 2)" }}
         >
-          {mode === "products" && user?.products
-            ? user?.products.map((product, index) => {
+          {mode === "products" && user?.products ? (
+            user?.products.length ? (
+              user?.products.map((product, index) => {
                 const date: string = product.productData?.createdAt
                   .toDate()
                   .toString();
@@ -174,7 +176,7 @@ const Mypage: React.VFC = () => {
                           name: product.productData?.title,
                           userName: user.userData?.name,
                           userIcon: user.userData?.iconURL,
-                          likes: 0,
+                          likes: product.productData?.likeCount,
                           createdAt: moment(date).fromNow(),
                         }}
                       />
@@ -182,31 +184,39 @@ const Mypage: React.VFC = () => {
                   </Box>
                 );
               })
-            : likedProducts.map((likedProduct: any, index: string) => {
-                const createdAtString: string =
-                  likedProduct.productData.createdAt.toDate().toString();
-                return (
-                  <Box
-                    key={index}
-                    m={{ md: "0.5em auto", base: "0.5em auto" }}
-                    p="0"
-                    w={{ md: " calc(96%/2)", base: "96%" }}
-                  >
-                    <Box m="0 auto" w="350px">
-                      <Exhibit
-                        exhibit={{
-                          id: likedProduct.id,
-                          name: likedProduct.productData.title,
-                          userName: likedProduct.authorName,
-                          userIcon: likedProduct.authorIconURL,
-                          likes: 0,
-                          createdAt: moment(createdAtString).fromNow(),
-                        }}
-                      />
-                    </Box>
+            ) : (
+              <Box ml="20px">投稿はありません</Box>
+            )
+          ) : likedProducts.length ? (
+            likedProducts.map((likedProduct: any, index: string) => {
+              const createdAtString: string = likedProduct.productData.createdAt
+                .toDate()
+                .toString();
+              return (
+                <Box
+                  key={index}
+                  m={{ md: "0.5em auto", base: "0.5em auto" }}
+                  p="0"
+                  w={{ md: " calc(96%/2)", base: "96%" }}
+                >
+                  <Box m="0 auto" w="350px">
+                    <Exhibit
+                      exhibit={{
+                        id: likedProduct.id,
+                        name: likedProduct.productData.title,
+                        userName: likedProduct.authorName,
+                        userIcon: likedProduct.authorIconURL,
+                        likes: likedProduct.productData.likeCount,
+                        createdAt: moment(createdAtString).fromNow(),
+                      }}
+                    />
                   </Box>
-                );
-              })}
+                </Box>
+              );
+            })
+          ) : (
+            <Box ml="20px">投稿はありません</Box>
+          )}
         </Flex>
       </Flex>
       <></>
