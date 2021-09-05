@@ -18,6 +18,7 @@ import Link from "next/link";
 import { AiFillHeart } from "react-icons/ai";
 import { IconContext } from "react-icons/lib";
 import "github-markdown-css";
+import useMessage from "../../hooks/useMessage";
 
 const ProductPage: React.VFC = () => {
   const router = useRouter();
@@ -33,10 +34,13 @@ const ProductPage: React.VFC = () => {
 
   const { currentUser } = useContext(AuthContext);
   const { commentsData, isError, isLoading } = useCommentFetch(query);
+  const { showMessage } = useMessage();
 
   const onClickEdit = () => {
     router.push(`/products/${product?.id}/edit`);
   };
+
+  const notFoundUser = () => {};
 
   const fetchIsLiked = async () => {
     const isLikedDoc = await db
@@ -173,14 +177,18 @@ const ProductPage: React.VFC = () => {
         >
           <Link href={`/${product?.userId}`}>
             <>
-              <Avatar src={product?.user.iconURL} mr={3} ml={3} />
-              <Box>{product?.user.user_name}</Box>
+              <Avatar src={product?.user?.iconURL} mr={3} ml={3} />
+              <Box>{product?.user?.user_name}</Box>
             </>
           </Link>
         </Flex>
 
         <Box
-          onClick={() => onClickLiked(isliked)}
+          onClick={() =>
+            currentUser
+              ? onClickLiked(isliked)
+              : showMessage({ title: "ログインしてください", status: "error" })
+          }
           cursor="pointer"
           mr="30px"
           ml="auto"
@@ -195,24 +203,26 @@ const ProductPage: React.VFC = () => {
         <Heading my={5}>{product?.data.title}</Heading>
         <Heading my={5}>{product?.title}</Heading>
         <Box>
-          {product?.tags.map((tag: string) => {
-            return (
-              <Box
-                key={tag}
-                display="inline-block"
-                m=".6em"
-                p=".6em"
-                lineHeight="1"
-                textDecoration="none"
-                color="#00e"
-                backgroundColor="#fff"
-                border="1px solid #00e"
-                borderRadius="2em"
-              >
-                {tag}
-              </Box>
-            );
-          })}
+          {product?.tags
+            ? product?.tags.map((tag: string) => {
+                return (
+                  <Box
+                    key={tag}
+                    display="inline-block"
+                    m=".6em"
+                    p=".6em"
+                    lineHeight="1"
+                    textDecoration="none"
+                    color="#00e"
+                    backgroundColor="#fff"
+                    border="1px solid #00e"
+                    borderRadius="2em"
+                  >
+                    {tag}
+                  </Box>
+                );
+              })
+            : null}
         </Box>
 
         <Box
@@ -232,7 +242,7 @@ const ProductPage: React.VFC = () => {
             }}
           ></Box>
         </Box>
-        <Box bg="white" H="100px" p={5} w="80%">
+        <Box bg="white" H="100px" p={5} w="80%" mb={5}>
           <Heading fontSize="20px" textAlign="center" my="2em">
             コメント
           </Heading>
