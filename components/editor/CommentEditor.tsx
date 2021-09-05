@@ -144,7 +144,15 @@ const CommentEditor: React.VFC<Props> = (props) => {
         </Box>
       </Box>
       <Box>
-        <PrimaryButton onClick={postComment}>コメントする</PrimaryButton>
+        <PrimaryButton
+          onClick={() =>
+            currentUser
+              ? postComment
+              : showMessage({ title: "ログインしてください", status: "error" })
+          }
+        >
+          コメントする
+        </PrimaryButton>
       </Box>
     </>
   );
