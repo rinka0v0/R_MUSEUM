@@ -110,7 +110,7 @@ const IndexPage: React.VFC = () => {
   }, []);
 
   return (
-    <Box>
+    <Box mb={5}>
       <Header />
       <Flex align="center" justify="center" flexDirection="column">
         <Box w="80%" mt={10}>
@@ -193,7 +193,7 @@ const IndexPage: React.VFC = () => {
             );
           })}
         </Flex>
-        <PrimaryButton onClick={() => router.push("/products/popular")}>
+        <PrimaryButton onClick={() => router.push("/products/popular")} >
           もっと見る
         </PrimaryButton>
       </Flex>
