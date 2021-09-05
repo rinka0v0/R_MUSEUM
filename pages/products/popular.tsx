@@ -7,23 +7,25 @@ import Exhibit from "../../components/card/Exhibit";
 import moment from "moment";
 import PrimaryButton from "../../components/atoms/button/PrimaryButton";
 
-const LatestPage: VFC = () => {
+const PopularPage: VFC = () => {
   const perPage = 2;
 
   const [nextDoc, setNextDoc]: any = useState();
-  const [newProducts, setNewProducts]: Array<any> | undefined = useState([]);
+  const [popularProducts, setPopularProducts]: Array<any> | undefined = useState([]);
   const [empty, setEmpty] = useState(false);
   const [fetching, setFetching] = useState(true);
 
   const getSnapshot = async (perPage: number) => {
-    const newProductsDocs = await db
+    const popularProductsDocs = await db
       .collection("products")
+      //   .where("open", "==", true)
+      .orderBy("likeCount")
       .orderBy("createdAt", "desc")
       .limit(perPage)
       .get();
 
     const popularProductsDataArray: Array<any> = [];
-    newProductsDocs.forEach((productRef) => {
+    popularProductsDocs.forEach((productRef) => {
       const productData = productRef.data();
       popularProductsDataArray.push({
         productId: productRef.id,
@@ -51,9 +53,9 @@ const LatestPage: VFC = () => {
       })
     );
 
-    setNewProducts(popularProductsDataArray);
-    if (newProductsDocs.docs[perPage - 1]) {
-      setNextDoc(newProductsDocs.docs[perPage - 1]);
+    setPopularProducts(popularProductsDataArray);
+    if (popularProductsDocs.docs[perPage - 1]) {
+      setNextDoc(popularProductsDocs.docs[perPage - 1]);
     } else {
       setEmpty(true);
     }
@@ -62,7 +64,7 @@ const LatestPage: VFC = () => {
 
   const getNextSnapshot = async (start: any, perPage: number) => {
     setFetching(true);
-    const newProductsDocs = await db
+    const popularProductsDocs = await db
       .collection("products")
       .orderBy("createdAt", "desc")
       .startAfter(start)
@@ -70,7 +72,7 @@ const LatestPage: VFC = () => {
       .get();
 
     const popularProductsDataArray: Array<any> = [];
-    newProductsDocs.forEach((productRef) => {
+    popularProductsDocs.forEach((productRef) => {
       const productData = productRef.data();
       popularProductsDataArray.push({
         productId: productRef.id,
@@ -98,10 +100,10 @@ const LatestPage: VFC = () => {
       })
     );
 
-    setNewProducts((prev: any) => [...prev, ...popularProductsDataArray]);
+    setPopularProducts((prev: any) => [...prev, ...popularProductsDataArray]);
 
-    if (newProductsDocs.docs[perPage - 1]) {
-      setNextDoc(newProductsDocs.docs[perPage - 1]);
+    if (popularProductsDocs.docs[perPage - 1]) {
+      setNextDoc(popularProductsDocs.docs[perPage - 1]);
     } else {
       setEmpty(true);
     }
@@ -125,7 +127,7 @@ const LatestPage: VFC = () => {
           justify="space-between"
           _after={{ content: "''", display: "block", width: "calc(100% / 2)" }}
         >
-          {newProducts.map((product: any, index: number) => {
+          {popularProducts.map((product: any, index: number) => {
             const date: string = product.createdAt.toDate().toString();
             return (
               <Box
@@ -163,4 +165,4 @@ const LatestPage: VFC = () => {
   );
 };
 
-export default LatestPage;
+export default PopularPage;
