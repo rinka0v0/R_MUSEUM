@@ -89,7 +89,7 @@ service cloud.firestore {
         return isIncremented(incomingData(), existingData(), key, number);
         }
         match /users/{userId} {
-            allow read: if isAuthenticated();
+            allow read: if true;
 
             allow delete: if isUserAuthenticated(userId);
 
@@ -135,7 +135,7 @@ service cloud.firestore {
             }
         }
         match /products/{productId} {
-            allow read: if isAuthenticated();
+            allow read: if true;
 
             allow delete: if isAuthenticated();
 
@@ -192,7 +192,7 @@ service cloud.firestore {
             }
 
             match /comments/{commentId} {
-                allow read: if isAuthenticated();
+                allow read: if true;
 
                 allow delete: if isAuthenticated();
 
