@@ -40,8 +40,6 @@ const ProductPage: React.VFC = () => {
     router.push(`/products/${product?.id}/edit`);
   };
 
-  const notFoundUser = () => {};
-
   const fetchIsLiked = async () => {
     const isLikedDoc = await db
       .collection("users")
@@ -55,14 +53,14 @@ const ProductPage: React.VFC = () => {
   const fetchProduct = async () => {
     const fetchedProduct = await db.collection("products").doc(query).get();
     if (!fetchedProduct.exists) {
-      setProduct({ data: { content: "投稿が見つかりませんでした" } });
+      setProduct({ data: { content: "投稿が見つかりませんでした🙇‍♂️" } });
     } else {
-      const productData = await fetchedProduct.data();
+      const productData = fetchedProduct.data();
       const fetchedUser = await db
         .collection("users")
         .doc(productData?.userId)
         .get();
-      const user = await fetchedUser.data();
+      const user = fetchedUser.data();
 
       const tagNames: Array<string> = [];
       if (productData?.tagsIDs.length) {
@@ -70,7 +68,7 @@ const ProductPage: React.VFC = () => {
         await Promise.all(
           productData?.tagsIDs.map(async (tagId: string) => {
             const fetchedTag = await db.collection("tags").doc(tagId).get();
-            const tagData = await fetchedTag.data();
+            const tagData = fetchedTag.data();
             tagNames.push(tagData?.name);
           })
         );
@@ -89,7 +87,7 @@ const ProductPage: React.VFC = () => {
         data: productData,
         id: fetchedProduct?.id,
         user,
-        userId: fetchedUser.id,
+        userId: productData?.userId,
         tags: tagNames,
       });
     }
@@ -167,21 +165,21 @@ const ProductPage: React.VFC = () => {
             <PrimaryButton onClick={onClickEdit}>編集</PrimaryButton>
           </Box>
         ) : null}
-        <Flex
-          alignItems="center"
-          my={5}
-          ml="1em"
-          mr="auto"
-          mt="40px"
-          cursor="pointer"
-        >
-          <Link href={`/${product?.userId}`}>
+        <Link href={`/${product?.userId}`}>
+          <Flex
+            alignItems="center"
+            my={5}
+            ml="1em"
+            mr="auto"
+            mt="40px"
+            cursor="pointer"
+          >
             <>
               <Avatar src={product?.user?.iconURL} mr={3} ml={3} />
               <Box>{product?.user?.user_name}</Box>
             </>
-          </Link>
-        </Flex>
+          </Flex>
+        </Link>
 
         <Box
           onClick={() =>
