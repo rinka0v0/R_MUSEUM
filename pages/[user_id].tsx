@@ -22,7 +22,7 @@ const ProductPage: React.VFC = () => {
   //   router.push(`/mypage`);
   // }
 
-  const perPage = 2;
+  const perPage = 10;
 
   const [userInfo, setUserInfo]: any = useState();
   const [nextDoc, setNextDoc]: any = useState();
