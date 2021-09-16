@@ -211,6 +211,16 @@ service cloud.firestore {
             allow create: if isAuthenticated() && isValidTag(request.resource.data)
 
             allow update: if isAuthenticated() && isValidTag(request.resource.data)
+
+            match /productId/{productId} {
+                allow read: if true
+
+                allow delete: if isAuthenticated()
+
+                allow create: if isAuthenticated() 
+
+                allow update: if isAuthenticated()
+            }
         }
   }
 }
