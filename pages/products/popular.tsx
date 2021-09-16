@@ -1,4 +1,4 @@
-import { Box, Flex } from "@chakra-ui/react";
+import { Box, Flex, Heading } from "@chakra-ui/react";
 import { useEffect, useState, VFC } from "react";
 import Header from "../../components/layout/Header";
 import { db } from "../../firebase";
@@ -11,7 +11,8 @@ const PopularPage: VFC = () => {
   const perPage = 2;
 
   const [nextDoc, setNextDoc]: any = useState();
-  const [popularProducts, setPopularProducts]: Array<any> | undefined = useState([]);
+  const [popularProducts, setPopularProducts]: Array<any> | undefined =
+    useState([]);
   const [empty, setEmpty] = useState(false);
   const [fetching, setFetching] = useState(true);
 
@@ -118,6 +119,7 @@ const PopularPage: VFC = () => {
     <Box>
       <Header />
       <Flex align="center" justify="center" flexDirection="column">
+        <Heading mt={5}>人気の投稿</Heading>
         <Flex
           position="relative"
           m="2em 0"

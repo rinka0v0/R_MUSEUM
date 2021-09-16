@@ -1,14 +1,13 @@
-import { Box, Flex } from "@chakra-ui/react";
+import { Box, Flex, Heading } from "@chakra-ui/react";
 import { useEffect, useState, VFC } from "react";
 import Header from "../../components/layout/Header";
 import { db } from "../../firebase";
-import firebase from "firebase";
 import Exhibit from "../../components/card/Exhibit";
 import moment from "moment";
 import PrimaryButton from "../../components/atoms/button/PrimaryButton";
 
 const LatestPage: VFC = () => {
-  const perPage = 2;
+  const perPage = 10;
 
   const [nextDoc, setNextDoc]: any = useState();
   const [newProducts, setNewProducts]: Array<any> | undefined = useState([]);
@@ -116,6 +115,7 @@ const LatestPage: VFC = () => {
     <Box>
       <Header />
       <Flex align="center" justify="center" flexDirection="column">
+        <Heading mt={5}>最新の投稿</Heading>
         <Flex
           position="relative"
           m="2em 0"
