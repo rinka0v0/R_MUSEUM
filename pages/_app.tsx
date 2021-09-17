@@ -10,10 +10,10 @@ const MyApp = ({ Component, pageProps }: AppProps): JSX.Element => {
     <>
       <ChakraProvider theme={theme}>
         <AuthProvider>
-          <Head>
-            <title>R_MUSEUM</title>
-          </Head>
-          <Flex minH="100vh" flexDirection="column">
+          <Flex flexDirection="column" minH="100vh">
+            <Head>
+              <title>R_MUSEUM</title>
+            </Head>
             <Box flex="1">
               <Component {...pageProps} />
             </Box>
