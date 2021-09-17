@@ -23,7 +23,9 @@ const DashBoard: VFC<Props> = (props) => {
         >
           <Box>{title}</Box>
           <Flex justify="space-around">
-            <Box color="red">{isOpen ? "公開中" : "非公開中"}</Box>
+            <Box color={isOpen ? "red" : "blue"}>
+              {isOpen ? "公開" : "非公開"}
+            </Box>
             <Box>{createdAt}</Box>
           </Flex>
         </Box>
