@@ -1,4 +1,4 @@
-import { Box, Flex, Tag } from "@chakra-ui/react";
+import { Box, Flex, SkeletonCircle, SkeletonText } from "@chakra-ui/react";
 import moment from "moment";
 import router from "next/router";
 import { useEffect, useState } from "react";
@@ -19,9 +19,11 @@ const TagPage: VFC = () => {
 
   const tagName = router.query.tagName;
   const [nextDoc, setNextDoc]: any = useState();
-  const [fetching, setFetching] = useState(true);
+  const [fetching, setFetching] = useState(false);
   const [empty, setEmpty] = useState(true);
   const [products, setProducts] = useState<Products>();
+
+  const [loading, setLoading] = useState(true);
 
   const fetchProducts = async () => {
     const tagsRef = await db
@@ -80,7 +82,7 @@ const TagPage: VFC = () => {
       setEmpty(true);
     }
     setProducts({ id: tag[0], dataArray: productsDataArray });
-    setFetching(false);
+    setLoading(false);
   };
 
   const getNextSnapshot = async (start: any, perPage: number) => {
@@ -182,32 +184,48 @@ const TagPage: VFC = () => {
           justify="space-between"
           _after={{ content: "''", display: "block", width: "calc(100% / 2)" }}
         >
-          {products?.dataArray?.map((product: any, index: number) => {
-            const date: string = product.createdAt.toDate().toString();
-            console.log(product);
-
-            return (
-              <Box
-                key={index}
-                m={{ md: "0.5em auto", base: "0.5em auto" }}
-                p="0"
-                w={{ md: " calc(96%/2)", base: "96%" }}
-              >
-                <Box m="0 auto" w="350px">
-                  <Exhibit
-                    exhibit={{
-                      id: product.productId,
-                      name: product.title,
-                      userName: product.authorName,
-                      userIcon: product.authorIconURL,
-                      likes: product.likes,
-                      createdAt: moment(date).fromNow(),
-                    }}
-                  />
-                </Box>
-              </Box>
-            );
-          })}
+          {loading
+            ? Array(10)
+                .fill(0)
+                .map((_, index) => {
+                  return (
+                    <Box
+                      key={index}
+                      m={{ md: "0.5em auto", base: "0.5em auto" }}
+                      p="0"
+                      w={{ md: " calc(96%/2)", base: "96%" }}
+                    >
+                      <Box m="0 auto" w="350px" bg="white" p="12px">
+                        <SkeletonText spacing="2" />
+                        <SkeletonCircle size="10" mt={2} />
+                      </Box>
+                    </Box>
+                  );
+                })
+            : products?.dataArray?.map((product: any, index: number) => {
+                const date: string = product.createdAt.toDate().toString();
+                return (
+                  <Box
+                    key={index}
+                    m={{ md: "0.5em auto", base: "0.5em auto" }}
+                    p="0"
+                    w={{ md: " calc(96%/2)", base: "96%" }}
+                  >
+                    <Box m="0 auto" w="350px">
+                      <Exhibit
+                        exhibit={{
+                          id: product.productId,
+                          name: product.title,
+                          userName: product.authorName,
+                          userIcon: product.authorIconURL,
+                          likes: product.likes,
+                          createdAt: moment(date).fromNow(),
+                        }}
+                      />
+                    </Box>
+                  </Box>
+                );
+              })}
         </Flex>
         {empty ? null : (
           <PrimaryButton

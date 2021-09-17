@@ -1,5 +1,11 @@
-import { Box, Flex, Heading } from "@chakra-ui/react";
 import { useEffect, useState, VFC } from "react";
+import {
+  Box,
+  Flex,
+  Heading,
+  SkeletonCircle,
+  SkeletonText,
+} from "@chakra-ui/react";
 import Header from "../../components/layout/Header";
 import { db } from "../../firebase";
 import Exhibit from "../../components/card/Exhibit";
@@ -11,8 +17,10 @@ const LatestPage: VFC = () => {
 
   const [nextDoc, setNextDoc]: any = useState();
   const [newProducts, setNewProducts]: Array<any> | undefined = useState([]);
-  const [empty, setEmpty] = useState(false);
-  const [fetching, setFetching] = useState(true);
+  const [empty, setEmpty] = useState(true);
+  const [fetching, setFetching] = useState(false);
+
+  const [loading, setLoading] = useState(true);
 
   const getSnapshot = async (perPage: number) => {
     const newProductsDocs = await db
@@ -53,10 +61,11 @@ const LatestPage: VFC = () => {
     setNewProducts(popularProductsDataArray);
     if (newProductsDocs.docs[perPage - 1]) {
       setNextDoc(newProductsDocs.docs[perPage - 1]);
+      setEmpty(false);
     } else {
       setEmpty(true);
     }
-    setFetching(false);
+    setLoading(false);
   };
 
   const getNextSnapshot = async (start: any, perPage: number) => {
@@ -101,6 +110,7 @@ const LatestPage: VFC = () => {
 
     if (newProductsDocs.docs[perPage - 1]) {
       setNextDoc(newProductsDocs.docs[perPage - 1]);
+      setEmpty(false);
     } else {
       setEmpty(true);
     }
@@ -125,30 +135,48 @@ const LatestPage: VFC = () => {
           justify="space-between"
           _after={{ content: "''", display: "block", width: "calc(100% / 2)" }}
         >
-          {newProducts.map((product: any, index: number) => {
-            const date: string = product.createdAt.toDate().toString();
-            return (
-              <Box
-                key={index}
-                m={{ md: "0.5em auto", base: "0.5em auto" }}
-                p="0"
-                w={{ md: " calc(96%/2)", base: "96%" }}
-              >
-                <Box m="0 auto" w="350px">
-                  <Exhibit
-                    exhibit={{
-                      id: product.productId,
-                      name: product.title,
-                      userName: product.authorName,
-                      userIcon: product.authorIconURL,
-                      likes: product.likeCount,
-                      createdAt: moment(date).fromNow(),
-                    }}
-                  />
-                </Box>
-              </Box>
-            );
-          })}
+          {loading
+            ? Array(10)
+                .fill(0)
+                .map((_, index) => {
+                  return (
+                    <Box
+                      key={index}
+                      m={{ md: "0.5em auto", base: "0.5em auto" }}
+                      p="0"
+                      w={{ md: " calc(96%/2)", base: "96%" }}
+                    >
+                      <Box m="0 auto" w="350px" bg="white" p="12px">
+                        <SkeletonText spacing="2" />
+                        <SkeletonCircle size="10" mt={2} />
+                      </Box>
+                    </Box>
+                  );
+                })
+            : newProducts.map((product: any, index: number) => {
+                const date: string = product.createdAt.toDate().toString();
+                return (
+                  <Box
+                    key={index}
+                    m={{ md: "0.5em auto", base: "0.5em auto" }}
+                    p="0"
+                    w={{ md: " calc(96%/2)", base: "96%" }}
+                  >
+                    <Box m="0 auto" w="350px">
+                      <Exhibit
+                        exhibit={{
+                          id: product.productId,
+                          name: product.title,
+                          userName: product.authorName,
+                          userIcon: product.authorIconURL,
+                          likes: product.likeCount,
+                          createdAt: moment(date).fromNow(),
+                        }}
+                      />
+                    </Box>
+                  </Box>
+                );
+              })}
         </Flex>
         {empty ? null : (
           <PrimaryButton
