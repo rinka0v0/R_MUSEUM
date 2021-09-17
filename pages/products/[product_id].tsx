@@ -1,4 +1,5 @@
 import React, { useContext, useState } from "react";
+import Link from "next/link";
 import { Avatar } from "@chakra-ui/avatar";
 import { Box, Flex, Heading } from "@chakra-ui/layout";
 import Header from "../../components/layout/Header";
@@ -14,7 +15,6 @@ import CommentEditor from "../../components/editor/CommentEditor";
 import Comment from "../../components/card/Comment";
 import moment from "moment";
 import useCommentFetch from "../../hooks/useFetchComment";
-import Link from "next/link";
 import { AiFillHeart } from "react-icons/ai";
 import { IconContext } from "react-icons/lib";
 import "github-markdown-css";
@@ -202,22 +202,24 @@ const ProductPage: React.VFC = () => {
         <Heading my={5}>{product?.title}</Heading>
         <Box>
           {product?.tags
-            ? product?.tags.map((tag: string) => {
+            ? product?.tags.map((tag: string,index:number) => {
                 return (
-                  <Box
-                    key={tag}
-                    display="inline-block"
-                    m=".6em"
-                    p=".6em"
-                    lineHeight="1"
-                    textDecoration="none"
-                    color="#00e"
-                    backgroundColor="#fff"
-                    border="1px solid #00e"
-                    borderRadius="2em"
-                  >
-                    {tag}
-                  </Box>
+                  <Link key={index} href={`/tags/${tag}`}>
+                    <Box
+                      display="inline-block"
+                      m=".6em"
+                      p=".6em"
+                      lineHeight="1"
+                      textDecoration="none"
+                      color="#00e"
+                      backgroundColor="#fff"
+                      border="1px solid #00e"
+                      borderRadius="2em"
+                      cursor="pointer"
+                    >
+                      {tag}
+                    </Box>
+                  </Link>
                 );
               })
             : null}
