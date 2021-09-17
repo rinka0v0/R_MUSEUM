@@ -100,18 +100,17 @@ const Edit: React.VFC = () => {
         await Promise.all(
           tags.map(async (tagName) => {
             const tagsRef = db.collection("tags");
-            const tagData = await tagsRef.where("name", "==", tagName).get();
+            const tagData = await tagsRef.where("name", "==",  tagName.toLocaleLowerCase().trim()).get();
             if (tagData.empty) {
               // create tag document
               await db
                 .collection("tags")
                 .add({
-                  name: tagName,
+                  name: tagName.toLocaleLowerCase(),
+                  count: 0,
                   createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 })
                 .then((res) => {
-
-
                   db.collection("tags")
                     .doc(res.id)
                     .collection("productId")
@@ -119,8 +118,6 @@ const Edit: React.VFC = () => {
                     .set({
                       id: query,
                     });
-
-
                   tagsDocumentId.push(res.id);
                 });
             } else {
@@ -281,7 +278,7 @@ const Edit: React.VFC = () => {
         />
 
         <Heading fontSize={20} mt={5} mb={3}>
-          使用技術(5個まで)
+          タグ(5個まで)
         </Heading>
         <Box width="80%">
           <TagInput tags={tags} setTags={setTags} />
