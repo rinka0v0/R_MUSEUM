@@ -15,9 +15,9 @@ const TagInput: VFC<Props> = (props) => {
   const { tags, setTags } = props;
 
   const inputKeyDown = (e: any) => {
-    const val = e?.target.value;
+    const val:string = e?.target.value;
     if (e?.key === "Enter" && val) {
-      if (tags.find((tag) => tag.toLowerCase() === val.toLowerCase())) {
+      if (tags.find((tag) => tag.toLowerCase() === val.trim().toLowerCase())) {
         return;
       }
       setTags([...tags, val]);
