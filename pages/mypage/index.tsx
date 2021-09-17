@@ -59,10 +59,9 @@ const Mypage: React.VFC = () => {
       .doc(currentUser?.uid)
       .collection("likedPosts")
       .get();
-      
 
     const likedProductsDataArray: Array<any> = [];
-     likedProductsDocs.forEach(async (likedProductDoc) => {
+    likedProductsDocs.forEach(async (likedProductDoc) => {
       const likedProductRef = await likedProductDoc.data().postRef;
       const productRef = await likedProductRef.get();
       const authorId = productRef.data().userId;
@@ -90,7 +89,7 @@ const Mypage: React.VFC = () => {
   }
 
   return (
-    <>
+    <Box mb={5}>
       <Header />
       <Flex alignItems="center" flexDirection="column" maxH="1000px">
         <Box ml="auto" mr={5} mt={5}>
@@ -99,7 +98,7 @@ const Mypage: React.VFC = () => {
           </Link>
         </Box>
         <Flex
-          w={{ md: "90%" }}
+          w={{ md: "90%", base: "100%" }}
           alignItems="center"
           my={10}
           justify="space-around"
@@ -113,23 +112,23 @@ const Mypage: React.VFC = () => {
                   : "https://bit.ly/broken-link"
               }
               size="2xl"
-              mx={3}
-              my={5}
+              maxW="960px"
+              w="100%"
               display="block"
             />
             {/* <Button>アイコンの変更</Button> */}
           </Box>
-          <Box width="70%">
+          <Box w={{ md: "70%", base: "90%" }}>
             <Box fontSize={{ base: "1.5em", md: "2em" }} fontWeight="bold">
               {currentUser.displayName}
             </Box>
             <Box as="p" fontSize={{ base: ".95em", md: "16px" }}>
-              {user?.userData?.name}
+              {user?.userData?.profile}
             </Box>
           </Box>
         </Flex>
 
-        <Flex fontSize="20px" ml="20%" mr="auto">
+        <Flex fontSize="20px">
           <Box
             mx={5}
             cursor="pointer"
@@ -219,8 +218,7 @@ const Mypage: React.VFC = () => {
           )}
         </Flex>
       </Flex>
-      <></>
-    </>
+    </Box>
   );
 };
 
