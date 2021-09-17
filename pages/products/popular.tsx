@@ -8,7 +8,7 @@ import moment from "moment";
 import PrimaryButton from "../../components/atoms/button/PrimaryButton";
 
 const PopularPage: VFC = () => {
-  const perPage = 2;
+  const perPage = 10;
 
   const [nextDoc, setNextDoc]: any = useState();
   const [popularProducts, setPopularProducts]: Array<any> | undefined =
@@ -20,7 +20,7 @@ const PopularPage: VFC = () => {
     const popularProductsDocs = await db
       .collection("products")
       //   .where("open", "==", true)
-      .orderBy("likeCount")
+      .orderBy("likeCount",'desc')
       .orderBy("createdAt", "desc")
       .limit(perPage)
       .get();
@@ -145,7 +145,7 @@ const PopularPage: VFC = () => {
                       name: product.title,
                       userName: product.authorName,
                       userIcon: product.authorIconURL,
-                      likes: product.likeCount,
+                      likes: product.likes,
                       createdAt: moment(date).fromNow(),
                     }}
                   />
