@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import TrendLanguage from "../components/card/TrendLanguage";
 import Exhibit from "../components/card/Exhibit";
 import { Box, Flex, Heading } from "@chakra-ui/layout";
 import Header from "../components/layout/Header";
@@ -116,9 +115,9 @@ const IndexPage: React.VFC = () => {
       <Box mb={5}>
         <Header />
         <Flex align="center" justify="center" flexDirection="column">
-          <Box w="80%" mt={10}>
+          {/* <Box w="80%" mt={10}>
             <TrendLanguage languages={["TypeScript", "Go", "React"]} />
-          </Box>
+          </Box> */}
           <Heading as="h2" textAlign="center" mt={5}>
             新しい作品
           </Heading>
@@ -137,7 +136,7 @@ const IndexPage: React.VFC = () => {
           >
             {Array(6)
               .fill(0)
-              .map((i, index) => {
+              .map((_, index) => {
                 return (
                   <Box
                     key={index}
@@ -171,7 +170,7 @@ const IndexPage: React.VFC = () => {
           >
             {Array(6)
               .fill(0)
-              .map((i, index) => {
+              .map((_, index) => {
                 return (
                   <Box
                     key={index}
@@ -196,9 +195,9 @@ const IndexPage: React.VFC = () => {
     <Box mb={5}>
       <Header />
       <Flex align="center" justify="center" flexDirection="column">
-        <Box w="80%" mt={10}>
+        {/* <Box w="80%" mt={10}>
           <TrendLanguage languages={["TypeScript", "Go", "React"]} />
-        </Box>
+        </Box> */}
         <Heading as="h2" textAlign="center" mt={5}>
           新しい作品
         </Heading>
