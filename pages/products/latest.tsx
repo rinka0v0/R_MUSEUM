@@ -169,7 +169,7 @@ const LatestPage: VFC = () => {
                           name: product.title,
                           userName: product.authorName,
                           userIcon: product.authorIconURL,
-                          likes: product.likeCount,
+                          likes: product.likes,
                           createdAt: moment(date).fromNow(),
                         }}
                       />
