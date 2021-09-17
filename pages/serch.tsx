@@ -3,16 +3,33 @@ import Link from "next/link";
 import { Flex } from "@chakra-ui/layout";
 import { Box, Heading } from "@chakra-ui/react";
 import Header from "../components/layout/Header";
+import { db } from "../firebase";
+import { useEffect } from "react";
 
 const SerchPage: React.VFC = () => {
   // const [keyWord, setKeyWord] = useState("");
   // const onChangeKeyWord = (e: React.ChangeEvent<HTMLInputElement>) => {
   //   setKeyWord(e.target.value);
   // };
+  const perPage = 64;
+  const [tagsName, setTagsName] = useState<Array<string>>([]);
 
-  const [tags, setTags] = useState(9);
+  const fetchTagNames = async () => {
+    const tagsRef = await db
+      .collection("tags")
+      .orderBy("name")
+      .limit(perPage)
+      .get();
+    const tagsNameArray: Array<string> = [];
+    tagsRef.forEach((ref) => {
+      tagsNameArray.push(ref.data().name);
+    });
+    setTagsName(tagsNameArray);
+  };
 
-  const tagName = 'Go'
+  useEffect(() => {
+    fetchTagNames();
+  }, []);
 
   return (
     <>
@@ -27,6 +44,7 @@ const SerchPage: React.VFC = () => {
           />
           <PrimaryButton>検索</PrimaryButton>
         </Flex> */}
+
         <Heading fontSize="20px" mt="40px">
           タグで検索
         </Heading>
@@ -42,39 +60,37 @@ const SerchPage: React.VFC = () => {
             content: "''",
             display: "block",
             width: {
-              md: `calc(${25 * (4 - (tags % 4))}%)`,
-              base: `calc(${50 * (2 - (tags % 2))}%)`,
+              md: `calc(${25 * (4 - (tagsName.length % 4))}%)`,
+              base: `calc(${50 * (2 - (tagsName.length % 2))}%)`,
             },
           }}
         >
-          {Array(tags)
-            .fill(0)
-            .map((_, index) => {
-              return (
-                <Link href={`/tags/${tagName.toLocaleLowerCase()}`} key={index}>
-                  <Box
-                    m={{ md: "0.5em auto", base: "0.5em auto" }}
-                    p="0"
-                    w={{ md: " calc(96%/4)", base: "calc(94%/2)" }}
-                  >
-                    <Box>
-                      <Box
-                        p=".5em 1em"
-                        fontWeight="bold"
-                        color="#6091d3"
-                        bg="#FFF"
-                        border="solid 3px #6091d3"
-                        borderRadius="10px"
-                        textAlign="center"
-                        cursor="pointer"
-                      >
-                        FirebaseFi
-                      </Box>
+          {tagsName.map((tagName, index) => {
+            return (
+              <Link href={`/tags/${tagName.toLocaleLowerCase()}`} key={index}>
+                <Box
+                  m={{ md: "0.5em auto", base: "0.5em auto" }}
+                  p="0"
+                  w={{ md: " calc(96%/4)", base: "calc(94%/2)" }}
+                >
+                  <Box>
+                    <Box
+                      p=".5em 1em"
+                      fontWeight="bold"
+                      color="#6091d3"
+                      bg="#FFF"
+                      border="solid 3px #6091d3"
+                      borderRadius="10px"
+                      textAlign="center"
+                      cursor="pointer"
+                    >
+                      {tagName}
                     </Box>
                   </Box>
-                </Link>
-              );
-            })}
+                </Box>
+              </Link>
+            );
+          })}
         </Flex>
       </Flex>
     </>
