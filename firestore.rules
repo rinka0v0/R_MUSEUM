@@ -45,9 +45,10 @@ service cloud.firestore {
             && "likes" in comment && comment.likes is number
         }
         function isValidTag(tag) {
-            return tag.size() == 2
+            return tag.size() == 3
             && 'name' in tag && tag.name is string
             && 'createdAt' in tag && tag.createdAt is timestamp
+            && "count" in tag && tag.count is number
         }
 
         function documentPath(paths) {
