@@ -21,7 +21,7 @@ const TagInput: VFC<Props> = (props) => {
         return;
       }
       setTags([...tags, val]);
-      e.target.value = "";
+      e.target.value = " ";
     } else if (e.key === "Backspace" && !val) {
       removeTag(tags.length - 1);
     }
@@ -60,7 +60,7 @@ const TagInput: VFC<Props> = (props) => {
           })}
         </UnorderedList>
         <Input
-          placeholder="使用言語"
+          placeholder="使用した技術など"
           onKeyUp={(e) => inputKeyDown(e)}
           flex="1"
           h="46px"
