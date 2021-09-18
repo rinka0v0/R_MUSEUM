@@ -171,7 +171,7 @@ const TagPage: VFC = () => {
           </Box>
         </Flex>
 
-        {!fetching && !products?.dataArray?.length ? (
+        {!loading && !products?.dataArray?.length ? (
           <Box>作品が見つかりませんでした</Box>
         ) : null}
 
