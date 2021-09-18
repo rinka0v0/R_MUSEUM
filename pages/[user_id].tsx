@@ -18,17 +18,18 @@ const ProductPage: React.VFC = () => {
   const userId = router.query.user_id;
   const { currentUser } = useContext(AuthContext);
 
-  //   if (currentUser?.uid === userId) {
-  //   router.push(`/mypage`);
-  // }
+  if (currentUser?.uid === userId) {
+    router.push(`/mypage`);
+  }
 
   const perPage = 10;
 
   const [userInfo, setUserInfo]: any = useState();
   const [nextDoc, setNextDoc]: any = useState();
-  const [fetching, setFetching] = useState(true);
+  const [fetching, setFetching] = useState(false);
   const [empty, setEmpty] = useState(false);
-  const [btnLoading, setBtnLoading] = useState(false);
+
+  const [loading,setLoading] = useState(true)
 
   const fetchUserInfo = async (userId: any) => {
     const userRef = await db.collection("users").doc(userId).get();
@@ -60,11 +61,11 @@ const ProductPage: React.VFC = () => {
       setEmpty(true);
     }
 
-    setFetching(false);
+    setLoading(false);
   };
 
   const getNextProducts = async (start: any, perPage: number) => {
-    setBtnLoading(true);
+    setFetching(true);
     const newProductsDocs = await db
       .collection("products")
       .where("userId", "==", userId)
@@ -98,7 +99,7 @@ const ProductPage: React.VFC = () => {
       setEmpty(true);
     }
 
-    setBtnLoading(false);
+    setFetching(false);
   };
 
   useEffect(() => {
@@ -108,7 +109,7 @@ const ProductPage: React.VFC = () => {
   return (
     <>
       <Header />
-      <Flex alignItems="center" flexDirection="column" maxH="1000px" mb={5}>
+      <Flex alignItems="center" flexDirection="column" mb={5}>
         <Flex
           w={{ md: "90%" }}
           alignItems="center"
@@ -147,10 +148,10 @@ const ProductPage: React.VFC = () => {
             width: "calc(100% / 2)",
           }}
         >
-          {fetching
+          {loading
             ? Array(10)
                 .fill(0)
-                .map((i, index) => {
+                .map((_, index) => {
                   return (
                     <Box
                       key={index}
@@ -193,7 +194,7 @@ const ProductPage: React.VFC = () => {
         {empty ? null : (
           <PrimaryButton
             onClick={() => getNextProducts(nextDoc, perPage)}
-            isLoading={btnLoading}
+            isLoading={fetching}
           >
             もっと見る
           </PrimaryButton>
