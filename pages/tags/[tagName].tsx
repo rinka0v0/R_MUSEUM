@@ -15,7 +15,7 @@ type Products = {
 };
 
 const TagPage: VFC = () => {
-  const perPage = 2;
+  const perPage = 10;
 
   const tagName = router.query.tagName;
   const [nextDoc, setNextDoc]: any = useState();
