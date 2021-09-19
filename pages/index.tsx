@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import TrendLanguage from "../components/card/TrendLanguage";
 import Exhibit from "../components/card/Exhibit";
 import { Box, Flex, Heading } from "@chakra-ui/layout";
 import Header from "../components/layout/Header";
@@ -9,6 +8,7 @@ import { useState } from "react";
 import moment from "moment";
 import PrimaryButton from "../components/atoms/button/PrimaryButton";
 import router from "next/router";
+import { SkeletonCircle, SkeletonText } from "@chakra-ui/react";
 
 type ProductData = {
   id: string;
@@ -23,6 +23,7 @@ const IndexPage: React.VFC = () => {
   >([]);
 
   const [popularProducts, setPopularProducts]: Array<any> = useState([]);
+  const [loading, setLoading] = useState(true);
 
   console.log("indexページがレンダリングされました");
 
@@ -70,7 +71,8 @@ const IndexPage: React.VFC = () => {
     const productsRef = await db
       .collection("products")
       .where("open", "==", true)
-      .orderBy("likeCount")
+      .orderBy("likeCount", "desc")
+      .orderBy("createdAt", "desc")
       .limit(6)
       .get();
 
@@ -105,17 +107,92 @@ const IndexPage: React.VFC = () => {
   };
 
   useEffect(() => {
-    fetchProducts();
-    fetchPopularProducts();
+    Promise.all([fetchProducts(), fetchPopularProducts()]).then(() => {
+      setLoading(false);
+    });
   }, []);
+  if (loading) {
+    return (
+      <Box mb={5}>
+        <Header />
+        <Flex align="center" justify="center" flexDirection="column">
+          <Heading as="h2" textAlign="center" mt={5}>
+            新しい作品
+          </Heading>
+          <Flex
+            position="relative"
+            m="2em 0"
+            maxW="960px"
+            w="100%"
+            flexWrap="wrap"
+            justify="space-between"
+            _after={{
+              content: "''",
+              display: "block",
+              width: "calc(100% / 2)",
+            }}
+          >
+            {Array(6)
+              .fill(0)
+              .map((_, index) => {
+                return (
+                  <Box
+                    key={index}
+                    m={{ md: "0.5em auto", base: "0.5em auto" }}
+                    p="0"
+                    w={{ md: " calc(96%/2)", base: "96%" }}
+                  >
+                    <Box m="0 auto" w="350px" bg="white" p="12px">
+                      <SkeletonText spacing="2" />
+                      <SkeletonCircle size="10" mt={2} />
+                    </Box>
+                  </Box>
+                );
+              })}
+          </Flex>
+          <Heading as="h2" textAlign="center" mt={5}>
+            人気の作品（過去1週間）
+          </Heading>
+          <Flex
+            position="relative"
+            m="2em 0"
+            maxW="960px"
+            w="100%"
+            flexWrap="wrap"
+            justify="space-between"
+            _after={{
+              content: "''",
+              display: "block",
+              width: "calc(100% / 2)",
+            }}
+          >
+            {Array(6)
+              .fill(0)
+              .map((_, index) => {
+                return (
+                  <Box
+                    key={index}
+                    m={{ md: "0.5em auto", base: "0.5em auto" }}
+                    p="0"
+                    w={{ md: " calc(96%/2)", base: "96%" }}
+                  >
+                    <Box m="0 auto" w="350px" bg="white" p="12px">
+                      <SkeletonText spacing="2" />
+                      <SkeletonCircle size="10" mt={2} />
+                    </Box>
+                  </Box>
+                );
+              })}
+          </Flex>
+        </Flex>
+      </Box>
+    );
+  }
 
   return (
-    <Box>
+    <Box mb={5}>
       <Header />
       <Flex align="center" justify="center" flexDirection="column">
-        <Box w="80%" mt={10}>
-          <TrendLanguage languages={["TypeScript", "Go", "React"]} />
-        </Box>
         <Heading as="h2" textAlign="center" mt={5}>
           新しい作品
         </Heading>

@@ -1,4 +1,5 @@
 import React, { useContext, useState } from "react";
+import Link from "next/link";
 import { Avatar } from "@chakra-ui/avatar";
 import { Box, Flex, Heading } from "@chakra-ui/layout";
 import Header from "../../components/layout/Header";
@@ -14,10 +15,10 @@ import CommentEditor from "../../components/editor/CommentEditor";
 import Comment from "../../components/card/Comment";
 import moment from "moment";
 import useCommentFetch from "../../hooks/useFetchComment";
-import Link from "next/link";
 import { AiFillHeart } from "react-icons/ai";
 import { IconContext } from "react-icons/lib";
 import "github-markdown-css";
+import useMessage from "../../hooks/useMessage";
 
 const ProductPage: React.VFC = () => {
   const router = useRouter();
@@ -33,6 +34,7 @@ const ProductPage: React.VFC = () => {
 
   const { currentUser } = useContext(AuthContext);
   const { commentsData, isError, isLoading } = useCommentFetch(query);
+  const { showMessage } = useMessage();
 
   const onClickEdit = () => {
     router.push(`/products/${product?.id}/edit`);
@@ -51,14 +53,14 @@ const ProductPage: React.VFC = () => {
   const fetchProduct = async () => {
     const fetchedProduct = await db.collection("products").doc(query).get();
     if (!fetchedProduct.exists) {
-      setProduct({ data: { content: "投稿が見つかりませんでした" } });
+      setProduct({ data: { content: "投稿が見つかりませんでした🙇‍♂️" } });
     } else {
-      const productData = await fetchedProduct.data();
+      const productData = fetchedProduct.data();
       const fetchedUser = await db
         .collection("users")
         .doc(productData?.userId)
         .get();
-      const user = await fetchedUser.data();
+      const user = fetchedUser.data();
 
       const tagNames: Array<string> = [];
       if (productData?.tagsIDs.length) {
@@ -66,7 +68,7 @@ const ProductPage: React.VFC = () => {
         await Promise.all(
           productData?.tagsIDs.map(async (tagId: string) => {
             const fetchedTag = await db.collection("tags").doc(tagId).get();
-            const tagData = await fetchedTag.data();
+            const tagData = fetchedTag.data();
             tagNames.push(tagData?.name);
           })
         );
@@ -85,7 +87,7 @@ const ProductPage: React.VFC = () => {
         data: productData,
         id: fetchedProduct?.id,
         user,
-        userId: fetchedUser.id,
+        userId: productData?.userId,
         tags: tagNames,
       });
     }
@@ -163,24 +165,28 @@ const ProductPage: React.VFC = () => {
             <PrimaryButton onClick={onClickEdit}>編集</PrimaryButton>
           </Box>
         ) : null}
-        <Flex
-          alignItems="center"
-          my={5}
-          ml="1em"
-          mr="auto"
-          mt="40px"
-          cursor="pointer"
-        >
-          <Link href={`/${product?.userId}`}>
+        <Link href={`/${product?.userId}`}>
+          <Flex
+            alignItems="center"
+            my={5}
+            ml="1em"
+            mr="auto"
+            mt="40px"
+            cursor="pointer"
+          >
             <>
-              <Avatar src={product?.user.iconURL} mr={3} ml={3} />
-              <Box>{product?.user.user_name}</Box>
+              <Avatar src={product?.user?.iconURL} mr={3} ml={3} />
+              <Box>{product?.user?.user_name}</Box>
             </>
-          </Link>
-        </Flex>
+          </Flex>
+        </Link>
 
         <Box
-          onClick={() => onClickLiked(isliked)}
+          onClick={() =>
+            currentUser
+              ? onClickLiked(isliked)
+              : showMessage({ title: "ログインしてください", status: "error" })
+          }
           cursor="pointer"
           mr="30px"
           ml="auto"
@@ -195,24 +201,28 @@ const ProductPage: React.VFC = () => {
         <Heading my={5}>{product?.data.title}</Heading>
         <Heading my={5}>{product?.title}</Heading>
         <Box>
-          {product?.tags.map((tag: string) => {
-            return (
-              <Box
-                key={tag}
-                display="inline-block"
-                m=".6em"
-                p=".6em"
-                lineHeight="1"
-                textDecoration="none"
-                color="#00e"
-                backgroundColor="#fff"
-                border="1px solid #00e"
-                borderRadius="2em"
-              >
-                {tag}
-              </Box>
-            );
-          })}
+          {product?.tags
+            ? product?.tags.map((tag: string,index:number) => {
+                return (
+                  <Link key={index} href={`/tags/${tag}`}>
+                    <Box
+                      display="inline-block"
+                      m=".6em"
+                      p=".6em"
+                      lineHeight="1"
+                      textDecoration="none"
+                      color="#00e"
+                      backgroundColor="#fff"
+                      border="1px solid #00e"
+                      borderRadius="2em"
+                      cursor="pointer"
+                    >
+                      {tag}
+                    </Box>
+                  </Link>
+                );
+              })
+            : null}
         </Box>
 
         <Box
@@ -232,7 +242,7 @@ const ProductPage: React.VFC = () => {
             }}
           ></Box>
         </Box>
-        <Box bg="white" H="100px" p={5} w="80%">
+        <Box bg="white" H="100px" p={5} w="80%" mb={5}>
           <Heading fontSize="20px" textAlign="center" my="2em">
             コメント
           </Heading>

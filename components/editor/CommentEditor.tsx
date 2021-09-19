@@ -39,9 +39,11 @@ const CommentEditor: React.VFC<Props> = (props) => {
   const { currentUser } = useContext(AuthContext);
   const { showMessage } = useMessage();
   const { mutate } = useFetchComment(productId);
+  const [loading, setLoading] = useState(false);
 
   const postComment = () => {
-    if (markdown) {
+    setLoading(true);
+    if (markdown && !loading) {
       db.collection("products")
         .doc(productId)
         .collection("comments")
@@ -56,9 +58,16 @@ const CommentEditor: React.VFC<Props> = (props) => {
           setMarkdown("");
           mutate();
           showMessage({ title: "コメントしました！", status: "success" });
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+        .finally(() => {
+          setLoading(false);
         });
     } else {
       showMessage({ title: "コメントできませんでした", status: "error" });
+      setLoading(false);
     }
   };
 
@@ -144,7 +153,16 @@ const CommentEditor: React.VFC<Props> = (props) => {
         </Box>
       </Box>
       <Box>
-        <PrimaryButton onClick={postComment}>コメントする</PrimaryButton>
+        <PrimaryButton
+          isLoading={loading}
+          onClick={() =>
+            currentUser
+              ? postComment()
+              : showMessage({ title: "ログインしてください", status: "error" })
+          }
+        >
+          コメントする
+        </PrimaryButton>
       </Box>
     </>
   );

@@ -45,9 +45,10 @@ service cloud.firestore {
             && "likes" in comment && comment.likes is number
         }
         function isValidTag(tag) {
-            return tag.size() == 2
+            return tag.size() == 3
             && 'name' in tag && tag.name is string
             && 'createdAt' in tag && tag.createdAt is timestamp
+            && "count" in tag && tag.count is number
         }
 
         function documentPath(paths) {
@@ -89,7 +90,7 @@ service cloud.firestore {
         return isIncremented(incomingData(), existingData(), key, number);
         }
         match /users/{userId} {
-            allow read: if isAuthenticated();
+            allow read: if true;
 
             allow delete: if isUserAuthenticated(userId);
 
@@ -135,7 +136,7 @@ service cloud.firestore {
             }
         }
         match /products/{productId} {
-            allow read: if isAuthenticated();
+            allow read: if true;
 
             allow delete: if isAuthenticated();
 
@@ -192,7 +193,7 @@ service cloud.firestore {
             }
 
             match /comments/{commentId} {
-                allow read: if isAuthenticated();
+                allow read: if true;
 
                 allow delete: if isAuthenticated();
 
@@ -211,6 +212,16 @@ service cloud.firestore {
             allow create: if isAuthenticated() && isValidTag(request.resource.data)
 
             allow update: if isAuthenticated() && isValidTag(request.resource.data)
+
+            match /productId/{productId} {
+                allow read: if true
+
+                allow delete: if isAuthenticated()
+
+                allow create: if isAuthenticated() 
+
+                allow update: if isAuthenticated()
+            }
         }
   }
 }

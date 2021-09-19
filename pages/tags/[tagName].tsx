@@ -1,38 +1,56 @@
-import { useEffect, useState, VFC } from "react";
-import {
-  Box,
-  Flex,
-  Heading,
-  SkeletonCircle,
-  SkeletonText,
-} from "@chakra-ui/react";
+import { Box, Flex, SkeletonCircle, SkeletonText } from "@chakra-ui/react";
+import moment from "moment";
+import router from "next/router";
+import { useEffect, useState } from "react";
+import { VFC } from "react";
+import PrimaryButton from "../../components/atoms/button/PrimaryButton";
+import Exhibit from "../../components/card/Exhibit";
 import Header from "../../components/layout/Header";
 import { db } from "../../firebase";
-import Exhibit from "../../components/card/Exhibit";
-import moment from "moment";
-import PrimaryButton from "../../components/atoms/button/PrimaryButton";
+import firebase from "firebase";
 
-const LatestPage: VFC = () => {
+type Products = {
+  id: string;
+  dataArray: Array<firebase.firestore.DocumentData> | undefined;
+};
+
+const TagPage: VFC = () => {
   const perPage = 10;
 
+  const tagName = router.query.tagName;
   const [nextDoc, setNextDoc]: any = useState();
-  const [newProducts, setNewProducts]: Array<any> | undefined = useState([]);
-  const [empty, setEmpty] = useState(true);
   const [fetching, setFetching] = useState(false);
+  const [empty, setEmpty] = useState(true);
+  const [products, setProducts] = useState<Products>();
 
   const [loading, setLoading] = useState(true);
 
-  const getSnapshot = async (perPage: number) => {
-    const newProductsDocs = await db
+  const fetchProducts = async () => {
+    const tagsRef = await db
+      .collection("tags")
+      .where("name", "==", tagName)
+      .limit(1)
+      .get();
+    if (tagsRef.empty) {
+      console.log("error");
+      setFetching(false);
+      return;
+    }
+    // let tagId: string;
+    const tag: Array<string> = [];
+    tagsRef.forEach((tagRef) => {
+      tag.push(tagRef.id);
+    });
+    const productRefs = await db
       .collection("products")
-      .orderBy("createdAt", "desc")
+      .where("tagsIDs", "array-contains", tag[0])
       .limit(perPage)
       .get();
 
-    const popularProductsDataArray: Array<any> = [];
-    newProductsDocs.forEach((productRef) => {
+    const productsDataArray: Array<any> = [];
+    productRefs.forEach((productRef) => {
       const productData = productRef.data();
-      popularProductsDataArray.push({
+      productsDataArray.push({
         productId: productRef.id,
         title: productData.title,
         likes: productData.likeCount,
@@ -42,14 +60,14 @@ const LatestPage: VFC = () => {
     });
 
     await Promise.all(
-      popularProductsDataArray.map(async (productData, index: number) => {
+      productsDataArray.map(async (productData, index: number) => {
         const authorDoc = await db
           .collection("users")
           .doc(productData.authorId)
           .get();
 
         const authorData = authorDoc.data();
-        popularProductsDataArray[index] = {
+        productsDataArray[index] = {
           ...productData,
           authorName: authorData?.user_name,
           authorIconURL: authorData?.iconURL,
@@ -57,30 +75,29 @@ const LatestPage: VFC = () => {
         return;
       })
     );
-
-    setNewProducts(popularProductsDataArray);
-    if (newProductsDocs.docs[perPage - 1]) {
-      setNextDoc(newProductsDocs.docs[perPage - 1]);
+    if (productRefs.docs[perPage - 1]) {
+      setNextDoc(productRefs.docs[perPage - 1]);
       setEmpty(false);
     } else {
       setEmpty(true);
     }
+    setProducts({ id: tag[0], dataArray: productsDataArray });
     setLoading(false);
   };
 
   const getNextSnapshot = async (start: any, perPage: number) => {
     setFetching(true);
-    const newProductsDocs = await db
+    const productRefs = await db
       .collection("products")
-      .orderBy("createdAt", "desc")
+      .where("tagsIDs", "array-contains", products?.id)
       .startAfter(start)
       .limit(perPage)
       .get();
 
-    const popularProductsDataArray: Array<any> = [];
-    newProductsDocs.forEach((productRef) => {
+    const nextProducts: Array<any> = [];
+    productRefs.forEach((productRef) => {
       const productData = productRef.data();
-      popularProductsDataArray.push({
+      nextProducts.push({
         productId: productRef.id,
         title: productData.title,
         likes: productData.likeCount,
@@ -90,14 +107,14 @@ const LatestPage: VFC = () => {
     });
 
     await Promise.all(
-      popularProductsDataArray.map(async (productData, index: number) => {
+      nextProducts.map(async (productData, index: number) => {
         const authorDoc = await db
           .collection("users")
           .doc(productData.authorId)
           .get();
 
         const authorData = authorDoc.data();
-        popularProductsDataArray[index] = {
+        nextProducts[index] = {
           ...productData,
           authorName: authorData?.user_name,
           authorIconURL: authorData?.iconURL,
@@ -106,10 +123,12 @@ const LatestPage: VFC = () => {
       })
     );
 
-    setNewProducts((prev: any) => [...prev, ...popularProductsDataArray]);
+    setProducts((prev: any) => {
+      return { id: prev?.id, dataArray: [...prev?.dataArray, ...nextProducts] };
+    });
 
-    if (newProductsDocs.docs[perPage - 1]) {
-      setNextDoc(newProductsDocs.docs[perPage - 1]);
+    if (productRefs.docs[perPage - 1]) {
+      setNextDoc(productRefs.docs[perPage - 1]);
       setEmpty(false);
     } else {
       setEmpty(true);
@@ -118,14 +137,44 @@ const LatestPage: VFC = () => {
   };
 
   useEffect(() => {
-    getSnapshot(perPage);
+    fetchProducts();
   }, []);
 
   return (
-    <Box>
+    <>
       <Header />
       <Flex align="center" justify="center" flexDirection="column">
-        <Heading mt={5}>最新の投稿</Heading>
+        <Flex
+          border="1px solid #ddd"
+          bg="white"
+          borderRadius="md"
+          p={5}
+          justify="center"
+          width="90%"
+          m="2em auto"
+        >
+          <Box>
+            <Box
+              display="inline-block"
+              m=".6em"
+              p=".6em"
+              lineHeight="1"
+              textDecoration="none"
+              color="#00e"
+              backgroundColor="#fff"
+              border="1px solid #00e"
+              borderRadius="2em"
+            >
+              {tagName}
+            </Box>
+            タグがつけられた作品
+          </Box>
+        </Flex>
+
+        {!loading && !products?.dataArray?.length ? (
+          <Box>作品が見つかりませんでした</Box>
+        ) : null}
+
         <Flex
           position="relative"
           m="2em 0"
@@ -153,7 +202,7 @@ const LatestPage: VFC = () => {
                     </Box>
                   );
                 })
-            : newProducts.map((product: any, index: number) => {
+            : products?.dataArray?.map((product: any, index: number) => {
                 const date: string = product.createdAt.toDate().toString();
                 return (
                   <Box
@@ -187,8 +236,8 @@ const LatestPage: VFC = () => {
           </PrimaryButton>
         )}
       </Flex>
-    </Box>
+    </>
   );
 };
 
-export default LatestPage;
+export default TagPage;

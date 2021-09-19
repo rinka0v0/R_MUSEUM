@@ -63,6 +63,7 @@ const Edit: React.VFC = () => {
           const data = product.data();
           setTitle(data?.title);
           setMarkdown(data?.content);
+          setOpen(data?.open)
           // タグを取得してステートに設定する
           const tagNames: Array<string> = [];
           console.log(data?.tagsIDs);
@@ -98,24 +99,41 @@ const Edit: React.VFC = () => {
         // タグがつけられている場合の処理
         await Promise.all(
           tags.map(async (tagName) => {
-            const tagsRef = await db.collection("tags");
-            const tagData = await tagsRef.where("name", "==", tagName).get();
+            const tagsRef = db.collection("tags");
+            const tagData = await tagsRef.where("name", "==",  tagName.toLocaleLowerCase().trim()).get();
             if (tagData.empty) {
               // create tag document
               await db
                 .collection("tags")
                 .add({
-                  name: tagName,
+                  name: tagName.toLocaleLowerCase(),
+                  count: 0,
                   createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 })
                 .then((res) => {
-                  res.id;
-                  console.log(res);
+                  db.collection("tags")
+                    .doc(res.id)
+                    .collection("productId")
+                    .doc(query)
+                    .set({
+                      id: query,
+                    });
                   tagsDocumentId.push(res.id);
                 });
             } else {
               tagData.forEach((doc) => {
                 tagsDocumentId.push(doc.id);
+
+
+                db.collection("tags")
+                  .doc(doc.id)
+                  .collection("productId")
+                  .doc(query)
+                  .set({
+                    id: query,
+                  });
+
+
               });
             }
           })
@@ -260,7 +278,7 @@ const Edit: React.VFC = () => {
         />
 
         <Heading fontSize={20} mt={5} mb={3}>
-          使用技術(5個まで)
+          タグ(5個まで)
         </Heading>
         <Box width="80%">
           <TagInput tags={tags} setTags={setTags} />
