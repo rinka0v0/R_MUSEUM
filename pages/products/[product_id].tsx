@@ -19,6 +19,7 @@ import { AiFillHeart } from "react-icons/ai";
 import { IconContext } from "react-icons/lib";
 import "github-markdown-css";
 import useMessage from "../../hooks/useMessage";
+import { Skeleton, SkeletonCircle, SkeletonText } from "@chakra-ui/react";
 
 const ProductPage: React.VFC = () => {
   const router = useRouter();
@@ -30,10 +31,10 @@ const ProductPage: React.VFC = () => {
   const [commentMarkdown, setCommentMarkdown] = useState("");
   const [error, setError] = useState(false);
   const [isliked, setIsLiked] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const { currentUser } = useContext(AuthContext);
-  const { commentsData, isError, isLoading } = useCommentFetch(query);
+  const { commentsData, isError } = useCommentFetch(query);
   const { showMessage } = useMessage();
 
   const onClickEdit = () => {
@@ -97,7 +98,6 @@ const ProductPage: React.VFC = () => {
     if (loading) {
       return;
     }
-    setLoading(true);
     const productRef = db.collection("products").doc(product?.id);
     const currentUserRef = db.collection("users").doc(currentUser?.uid);
     if (isliked) {
@@ -148,13 +148,35 @@ const ProductPage: React.VFC = () => {
       await batch.commit();
       setIsLiked(true);
     }
-    setLoading(false);
   };
 
   useEffect(() => {
-    fetchProduct();
-    fetchIsLiked();
+    Promise.all([fetchProduct(), fetchIsLiked()]).then(() => {
+      setLoading(false);
+    });
   }, []);
+
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <Flex
+          FlexShadow="lg"
+          justify="center"
+          flexDirection="column"
+          align="center"
+          mb={5}
+        >
+          <Flex justify="space-between" my={5} w="80%" align="center">
+            <SkeletonCircle h="48px" w="48px" />
+            <Skeleton h="48px" w="48px" />
+          </Flex>
+          <Skeleton height="43px" width="80%" my={5} mb="60px" />
+          <SkeletonText mt="4" noOfLines={30} spacing="4" w="80%" />
+        </Flex>
+      </>
+    );
+  }
 
   return (
     <>
@@ -248,7 +270,6 @@ const ProductPage: React.VFC = () => {
             コメント
           </Heading>
           <Box w="80%" m="0 auto">
-            {isLoading ? <Box>Loading...</Box> : null}
             {isError ? <Box>コメントを読み込めませんでした🙇‍♂️</Box> : null}
             {commentsData && commentsData.length
               ? commentsData.map((comment, index) => {

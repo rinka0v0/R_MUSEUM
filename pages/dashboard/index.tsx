@@ -8,7 +8,7 @@ import DashBoard from "../../components/card/DashBoard";
 import { db } from "../../firebase";
 import { useState } from "react";
 import moment from "moment";
-import { Stack } from "@chakra-ui/react";
+import { Skeleton, Stack } from "@chakra-ui/react";
 
 type ProductData = {
   id: string;
@@ -20,7 +20,7 @@ type ProductData = {
 const Dashbord: React.VFC = () => {
   const { currentUser, signInCheck } = useContext(AuthContext);
   const [products, setProducts] = useState<Array<ProductData>>([]);
-
+  const [loading, setLoading] = useState(true);
   const fetchProducts = async () => {
     await db
       .collection("products")
@@ -44,32 +44,45 @@ const Dashbord: React.VFC = () => {
 
   useEffect(() => {
     !currentUser && Router.push("/");
-    fetchProducts();
+    fetchProducts().then(() => {
+      setLoading(false);
+    });
   }, []);
 
   if (!signInCheck || !currentUser) {
     return <Loading />;
   }
+
   return (
     <>
       <Header />
-      <Flex flexDirection="column" alignItems="center">
+      <Flex flexDirection="column" alignItems="center" mb={5}>
         <Heading fontSize={20} my={5}>
           自分の作品一覧
         </Heading>
         <Stack spacing={5}>
-          {products.map((product) => {
-            return (
-              <Box key={product.id} cursor="pointer">
-                <DashBoard
-                  url={`/products/${product.id}/edit`}
-                  isOpen={product.isOpen}
-                  title={product.title}
-                  createdAt={product.createdAt}
-                />
-              </Box>
-            );
-          })}
+          {loading ? (
+            <>
+              {Array(10)
+                .fill(0)
+                .map((_, index) => {
+                  return <Skeleton height="74px" w="300px" key={index} />;
+                })}
+            </>
+          ) : (
+            products.map((product) => {
+              return (
+                <Box key={product.id} cursor="pointer">
+                  <DashBoard
+                    url={`/products/${product.id}/edit`}
+                    isOpen={product.isOpen}
+                    title={product.title}
+                    createdAt={product.createdAt}
+                  />
+                </Box>
+              );
+            })
+          )}
         </Stack>
       </Flex>
     </>
