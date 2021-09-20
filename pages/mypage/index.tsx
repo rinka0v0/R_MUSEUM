@@ -52,7 +52,8 @@ const Mypage: React.VFC = () => {
     const productsRef = await db
       .collection("products")
       .where("userId", "==", currentUser?.uid)
-      .orderBy("createdAt")
+      .where('open','==',true)
+      .orderBy("createdAt",'desc')
       .limit(perPage)
       .get();
 
@@ -88,7 +89,7 @@ const Mypage: React.VFC = () => {
       .collection("users")
       .doc(currentUser?.uid)
       .collection("likedPosts")
-      .orderBy("createdAt")
+      .orderBy("createdAt",'desc')
       .limit(perPage)
       .get();
 
@@ -136,7 +137,7 @@ const Mypage: React.VFC = () => {
       .collection("users")
       .doc(currentUser?.uid)
       .collection("likedPosts")
-      .orderBy("createdAt")
+      .orderBy("createdAt",'desc')
       .startAfter(start)
       .limit(perPage)
       .get();
@@ -186,7 +187,7 @@ const Mypage: React.VFC = () => {
     const productsRef = await db
       .collection("products")
       .where("userId", "==", currentUser?.uid)
-      .orderBy("createdAt")
+      .orderBy("createdAt",'desc')
       .startAfter(start)
       .limit(perPage)
       .get();
@@ -251,7 +252,7 @@ const Mypage: React.VFC = () => {
     return (
       <Box mb={5}>
         <Header />
-        <Flex alignItems="center" flexDirection="column" maxH="1000px">
+        <Flex alignItems="center" flexDirection="column">
           <Box ml="auto" mr={5} mt={5}>
             <Link href="/mypage/edit">
               <PrimaryButton>プロフィール編集</PrimaryButton>

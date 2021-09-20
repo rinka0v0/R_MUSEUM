@@ -25,8 +25,9 @@ const PopularPage: VFC = () => {
   const getSnapshot = async (perPage: number) => {
     const popularProductsDocs = await db
       .collection("products")
-      //   .where("open", "==", true)
+      .where("open", "==", true)
       .orderBy("likeCount", "desc")
+      .where("likeCount", ">", 0)
       .orderBy("createdAt", "desc")
       .limit(perPage)
       .get();
@@ -74,6 +75,9 @@ const PopularPage: VFC = () => {
     setFetching(true);
     const popularProductsDocs = await db
       .collection("products")
+      .where("open", "==", true)
+      .orderBy("likeCount", "desc")
+      .where("likeCount", ">", 0)
       .orderBy("createdAt", "desc")
       .startAfter(start)
       .limit(perPage)
