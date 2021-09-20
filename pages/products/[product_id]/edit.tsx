@@ -265,6 +265,9 @@ const Edit: React.VFC = () => {
           </Wrap>
         </Flex>
 
+        <Box mt={5} display={{ md: "none" }}>
+          ＊編集作業はPC推奨です＊
+        </Box>
         <Heading fontSize={20} mt={5} mb={3}>
           タイトル
         </Heading>
