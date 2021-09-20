@@ -25,6 +25,7 @@ const Dashbord: React.VFC = () => {
     await db
       .collection("products")
       .where("userId", "==", currentUser?.uid)
+      .orderBy("createdAt", "desc")
       .get()
       .then((products) => {
         const productList: Array<ProductData> = [];
