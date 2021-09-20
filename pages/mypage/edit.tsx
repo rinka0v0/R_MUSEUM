@@ -17,6 +17,7 @@ const EditMyPage: React.VFC = () => {
   const [twitter, setTwitter] = useState("");
   const [instagram, setInstagram] = useState("");
   const [gitHub, setGitHub] = useState("");
+  const [updating, setUpdating] = useState(false);
 
   const { currentUser, signInCheck } = useContext(AuthContext);
   const { showMessage } = useMessage();
@@ -33,7 +34,6 @@ const EditMyPage: React.VFC = () => {
       .get()
       .then(async (userData) => {
         const user = userData.data();
-        console.log(user);
         setName(user?.user_name);
         setProfile(user?.profile);
         setGitHub(user?.gitHub);
@@ -43,8 +43,9 @@ const EditMyPage: React.VFC = () => {
   };
 
   const onClickBtn = async () => {
-    await db
-      .collection("users")
+    setUpdating(true);
+    
+    db.collection("users")
       .doc(currentUser?.uid)
       .update({
         user_name: name,
@@ -57,6 +58,12 @@ const EditMyPage: React.VFC = () => {
         setWarningExit(false);
         Router.push("/mypage");
         showMessage({ title: "保存しました", status: "success" });
+      })
+      .catch(() => {
+        showMessage({ title: "エラーが発生しました", status: "error" });
+      })
+      .finally(() => {
+        setUpdating(false);
       });
   };
 
@@ -64,7 +71,6 @@ const EditMyPage: React.VFC = () => {
     if (!currentUser) {
       setWarningExit(false);
       Router.push("/");
-      // !currentUser && Router.push("/");
     }
     fetchUser();
   }, [currentUser]);
@@ -76,7 +82,7 @@ const EditMyPage: React.VFC = () => {
   return (
     <>
       <Header />
-      <Flex alignItems="center" flexDirection="column" maxH="1000px">
+      <Flex align="center" justify="center" flexDirection="column" mb={5}>
         <Flex
           w="90%"
           alignItems="center"
@@ -84,7 +90,7 @@ const EditMyPage: React.VFC = () => {
           justify="space-around"
           flexDirection={{ base: "column", md: "row" }}
         >
-          <Box width="70%">
+          <Box w="100%">
             <Box border="1px solid #ddd" p={3} borderRadius={3}>
               <Text>ユーザー名</Text>
               <Input
@@ -107,7 +113,7 @@ const EditMyPage: React.VFC = () => {
               ></Textarea>
             </Box>
 
-            <Box display={{ base: "none", md: "block" }}>
+            <Box>
               <Box border="1px solid #ddd" p={3} borderRadius={3}>
                 <Text>GitHubのURL</Text>
                 <InputGroup>
@@ -148,42 +154,11 @@ const EditMyPage: React.VFC = () => {
                 </InputGroup>
               </Box>
             </Box>
-
-            <Box display={{ base: "block", md: "none" }}>
-              <Box border="1px solid #ddd" p={3} borderRadius={3}>
-                <Text>GitHubユーザー名</Text>
-                <Input
-                  value={instagram}
-                  placeholder="例） https://github.com/rinka0x0"
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    setInstagram(e.target.value);
-                  }}
-                />
-              </Box>
-              <Box border="1px solid #ddd" p={3} borderRadius={3}>
-                <Text>Twitterユーザー名</Text>
-                <Input
-                  value={instagram}
-                  placeholder="例） https://twitter.com/rinka0x0"
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    setInstagram(e.target.value);
-                  }}
-                />
-              </Box>
-              <Box border="1px solid #ddd" p={3} borderRadius={3}>
-                <Text>Instagramユーザー名</Text>
-                <Input
-                  value={instagram}
-                  placeholder="例） https://instagram.com/rinka0x0"
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    setInstagram(e.target.value);
-                  }}
-                />
-              </Box>
-            </Box>
-            <PrimaryButton onClick={onClickBtn}>保存</PrimaryButton>
           </Box>
         </Flex>
+        <PrimaryButton onClick={onClickBtn} isLoading={updating}>
+          保存
+        </PrimaryButton>
       </Flex>
       <></>
     </>
