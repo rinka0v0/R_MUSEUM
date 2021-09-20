@@ -157,52 +157,53 @@ const ProductPage: React.VFC = () => {
   }, []);
 
   return (
-    <Box>
+    <>
       <Header />
-      <Flex alignItems="center" flexDirection="column">
-        {currentUser?.uid === product?.data.userId ? (
-          <Box position="absolute" right="30px" top="100px">
-            <PrimaryButton onClick={onClickEdit}>編集</PrimaryButton>
-          </Box>
-        ) : null}
-        <Link href={`/${product?.userId}`}>
-          <Flex
-            alignItems="center"
-            my={5}
-            ml="1em"
-            mr="auto"
-            mt="40px"
-            cursor="pointer"
-          >
-            <>
-              <Avatar src={product?.user?.iconURL} mr={3} ml={3} />
-              <Box>{product?.user?.user_name}</Box>
-            </>
+      <Flex flexDirection="column" align="center">
+        <Flex align="center" my={5} justify="space-between" width="80%">
+          <Link href={`/${product?.userId}`}>
+            <Flex alignItems="center" cursor="pointer">
+              <>
+                <Avatar src={product?.user?.iconURL} mr={3} ml={3} />
+                <Box>{product?.user?.user_name}</Box>
+              </>
+            </Flex>
+          </Link>
+
+          <Flex align="center" justify="space-around">
+            {currentUser?.uid === product?.data.userId ? (
+              <Box>
+                <PrimaryButton onClick={onClickEdit}>編集</PrimaryButton>
+              </Box>
+            ) : null}
+
+            <Box
+              onClick={() =>
+                currentUser
+                  ? onClickLiked(isliked)
+                  : showMessage({
+                      title: "ログインしてください",
+                      status: "error",
+                    })
+              }
+              cursor="pointer"
+            >
+              <IconContext.Provider
+                value={{ color: isliked ? "red" : "gray", size: "3em" }}
+              >
+                <AiFillHeart />
+              </IconContext.Provider>
+            </Box>
           </Flex>
-        </Link>
+        </Flex>
 
-        <Box
-          onClick={() =>
-            currentUser
-              ? onClickLiked(isliked)
-              : showMessage({ title: "ログインしてください", status: "error" })
-          }
-          cursor="pointer"
-          mr="30px"
-          ml="auto"
-        >
-          <IconContext.Provider
-            value={{ color: isliked ? "red" : "gray", size: "3em" }}
-          >
-            <AiFillHeart />
-          </IconContext.Provider>
-        </Box>
+        <Heading my={5} maxW="80%">
+          {product?.data.title}
+        </Heading>
 
-        <Heading my={5}>{product?.data.title}</Heading>
-        <Heading my={5}>{product?.title}</Heading>
-        <Box>
+        <Box maxW="80%">
           {product?.tags
-            ? product?.tags.map((tag: string,index:number) => {
+            ? product?.tags.map((tag: string, index: number) => {
                 return (
                   <Link key={index} href={`/tags/${tag}`}>
                     <Box
@@ -271,7 +272,7 @@ const ProductPage: React.VFC = () => {
           />
         </Box>
       </Flex>
-    </Box>
+    </>
   );
 };
 
