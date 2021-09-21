@@ -29,7 +29,6 @@ const ProductPage: React.VFC = () => {
     useState<firebase.firestore.DocumentData | undefined>();
 
   const [commentMarkdown, setCommentMarkdown] = useState("");
-  const [error, setError] = useState(false);
   const [isliked, setIsLiked] = useState(false);
   const [loading, setLoading] = useState(true);
 
