@@ -95,12 +95,13 @@ const Edit: React.VFC = () => {
     if (title && markdown) {
       // タグ付けの機能を追加
       const tagsDocumentId: Array<string> = [];
-      if (tags.length) {
+      if (open && tags.length) {
         // タグがつけられている場合の処理
         await Promise.all(
           tags.map(async (tagName) => {
-            const tagsRef = db.collection("tags");
-            const tagData = await tagsRef
+            // const tagsRef = db.collection("tags");
+            const tagData = await db
+              .collection("tags")
               .where("name", "==", tagName.toLocaleLowerCase().trim())
               .get();
             if (tagData.empty) {
@@ -233,7 +234,6 @@ const Edit: React.VFC = () => {
 
           <Wrap>
             <Button colorScheme="red" onClick={onClickDelete}>
-              {" "}
               削除
             </Button>
 
@@ -280,7 +280,7 @@ const Edit: React.VFC = () => {
           w="90%"
         />
 
-        <Heading fontSize={20} my={5} mb={3}>
+        {/* <Heading fontSize={20} my={5} mb={3}>
           ソースコードのURL
         </Heading>
         <Input
@@ -290,7 +290,7 @@ const Edit: React.VFC = () => {
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setSourceCodeUrl(e.target.value)
           }
-        />
+        /> */}
 
         <Heading fontSize={20} mt={5} mb={3}>
           タグ(5個まで)
