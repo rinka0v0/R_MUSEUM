@@ -25,6 +25,7 @@ const Dashbord: React.VFC = () => {
     await db
       .collection("products")
       .where("userId", "==", currentUser?.uid)
+      .where("saved", "==", true)
       .orderBy("createdAt", "desc")
       .get()
       .then((products) => {
@@ -70,7 +71,7 @@ const Dashbord: React.VFC = () => {
                   return <Skeleton height="74px" w="300px" key={index} />;
                 })}
             </>
-          ) : (
+          ) : products.length ? (
             products.map((product) => {
               return (
                 <Box key={product.id} cursor="pointer">
@@ -83,6 +84,8 @@ const Dashbord: React.VFC = () => {
                 </Box>
               );
             })
+          ) : (
+            <Box>投稿が見つかりません</Box>
           )}
         </Stack>
       </Flex>
