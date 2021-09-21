@@ -276,9 +276,10 @@ const ProductPage: React.VFC = () => {
                   return (
                     <Box key={index} mb={4}>
                       <Comment
+                        commentId={comment.id}
+                        productId={query}
                         userId={comment.userId}
                         content={comment.content}
-                        likes={comment.likes}
                         createdAt={moment(comment.createdAt).fromNow()}
                       />
                     </Box>
