@@ -52,8 +52,8 @@ const Mypage: React.VFC = () => {
     const productsRef = await db
       .collection("products")
       .where("userId", "==", currentUser?.uid)
-      .where('open','==',true)
-      .orderBy("createdAt",'desc')
+      .where("open", "==", true)
+      .orderBy("createdAt", "desc")
       .limit(perPage)
       .get();
 
@@ -89,7 +89,7 @@ const Mypage: React.VFC = () => {
       .collection("users")
       .doc(currentUser?.uid)
       .collection("likedPosts")
-      .orderBy("createdAt",'desc')
+      .orderBy("createdAt", "desc")
       .limit(perPage)
       .get();
 
@@ -103,21 +103,23 @@ const Mypage: React.VFC = () => {
     await Promise.all(
       likedProductsDataArray.map(async (productRef, index: number) => {
         const productDoc = await productRef.ref.get();
-        const productData = productDoc.data();
-        const authorDoc = await db
-          .collection("users")
-          .doc(productDoc.data().userId)
-          .get();
-        const authorData = authorDoc.data();
+        if (productDoc.exists) {
+          const productData = productDoc.data();
+          const authorDoc = await db
+            .collection("users")
+            .doc(productDoc.data().userId)
+            .get();
+          const authorData = authorDoc.data();
 
-        likedProductsDataArray[index] = {
-          productId: productRef.ref.id,
-          authorName: authorData?.user_name,
-          authorIconURL: authorData?.iconURL,
-          title: productData.title,
-          likeCount: productData.likeCount,
-          createdAt: productData.createdAt,
-        };
+          likedProductsDataArray[index] = {
+            productId: productRef.ref.id,
+            authorName: authorData?.user_name,
+            authorIconURL: authorData?.iconURL,
+            title: productData.title,
+            likeCount: productData.likeCount,
+            createdAt: productData.createdAt,
+          };
+        }
         return;
       })
     );
@@ -137,7 +139,7 @@ const Mypage: React.VFC = () => {
       .collection("users")
       .doc(currentUser?.uid)
       .collection("likedPosts")
-      .orderBy("createdAt",'desc')
+      .orderBy("createdAt", "desc")
       .startAfter(start)
       .limit(perPage)
       .get();
@@ -187,7 +189,7 @@ const Mypage: React.VFC = () => {
     const productsRef = await db
       .collection("products")
       .where("userId", "==", currentUser?.uid)
-      .orderBy("createdAt",'desc')
+      .orderBy("createdAt", "desc")
       .startAfter(start)
       .limit(perPage)
       .get();
