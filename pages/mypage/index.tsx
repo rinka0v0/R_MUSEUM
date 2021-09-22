@@ -130,6 +130,7 @@ const Mypage: React.VFC = () => {
     ).catch(() => {
       showMessage({ title: "エラーが発生しました", status: "error" });
     });
+    
     setLikedProducts(likedProductsDataArray);
     if (likedProductsDocs.docs[perPage - 1]) {
       setNextLikedDoc(likedProductsDocs.docs[perPage - 1]);
@@ -178,7 +179,9 @@ const Mypage: React.VFC = () => {
         };
         return;
       })
-    );
+    ).catch(() => {
+      showMessage({ title: "エラーが発生しました", status: "error" });
+    });
 
     setLikedProducts((prev: any) => [...prev, ...likedProductsDataArray]);
     if (likedProductsDocs.docs[perPage - 1]) {
@@ -228,7 +231,9 @@ const Mypage: React.VFC = () => {
         };
         return;
       })
-    );
+    ).then(() => {
+      showMessage({ title: "エラーが発生しました", status: "error" });
+    });
 
     setUser((prev: any) => {
       return {
