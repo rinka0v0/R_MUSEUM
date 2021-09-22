@@ -7,18 +7,30 @@ import { useState } from "react";
 import { db } from "../../firebase";
 import DOMPurify from "dompurify";
 import marked from "marked";
+import { useContext } from "react";
+import { AuthContext } from "../../auth/AuthProvider";
+import { Button } from "@chakra-ui/react";
+import useMessage from "../../hooks/useMessage";
+import useFetchComment from "../../hooks/useFetchComment";
 
 type Props = {
+  commentId: string;
+  productId: string;
   userId: string;
   createdAt: string;
   content: string;
-  likes: number;
 };
 
 const Comment: React.VFC<Props> = (props) => {
   const [user, setUser] =
     useState<firebase.firestore.DocumentData | undefined>();
-  const { userId, createdAt, content, likes } = props;
+  const [deleting, setDeleting] = useState(false);
+
+  const { commentId, productId, userId, createdAt, content } = props;
+  const { mutate } = useFetchComment(productId);
+  const { currentUser } = useContext(AuthContext);
+  const { showMessage } = useMessage();
+
   const fetchUser = () => {
     db.collection("users")
       .doc(userId)
@@ -28,6 +40,24 @@ const Comment: React.VFC<Props> = (props) => {
         setUser(data);
         console.log(data);
       });
+  };
+
+  const deleteComment = () => {
+    if (confirm("コメントを削除しますか？")) {
+      setDeleting(true);
+      try {
+        db.collection("products")
+          .doc(productId)
+          .collection("comments")
+          .doc(commentId)
+          .delete();
+        showMessage({ title: "削除しました", status: "success" });
+      } catch (err) {
+        showMessage({ title: "エラーが発生しました", status: "error" });
+      }
+      mutate();
+      setDeleting(false);
+    }
   };
 
   useEffect(() => {
@@ -61,9 +91,19 @@ const Comment: React.VFC<Props> = (props) => {
               borderRight: "12px solid #d7ebfe",
             }}
           >
-            <Flex mb={3}>
-              <Box mr="2em">{user?.user_name}</Box>
-              <Box>{createdAt}</Box>
+            <Flex mb={3} align="center">
+              <Box>{user?.user_name}</Box>
+              <Box mx={5}>{createdAt}</Box>
+              {currentUser?.uid === userId ? (
+                <Button
+                  colorScheme="red"
+                  onClick={deleteComment}
+                  ml="auto"
+                  isLoading={deleting}
+                >
+                  削除
+                </Button>
+              ) : null}
             </Flex>
             <Box
               boxSizing="border-box"

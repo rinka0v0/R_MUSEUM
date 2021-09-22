@@ -1,4 +1,5 @@
-import { Box, Flex, Link } from "@chakra-ui/layout";
+import Link from "next/link";
+import { Box, Flex, HStack } from "@chakra-ui/layout";
 import React from "react";
 
 const Footer: React.VFC = () => {
@@ -6,12 +7,11 @@ const Footer: React.VFC = () => {
     <Box as="footer" w="100%" mb={5}>
       <Flex justify="">
         <Box mx="auto">
-          <Link href="/terms" mx={3}>
-            利用規約
-          </Link>
-          <Link href="/privacy" mx={3}>
-            プライバシーポリシー
-          </Link>
+          <HStack>
+
+          <Link href="/terms">利用規約</Link>
+          <Link href="/privacy">プライバシーポリシー</Link>
+          </HStack>
         </Box>
       </Flex>
       <Box textAlign="center" fontSize="sm">

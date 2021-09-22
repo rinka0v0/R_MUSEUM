@@ -29,13 +29,14 @@ const ProductPage: React.VFC = () => {
   const [fetching, setFetching] = useState(false);
   const [empty, setEmpty] = useState(false);
 
-  const [loading,setLoading] = useState(true)
+  const [loading, setLoading] = useState(true);
 
   const fetchUserInfo = async (userId: any) => {
     const userRef = await db.collection("users").doc(userId).get();
     const productsRef = await db
       .collection("products")
       .where("userId", "==", userId)
+      .where("open", "==", true)
       .orderBy("createdAt", "desc")
       .limit(perPage)
       .get();
@@ -69,6 +70,7 @@ const ProductPage: React.VFC = () => {
     const newProductsDocs = await db
       .collection("products")
       .where("userId", "==", userId)
+      .where("open", "==", true)
       .orderBy("createdAt", "desc")
       .startAfter(start)
       .limit(perPage)

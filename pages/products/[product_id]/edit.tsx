@@ -12,7 +12,7 @@ import TagInput from "../../../components/Input/TagsInput";
 import useMessage from "../../../hooks/useMessage";
 import { db } from "../../../firebase";
 import firebase from "firebase";
-import { Switch } from "@chakra-ui/react";
+import { Switch, Wrap } from "@chakra-ui/react";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import Link from "next/link";
 import { useWarningOnExit } from "../../../hooks/useWarningOnExit";
@@ -63,7 +63,7 @@ const Edit: React.VFC = () => {
           const data = product.data();
           setTitle(data?.title);
           setMarkdown(data?.content);
-          setOpen(data?.open)
+          setOpen(data?.open);
           // タグを取得してステートに設定する
           const tagNames: Array<string> = [];
           console.log(data?.tagsIDs);
@@ -99,14 +99,17 @@ const Edit: React.VFC = () => {
         // タグがつけられている場合の処理
         await Promise.all(
           tags.map(async (tagName) => {
-            const tagsRef = db.collection("tags");
-            const tagData = await tagsRef.where("name", "==",  tagName.toLocaleLowerCase().trim()).get();
+            // const tagsRef = db.collection("tags");
+            const tagData = await db
+              .collection("tags")
+              .where("name", "==", tagName.toLocaleLowerCase().trim())
+              .get();
             if (tagData.empty) {
               // create tag document
               await db
                 .collection("tags")
                 .add({
-                  name: tagName.toLocaleLowerCase(),
+                  name: tagName.toLocaleLowerCase().trim(),
                   count: 0,
                   createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 })
@@ -124,7 +127,6 @@ const Edit: React.VFC = () => {
               tagData.forEach((doc) => {
                 tagsDocumentId.push(doc.id);
 
-
                 db.collection("tags")
                   .doc(doc.id)
                   .collection("productId")
@@ -132,8 +134,6 @@ const Edit: React.VFC = () => {
                   .set({
                     id: query,
                   });
-
-
               });
             }
           })
@@ -211,48 +211,63 @@ const Edit: React.VFC = () => {
   return (
     <>
       <Header isEditPage={true} />
-      <Flex alignItems="center" justify="space-between" my={5}>
-        <Link href="/dashboard">
-          <Flex alignItems="center" ml={5} _hover={{ cursor: "pointer" }}>
-            <ArrowBackIcon h={8} w={8} />
-            <Box ml={2} textDecoration="none">
-              戻る
-            </Box>
-          </Flex>
-        </Link>
-        <HStack spacing={3} mr={5}>
-          <Button colorScheme="red" onClick={onClickDelete}>
-            {" "}
-            削除
-          </Button>
-
-          {open ? (
-            <PrimaryButton onClick={onClickSave}>公開する</PrimaryButton>
-          ) : (
-            <PrimaryButton onClick={onClickSave}>下書きを保存</PrimaryButton>
-          )}
-
-          {open ? (
-            <HStack>
-              <Box color="gray">非公開</Box>
-              <Switch size="lg" onChange={onClickOpen} isChecked={open} />
-              <Box color="blue" fontWeight="bold">
-                公開
+      <Flex
+        alignItems="center"
+        justify="space-between"
+        flexDirection="column"
+        my={5}
+      >
+        <Flex
+          alignItems="center"
+          flexWrap="wrap"
+          justify="space-between"
+          width="90%"
+        >
+          <Link href="/dashboard">
+            <Flex flexWrap="wrap" align="center" my={2} cursor="pointer">
+              <ArrowBackIcon h={8} w={8} m={0} />
+              <Box ml={2} textDecoration="none">
+                戻る
               </Box>
-            </HStack>
-          ) : (
-            <HStack>
-              <Box color="blue" fontWeight="bold">
-                非公開
-              </Box>
-              <Switch size="lg" onChange={onClickOpen} isChecked={open} />
-              <Box color="gray">公開</Box>
-            </HStack>
-          )}
-        </HStack>
-      </Flex>
+            </Flex>
+          </Link>
 
-      <Flex flexDirection="column" align="center" w="100%">
+          <Wrap>
+            <Button colorScheme="red" onClick={onClickDelete}>
+              削除
+            </Button>
+
+            {open ? (
+              <PrimaryButton onClick={onClickSave}>公開する</PrimaryButton>
+            ) : (
+              <PrimaryButton onClick={onClickSave}>下書きを保存</PrimaryButton>
+            )}
+
+            {open ? (
+              <HStack>
+                <Box color="gray" overflowWrap="unset">
+                  非公開
+                </Box>
+                <Switch size="lg" onChange={onClickOpen} isChecked={open} />
+                <Box color="red" fontWeight="bold">
+                  公開
+                </Box>
+              </HStack>
+            ) : (
+              <HStack>
+                <Box color="blue" fontWeight="bold">
+                  非公開
+                </Box>
+                <Switch size="lg" onChange={onClickOpen} isChecked={open} />
+                <Box color="gray">公開</Box>
+              </HStack>
+            )}
+          </Wrap>
+        </Flex>
+
+        <Box mt={5} display={{ md: "none" }}>
+          ＊編集作業はPC推奨です＊
+        </Box>
         <Heading fontSize={20} mt={5} mb={3}>
           タイトル
         </Heading>
@@ -262,31 +277,31 @@ const Edit: React.VFC = () => {
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setTitle(e.target.value)
           }
-          w="80%"
+          w="90%"
         />
 
-        <Heading fontSize={20} my={5} mb={3}>
+        {/* <Heading fontSize={20} my={5} mb={3}>
           ソースコードのURL
         </Heading>
         <Input
           placeholder="GitHubなどのURL"
-          w="80%"
+          w="90%"
           value={sourceCodeUrl}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setSourceCodeUrl(e.target.value)
           }
-        />
+        /> */}
 
         <Heading fontSize={20} mt={5} mb={3}>
           タグ(5個まで)
         </Heading>
-        <Box width="80%">
+        <Box width="90%">
           <TagInput tags={tags} setTags={setTags} />
         </Box>
         <Heading fontSize={20} my="2em">
           作品の紹介文
         </Heading>
-        <Box w="100%" mb="1em">
+        <Box w="90%" mb="1em">
           <MarkdownEditor
             markdown={markdown}
             setMarkdown={setMarkdown}

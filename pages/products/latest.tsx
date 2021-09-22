@@ -25,6 +25,7 @@ const LatestPage: VFC = () => {
   const getSnapshot = async (perPage: number) => {
     const newProductsDocs = await db
       .collection("products")
+      .where("open", "==", true)
       .orderBy("createdAt", "desc")
       .limit(perPage)
       .get();
@@ -72,6 +73,7 @@ const LatestPage: VFC = () => {
     setFetching(true);
     const newProductsDocs = await db
       .collection("products")
+      .where("open", "==", true)
       .orderBy("createdAt", "desc")
       .startAfter(start)
       .limit(perPage)
@@ -124,7 +126,7 @@ const LatestPage: VFC = () => {
   return (
     <Box>
       <Header />
-      <Flex align="center" justify="center" flexDirection="column">
+      <Flex align="center" justify="center" flexDirection="column" mb={5}>
         <Heading mt={5}>最新の投稿</Heading>
         <Flex
           position="relative"

@@ -2,6 +2,7 @@ import useSWR from "swr";
 import { db } from "../firebase";
 
 type CommentData = {
+  id: string;
   userId: string;
   content: string;
   createdAt: string;
@@ -36,11 +37,13 @@ const fetchComments = async (query: string) => {
     .get();
 
   doc.forEach((comment) => {
+    const data = comment.data();
     fetchedComments.push({
-      content: comment.data().content.toString(),
-      likes: comment.data().likes,
-      createdAt: comment.data().createdAt.toDate().toString(),
-      userId: comment.data().userId,
+      id: comment.id,
+      content: data.content.toString(),
+      likes: data.likes,
+      createdAt: data.createdAt.toDate().toString(),
+      userId: data.userId,
     });
   });
   return fetchedComments;
