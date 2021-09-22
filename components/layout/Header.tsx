@@ -30,6 +30,9 @@ import { AuthContext } from "../../auth/AuthProvider";
 import useMessage from "../../hooks/useMessage";
 import firebase from "firebase";
 import { useState } from "react";
+import { Button } from "@chakra-ui/react";
+import { FcGoogle } from "react-icons/fc";
+
 type Props = {
   isEditPage?: boolean;
 };
@@ -44,10 +47,6 @@ const Header: VFC<Props> = (props) => {
 
   const router = useRouter();
 
-  // const pushSignIn = useCallback(() => {
-  //   router.push("/signIn");
-  // }, []);
-
   const GoogleLogin = () => {
     try {
       loginWithGoogle();
@@ -55,13 +54,6 @@ const Header: VFC<Props> = (props) => {
       showMessage({ title: err.message, status: "error" });
     }
   };
-  // const GitHubLogin = () => {
-  //   try {
-  //     loginWithGitHub();
-  //   } catch (err) {
-  //     showMessage({ title: err.message, status: "error" });
-  //   }
-  // };
 
   const redirectEditPage = (id: string) => {
     db.collection("products")
@@ -179,20 +171,14 @@ const Header: VFC<Props> = (props) => {
             <Modal isOpen={isOpen} onClose={onClose}>
               <ModalOverlay>
                 <ModalContent>
-                  <ModalHeader>ログイン</ModalHeader>
+                  <ModalHeader textAlign="center">ログイン</ModalHeader>
                   <ModalCloseButton />
                   <ModalBody p={5}>
                     <Flex flexDirection="column" alignItems="center">
                       <Stack spacing={5}>
-                        <PrimaryButton onClick={GoogleLogin}>
+                        <Button leftIcon={<FcGoogle />} onClick={GoogleLogin}>
                           Login with Google
-                        </PrimaryButton>
-                        {/* <PrimaryButton onClick={GitHubLogin}>
-                          Login with GitHub
-                        </PrimaryButton> */}
-                        {/* <PrimaryButton onClick={pushSignIn}>
-                          Login with Email
-                        </PrimaryButton> */}
+                        </Button>
                       </Stack>
                     </Flex>
                   </ModalBody>
