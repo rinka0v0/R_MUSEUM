@@ -22,22 +22,12 @@ export const auth = firebase.auth();
 
 export const loginWithGoogle = (): void => {
   const provider = new firebase.auth.GoogleAuthProvider();
-  firebase
-    .auth()
-    .signInWithRedirect(provider)
-    .then((result) => {
-      console.log(result);
-    });
+  firebase.auth().signInWithRedirect(provider);
 };
 
-export const loginWithGitHub = ():void => {
+export const loginWithGitHub = (): void => {
   const provider = new firebase.auth.GithubAuthProvider();
-  firebase
-    .auth()
-    .signInWithRedirect(provider)
-    .then((result) => {
-      console.log(result);
-    });
+  firebase.auth().signInWithRedirect(provider);
 };
 
 export const logout = (): void => {
