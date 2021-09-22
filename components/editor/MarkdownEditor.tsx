@@ -73,6 +73,7 @@ const MarkdownEditor: React.VFC<Props> = (props) => {
     <Flex
       justify={{ base: "center", md: "space-around" }}
       flexDirection={{ base: "column", md: "row" }}
+      
     >
       <Box w={{ base: "100%", md: "45%" }}>
         <SimpleMDE

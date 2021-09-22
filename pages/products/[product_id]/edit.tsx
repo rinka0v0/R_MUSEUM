@@ -5,7 +5,6 @@ import { Input } from "@chakra-ui/input";
 import { Box, Flex, Heading, HStack } from "@chakra-ui/layout";
 import { Button } from "@chakra-ui/button";
 import PrimaryButton from "../../../components/atoms/button/PrimaryButton";
-import Header from "../../../components/layout/Header";
 import { AuthContext } from "../../../auth/AuthProvider";
 import Loading from "../../../components/layout/Loading";
 import TagInput from "../../../components/Input/TagsInput";
@@ -33,9 +32,9 @@ const Edit: React.VFC = () => {
 
   const [title, setTitle] = useState("");
   const [markdown, setMarkdown] = useState("");
-  // const [sourceCodeUrl, setSourceCodeUrl] = useState("");
   const [tags, setTags] = useState<Array<string>>([]);
   const [open, setOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const { currentUser, signInCheck } = useContext(AuthContext);
   const { showMessage } = useMessage();
@@ -99,6 +98,7 @@ const Edit: React.VFC = () => {
   };
 
   const onClickSave = async () => {
+    setSaving(true);
     if (title && markdown) {
       // タグ付けの機能を追加
       const tagsDocumentId: Array<string> = [];
@@ -135,11 +135,11 @@ const Edit: React.VFC = () => {
                     title: "エラーが発生しました",
                     status: "error",
                   });
+                  setSaving(false);
                 });
             } else {
               tagData.forEach((doc) => {
                 tagsDocumentId.push(doc.id);
-
                 db.collection("tags")
                   .doc(doc.id)
                   .collection("productId")
@@ -152,6 +152,7 @@ const Edit: React.VFC = () => {
           })
         ).catch(() => {
           showMessage({ title: "エラーが発生しました", status: "error" });
+          setSaving(false);
         });
       }
 
@@ -181,12 +182,14 @@ const Edit: React.VFC = () => {
         })
         .catch(() => {
           showMessage({ title: "エラーが発生しました", status: "error" });
+          setSaving(false);
         });
     } else {
       showMessage({
         title: "タイトルと紹介文を書いてください",
         status: "error",
       });
+      setSaving(false);
     }
   };
 
@@ -227,12 +230,12 @@ const Edit: React.VFC = () => {
 
   return (
     <>
-      <Header isEditPage={true} />
       <Flex
         alignItems="center"
         justify="space-between"
         flexDirection="column"
         my={5}
+        w="100%"
       >
         <Flex
           alignItems="center"
@@ -255,9 +258,13 @@ const Edit: React.VFC = () => {
             </Button>
 
             {open ? (
-              <PrimaryButton onClick={onClickSave}>公開する</PrimaryButton>
+              <PrimaryButton onClick={onClickSave} isLoading={saving}>
+                公開する
+              </PrimaryButton>
             ) : (
-              <PrimaryButton onClick={onClickSave}>下書きを保存</PrimaryButton>
+              <PrimaryButton onClick={onClickSave} isLoading={saving}>
+                下書きを保存
+              </PrimaryButton>
             )}
 
             {open ? (
