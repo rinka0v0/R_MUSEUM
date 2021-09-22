@@ -38,6 +38,7 @@ const Header: VFC<Props> = (props) => {
   const { isEditPage = false } = props;
   const { currentUser } = useContext(AuthContext);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { showMessage } = useMessage();
 
   const [loading, setLoading] = useState(false);
 
@@ -46,8 +47,6 @@ const Header: VFC<Props> = (props) => {
   const pushSignIn = useCallback(() => {
     router.push("/signIn");
   }, []);
-
-  const { showMessage } = useMessage();
 
   const GoogleLogin = () => {
     try {
@@ -82,6 +81,9 @@ const Header: VFC<Props> = (props) => {
         router.push({
           pathname: `/products/${id}/edit`,
         });
+      })
+      .catch(() => {
+        showMessage({ title: "エラーが発生しました", status: "error" });
       });
   };
   const onClickPost = async () => {
