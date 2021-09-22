@@ -32,7 +32,6 @@ const TagPage: VFC = () => {
       .limit(1)
       .get();
     if (tagsRef.empty) {
-      console.log("error");
       setLoading(false);
       return;
     }
@@ -45,7 +44,7 @@ const TagPage: VFC = () => {
       .collection("products")
       .where("tagsIDs", "array-contains", tag[0])
       .where("open", "==", true)
-      .orderBy("createdAt",'desc')
+      .orderBy("createdAt", "desc")
       .limit(perPage)
       .get();
 

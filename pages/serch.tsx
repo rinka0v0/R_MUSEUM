@@ -7,10 +7,6 @@ import { db } from "../firebase";
 import { useEffect } from "react";
 
 const SerchPage: React.VFC = () => {
-  // const [keyWord, setKeyWord] = useState("");
-  // const onChangeKeyWord = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   setKeyWord(e.target.value);
-  // };
   const perPage = 64;
   const [tagsName, setTagsName] = useState<Array<string>>([]);
 
@@ -35,16 +31,6 @@ const SerchPage: React.VFC = () => {
     <>
       <Header />
       <Flex align="center" justify="center" flexDirection="column">
-        {/* <Flex w="80%" justify="space-between" mx="auto" mt={10}>
-          <Input
-            placeholder="キーワード検索は開発中"
-            value={keyWord}
-            onChange={(e) => onChangeKeyWord(e)}
-            disabled={true}
-          />
-          <PrimaryButton>検索</PrimaryButton>
-        </Flex> */}
-
         <Heading fontSize="20px" mt="40px">
           タグで検索
         </Heading>

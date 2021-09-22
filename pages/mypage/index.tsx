@@ -35,8 +35,6 @@ type Products = {
 };
 
 const Mypage: React.VFC = () => {
-  console.log("マイページがレンダリングされました");
-
   const { currentUser, signInCheck } = useContext(AuthContext);
 
   const [mode, setMode] = useState("products");

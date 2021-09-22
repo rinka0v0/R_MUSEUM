@@ -27,15 +27,13 @@ const MarkdownEditor = dynamic(
 );
 
 const Edit: React.VFC = () => {
-  console.log("editページがレンダリングしました");
-
   const router = useRouter();
   // product_idを文字列として取り出す
   const query = router.asPath.split("/")[2];
 
   const [title, setTitle] = useState("");
   const [markdown, setMarkdown] = useState("");
-  const [sourceCodeUrl, setSourceCodeUrl] = useState("");
+  // const [sourceCodeUrl, setSourceCodeUrl] = useState("");
   const [tags, setTags] = useState<Array<string>>([]);
   const [open, setOpen] = useState(false);
 
@@ -66,8 +64,6 @@ const Edit: React.VFC = () => {
           setOpen(data?.open);
           // タグを取得してステートに設定する
           const tagNames: Array<string> = [];
-          console.log(data?.tagsIDs);
-
           if (data?.tagsIDs.length) {
             Promise.all(
               data?.tagsIDs.map(async (tagId: string) => {
@@ -78,12 +74,10 @@ const Edit: React.VFC = () => {
                   .then((doc) => {
                     if (doc.exists) {
                       tagNames.push(doc.data()?.name);
-                      console.log("データ取得完了");
                     }
                   });
               })
             ).then(() => {
-              console.log("set state");
               setTags(tagNames);
             });
           }
@@ -138,7 +132,6 @@ const Edit: React.VFC = () => {
             }
           })
         );
-        console.log("タグID取得完了", tagsDocumentId);
       }
 
       db.collection("products")
@@ -148,7 +141,7 @@ const Edit: React.VFC = () => {
             title: title,
             content: markdown,
             userId: currentUser?.uid,
-            sorceCode: sourceCodeUrl,
+            sorceCode: "",
             tagsIDs: tagsDocumentId,
             open: open,
             saved: true,
