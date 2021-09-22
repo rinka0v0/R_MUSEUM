@@ -71,7 +71,9 @@ const ProductPage: React.VFC = () => {
             const tagData = fetchedTag.data();
             tagNames.push(tagData?.name);
           })
-        );
+        ).catch(() => {
+          showMessage({ title: "タグが取得できませんでした", status: "error" });
+        });
       }
 
       const isLikedDoc = await db
@@ -150,9 +152,13 @@ const ProductPage: React.VFC = () => {
   };
 
   useEffect(() => {
-    Promise.all([fetchProduct(), fetchIsLiked()]).then(() => {
-      setLoading(false);
-    });
+    Promise.all([fetchProduct(), fetchIsLiked()])
+      .then(() => {
+        setLoading(false);
+      })
+      .catch(() => {
+        showMessage({ title: "エラーが発生しました", status: "error" });
+      });
   }, []);
 
   if (loading) {
