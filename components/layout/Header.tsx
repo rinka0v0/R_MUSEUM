@@ -33,11 +33,7 @@ import { useState } from "react";
 import { Button } from "@chakra-ui/react";
 import { FcGoogle } from "react-icons/fc";
 
-type Props = {
-  isEditPage?: boolean;
-};
-
-const Header: VFC<Props> = (props) => {
+const Header: VFC = () => {
   const { currentUser } = useContext(AuthContext);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { showMessage } = useMessage();
