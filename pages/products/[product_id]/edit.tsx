@@ -242,7 +242,7 @@ const Edit: React.VFC = () => {
           alignItems="center"
           flexWrap="wrap"
           justify="space-between"
-          // width="90%"
+          width="90%"
         >
           <Link href="/dashboard">
             <Flex flexWrap="wrap" align="center" my={2} cursor="pointer">
