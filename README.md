@@ -10,6 +10,7 @@
   - Authentication
   - Cloud Firestore
   - Cloud Storage
+  - Cloud Functions
 - Jest (firestore rules のテストに使用)
 - prettier
 - eslint
