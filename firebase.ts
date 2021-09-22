@@ -22,32 +22,12 @@ export const auth = firebase.auth();
 
 export const loginWithGoogle = (): void => {
   const provider = new firebase.auth.GoogleAuthProvider();
-  firebase
-    .auth()
-    .signInWithRedirect(provider)
-    .then(() => {
-      // showMessage({ title: "ログイン成功", status: "success" });
-      // console.log(result);
-    })
-    .catch((err) => {
-      // showMessage({ title: "ログインできませんでした", status: "error" });
-      console.log(err.message);
-    });
+  firebase.auth().signInWithRedirect(provider);
 };
 
 export const loginWithGitHub = (): void => {
   const provider = new firebase.auth.GithubAuthProvider();
-  firebase
-    .auth()
-    .signInWithRedirect(provider)
-    .then(() => {
-      // console.log(result);
-      // showMessage({ title: "ログイン成功", status: "success" });
-    })
-    .catch((err) => {
-      // showMessage({ title: "ログインできませんでした", status: "error" });
-      console.log(err.message);
-    });
+  firebase.auth().signInWithRedirect(provider);
 };
 
 export const logout = (): void => {
