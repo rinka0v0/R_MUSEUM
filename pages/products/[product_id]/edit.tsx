@@ -82,6 +82,9 @@ const Edit: React.VFC = () => {
             });
           }
         }
+      })
+      .catch(() => {
+        showMessage({ title: "エラーが発生しました", status: "error" });
       });
   };
 
@@ -131,7 +134,9 @@ const Edit: React.VFC = () => {
               });
             }
           })
-        );
+        ).catch(() => {
+          showMessage({ title: "エラーが発生しました", status: "error" });
+        });
       }
 
       db.collection("products")
@@ -157,6 +162,9 @@ const Edit: React.VFC = () => {
           } else {
             router.push("/dashboard");
           }
+        })
+        .catch(() => {
+          showMessage({ title: "エラーが発生しました", status: "error" });
         });
     } else {
       showMessage({
@@ -177,7 +185,7 @@ const Edit: React.VFC = () => {
           showMessage({ title: "削除しました", status: "success" });
         })
         .catch((error) => {
-          showMessage({ title: error, status: "error" });
+          showMessage({ title: "エラーが発生しました", status: "error" });
         });
     }
   }, []);
@@ -272,18 +280,6 @@ const Edit: React.VFC = () => {
           }
           w="90%"
         />
-
-        {/* <Heading fontSize={20} my={5} mb={3}>
-          ソースコードのURL
-        </Heading>
-        <Input
-          placeholder="GitHubなどのURL"
-          w="90%"
-          value={sourceCodeUrl}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setSourceCodeUrl(e.target.value)
-          }
-        /> */}
 
         <Heading fontSize={20} mt={5} mb={3}>
           タグ(5個まで)

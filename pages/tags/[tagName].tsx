@@ -8,6 +8,7 @@ import Exhibit from "../../components/card/Exhibit";
 import Header from "../../components/layout/Header";
 import { db } from "../../firebase";
 import firebase from "firebase";
+import useMessage from "../../hooks/useMessage";
 
 type Products = {
   id: string;
@@ -22,8 +23,9 @@ const TagPage: VFC = () => {
   const [fetching, setFetching] = useState(false);
   const [empty, setEmpty] = useState(true);
   const [products, setProducts] = useState<Products>();
-
   const [loading, setLoading] = useState(true);
+
+  const { showMessage } = useMessage();
 
   const fetchProducts = async () => {
     const tagsRef = await db
@@ -75,7 +77,9 @@ const TagPage: VFC = () => {
         };
         return;
       })
-    );
+    ).catch(() => {
+      showMessage({ title: "エラーが発生しました", status: "error" });
+    });
     if (productRefs.docs[perPage - 1]) {
       setNextDoc(productRefs.docs[perPage - 1]);
       setEmpty(false);
@@ -122,7 +126,9 @@ const TagPage: VFC = () => {
         };
         return;
       })
-    );
+    ).catch(() => {
+      showMessage({ title: "エラーが発生しました", status: "error" });
+    });
 
     setProducts((prev: any) => {
       return { id: prev?.id, dataArray: [...prev?.dataArray, ...nextProducts] };

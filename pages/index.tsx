@@ -9,6 +9,7 @@ import moment from "moment";
 import PrimaryButton from "../components/atoms/button/PrimaryButton";
 import router from "next/router";
 import { SkeletonCircle, SkeletonText } from "@chakra-ui/react";
+import useMessage from "../hooks/useMessage";
 
 type ProductData = {
   id: string;
@@ -24,6 +25,7 @@ const IndexPage: React.VFC = () => {
 
   const [popularProducts, setPopularProducts]: Array<any> = useState([]);
   const [loading, setLoading] = useState(true);
+  const { showMessage } = useMessage();
 
   const fetchProducts = async () => {
     const data = await db
@@ -61,8 +63,13 @@ const IndexPage: React.VFC = () => {
           })
         );
         return fetchedProducts;
+      })
+      .catch(() => {
+        showMessage({ title: "エラーが発生しました", status: "error" });
       });
-    setProducts(data);
+    if (data) {
+      setProducts(data);
+    }
   };
 
   const fetchPopularProducts = async () => {
@@ -101,7 +108,9 @@ const IndexPage: React.VFC = () => {
         };
         return;
       })
-    );
+    ).catch(() => {
+      showMessage({ title: "エラーが発生しました", status: "error" });
+    });
     setPopularProducts(popularProductsDataArray);
   };
 

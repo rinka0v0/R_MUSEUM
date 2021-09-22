@@ -37,12 +37,15 @@ const EditMyPage: React.VFC = () => {
         setGitHub(user?.gitHub);
         setTwitter(user?.twitter);
         setInstagram(user?.instagram);
+      })
+      .catch(() => {
+        showMessage({ title: "エラーが発生しました", status: "error" });
       });
   };
 
   const onClickBtn = async () => {
     setUpdating(true);
-    
+
     db.collection("users")
       .doc(currentUser?.uid)
       .update({

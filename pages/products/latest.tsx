@@ -11,6 +11,7 @@ import { db } from "../../firebase";
 import Exhibit from "../../components/card/Exhibit";
 import moment from "moment";
 import PrimaryButton from "../../components/atoms/button/PrimaryButton";
+import useMessage from "../../hooks/useMessage";
 
 const LatestPage: VFC = () => {
   const perPage = 10;
@@ -19,8 +20,9 @@ const LatestPage: VFC = () => {
   const [newProducts, setNewProducts]: Array<any> | undefined = useState([]);
   const [empty, setEmpty] = useState(true);
   const [fetching, setFetching] = useState(false);
-
   const [loading, setLoading] = useState(true);
+
+  const { showMessage } = useMessage();
 
   const getSnapshot = async (perPage: number) => {
     const newProductsDocs = await db
@@ -57,7 +59,9 @@ const LatestPage: VFC = () => {
         };
         return;
       })
-    );
+    ).catch(() => {
+      showMessage({ title: "エラーが発生しました", status: "error" });
+    });
 
     setNewProducts(popularProductsDataArray);
     if (newProductsDocs.docs[perPage - 1]) {
@@ -106,7 +110,9 @@ const LatestPage: VFC = () => {
         };
         return;
       })
-    );
+    ).catch(() => {
+      showMessage({ title: "エラーが発生しました", status: "error" });
+    });
 
     setNewProducts((prev: any) => [...prev, ...popularProductsDataArray]);
 

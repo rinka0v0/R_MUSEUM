@@ -18,6 +18,7 @@ import {
   AiFillInstagram,
   AiFillTwitterCircle,
 } from "react-icons/ai";
+import useMessage from "../../hooks/useMessage";
 
 type User = {
   userId: string;
@@ -36,6 +37,7 @@ type Products = {
 
 const Mypage: React.VFC = () => {
   const { currentUser, signInCheck } = useContext(AuthContext);
+  const { showMessage } = useMessage();
 
   const [mode, setMode] = useState("products");
   const [likedProducts, setLikedProducts]: Array<any> = useState([]);
@@ -125,7 +127,9 @@ const Mypage: React.VFC = () => {
         }
         return;
       })
-    );
+    ).catch(() => {
+      showMessage({ title: "エラーが発生しました", status: "error" });
+    });
     setLikedProducts(likedProductsDataArray);
     if (likedProductsDocs.docs[perPage - 1]) {
       setNextLikedDoc(likedProductsDocs.docs[perPage - 1]);

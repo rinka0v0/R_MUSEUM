@@ -9,6 +9,7 @@ import { db } from "../../firebase";
 import { useState } from "react";
 import moment from "moment";
 import { Skeleton, Stack } from "@chakra-ui/react";
+import useMessage from "../../hooks/useMessage";
 
 type ProductData = {
   id: string;
@@ -21,6 +22,8 @@ const Dashbord: React.VFC = () => {
   const { currentUser, signInCheck } = useContext(AuthContext);
   const [products, setProducts] = useState<Array<ProductData>>([]);
   const [loading, setLoading] = useState(true);
+  const { showMessage } = useMessage();
+
   const fetchProducts = async () => {
     await db
       .collection("products")
@@ -41,6 +44,9 @@ const Dashbord: React.VFC = () => {
           });
         });
         setProducts(productList);
+      })
+      .catch(() => {
+        showMessage({ title: "エラーが発生しました", status: "error" });
       });
   };
 
