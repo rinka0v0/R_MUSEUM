@@ -38,7 +38,6 @@ type Props = {
 };
 
 const Header: VFC<Props> = (props) => {
-  const { isEditPage = false } = props;
   const { currentUser } = useContext(AuthContext);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { showMessage } = useMessage();
@@ -70,9 +69,7 @@ const Header: VFC<Props> = (props) => {
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       })
       .then(() => {
-        router.push({
-          pathname: `/products/${id}/edit`,
-        });
+        router.push(`/products/${id}/edit`);
       })
       .catch(() => {
         showMessage({ title: "エラーが発生しました", status: "error" });
@@ -109,11 +106,9 @@ const Header: VFC<Props> = (props) => {
         </NextLink>
         {currentUser ? (
           <>
-            {isEditPage ? null : (
-              <PrimaryButton onClick={onClickPost} isLoading={loading}>
-                投稿する
-              </PrimaryButton>
-            )}
+            <PrimaryButton onClick={onClickPost} isLoading={loading}>
+              投稿する
+            </PrimaryButton>
             <Popover>
               <PopoverTrigger>
                 <Avatar
