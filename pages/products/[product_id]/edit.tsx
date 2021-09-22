@@ -95,7 +95,7 @@ const Edit: React.VFC = () => {
     if (title && markdown) {
       // タグ付けの機能を追加
       const tagsDocumentId: Array<string> = [];
-      if (open && tags.length) {
+      if (tags.length) {
         // タグがつけられている場合の処理
         await Promise.all(
           tags.map(async (tagName) => {
@@ -109,7 +109,7 @@ const Edit: React.VFC = () => {
               await db
                 .collection("tags")
                 .add({
-                  name: tagName.toLocaleLowerCase(),
+                  name: tagName.toLocaleLowerCase().trim(),
                   count: 0,
                   createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 })
