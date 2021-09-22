@@ -64,7 +64,9 @@ const IndexPage: React.VFC = () => {
               });
             return;
           })
-        );
+        ).catch(() => {
+          showMessage({ title: "エラーが発生しました", status: "error" });
+        });
         return fetchedProducts;
       })
       .catch(() => {
