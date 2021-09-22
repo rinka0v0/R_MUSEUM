@@ -274,7 +274,7 @@ const ProductPage: React.VFC = () => {
           <Heading fontSize="20px" textAlign="center" my="2em">
             コメント
           </Heading>
-          <Box w="80%" m="0 auto">
+          <Box w="100%" m="0 auto">
             {isError ? <Box>コメントを読み込めませんでした🙇‍♂️</Box> : null}
             {commentsData && commentsData.length
               ? commentsData.map((comment, index) => {
