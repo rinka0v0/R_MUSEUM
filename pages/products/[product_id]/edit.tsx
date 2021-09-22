@@ -75,11 +75,21 @@ const Edit: React.VFC = () => {
                     if (doc.exists) {
                       tagNames.push(doc.data()?.name);
                     }
+                  })
+                  .catch(() => {
+                    showMessage({
+                      title: "エラーが発生しました",
+                      status: "error",
+                    });
                   });
               })
-            ).then(() => {
-              setTags(tagNames);
-            });
+            )
+              .then(() => {
+                setTags(tagNames);
+              })
+              .catch(() => {
+                showMessage({ title: "エラーが発生しました", status: "error" });
+              });
           }
         }
       })
@@ -119,6 +129,12 @@ const Edit: React.VFC = () => {
                       id: query,
                     });
                   tagsDocumentId.push(res.id);
+                })
+                .catch(() => {
+                  showMessage({
+                    title: "エラーが発生しました",
+                    status: "error",
+                  });
                 });
             } else {
               tagData.forEach((doc) => {
