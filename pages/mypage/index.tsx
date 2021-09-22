@@ -13,6 +13,11 @@ import Exhibit from "../../components/card/Exhibit";
 import moment from "moment";
 import firebase from "firebase";
 import { SkeletonCircle, SkeletonText } from "@chakra-ui/react";
+import {
+  AiFillGithub,
+  AiFillInstagram,
+  AiFillTwitterCircle,
+} from "react-icons/ai";
 
 type User = {
   userId: string;
@@ -359,7 +364,7 @@ const Mypage: React.VFC = () => {
           justify="space-around"
           flexDirection={{ base: "column", md: "row" }}
         >
-          <Box>
+          <Box mb={5}>
             <Avatar
               src={
                 currentUser.photoURL
@@ -374,9 +379,34 @@ const Mypage: React.VFC = () => {
             {/* <Button>アイコンの変更</Button> */}
           </Box>
           <Box w={{ md: "70%", base: "90%" }}>
-            <Box fontSize={{ base: "1.5em", md: "2em" }} fontWeight="bold">
-              {currentUser.displayName}
-            </Box>
+            <Flex align="center">
+              <Box fontSize={{ base: "1.5em", md: "2em" }} fontWeight="bold">
+                {currentUser.displayName}
+              </Box>
+              {user?.userData?.twitter ? (
+                <Box mx={1} cursor="pointer">
+                  <Link href={`http://twitter.com/${user.userData.twitter}`}>
+                    <AiFillTwitterCircle size="2em" />
+                  </Link>
+                </Box>
+              ) : null}
+              {user?.userData?.gitHub ? (
+                <Box mx={1} cursor="pointer">
+                  <Link href={`https://gitHub.com/${user.userData.gitHub}`}>
+                    <AiFillGithub size="2em" />
+                  </Link>
+                </Box>
+              ) : null}
+              {user?.userData?.instagram ? (
+                <Box mx={1} cursor="pointer">
+                  <Link
+                    href={`https://instagram.com/${user.userData.instagram}`}
+                  >
+                    <AiFillInstagram size="2em" />
+                  </Link>
+                </Box>
+              ) : null}
+            </Flex>
             <Box as="p" fontSize={{ base: ".95em", md: "16px" }}>
               {user?.userData?.profile}
             </Box>
@@ -437,7 +467,9 @@ const Mypage: React.VFC = () => {
                 );
               })
             ) : (
-              <Box ml="20px">投稿はありません</Box>
+              <Box ml="20px" textAlign="center" w="100%">
+                投稿はありません
+              </Box>
             )
           ) : likedProducts.length ? (
             likedProducts.map((likedProduct: any, index: string) => {
