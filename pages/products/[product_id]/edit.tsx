@@ -184,7 +184,7 @@ const Edit: React.VFC = () => {
           router.push("/");
           showMessage({ title: "削除しました", status: "success" });
         })
-        .catch((error) => {
+        .catch(() => {
           showMessage({ title: "エラーが発生しました", status: "error" });
         });
     }
