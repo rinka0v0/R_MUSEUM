@@ -130,7 +130,7 @@ const Mypage: React.VFC = () => {
     ).catch(() => {
       showMessage({ title: "エラーが発生しました", status: "error" });
     });
-    
+
     setLikedProducts(likedProductsDataArray);
     if (likedProductsDocs.docs[perPage - 1]) {
       setNextLikedDoc(likedProductsDocs.docs[perPage - 1]);
@@ -299,7 +299,7 @@ const Mypage: React.VFC = () => {
             </Box>
             <Box w={{ md: "70%", base: "90%" }}>
               <Box fontSize={{ base: "1.5em", md: "2em" }} fontWeight="bold">
-                {currentUser.displayName}
+                {user?.userData?.user_name}
               </Box>
               <Box as="p" fontSize={{ base: ".95em", md: "16px" }}>
                 {user?.userData?.profile}
@@ -392,7 +392,7 @@ const Mypage: React.VFC = () => {
           <Box w={{ md: "70%", base: "90%" }}>
             <Flex align="center">
               <Box fontSize={{ base: "1.5em", md: "2em" }} fontWeight="bold">
-                {currentUser.displayName}
+                {user?.userData?.user_name}
               </Box>
               {user?.userData?.twitter ? (
                 <Box mx={1} cursor="pointer">
@@ -443,7 +443,6 @@ const Mypage: React.VFC = () => {
           </Box>
         </Flex>
         <Flex
-          // position="relative"
           m="2em 0"
           maxW="960px"
           w="100%"
@@ -467,7 +466,7 @@ const Mypage: React.VFC = () => {
                         exhibit={{
                           id: product.productId,
                           name: product.title,
-                          userName: user.userData?.name,
+                          userName: user.userData?.user_name,
                           userIcon: user.userData?.iconURL,
                           likes: product.likeCount,
                           createdAt: moment(date).fromNow(),
