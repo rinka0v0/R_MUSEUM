@@ -52,9 +52,13 @@ const Dashbord: React.VFC = () => {
 
   useEffect(() => {
     !currentUser && Router.push("/");
-    fetchProducts().then(() => {
-      setLoading(false);
-    });
+    fetchProducts()
+      .then(() => {
+        setLoading(false);
+      })
+      .catch(() => {
+        showMessage({ title: "エラーが発生しました", status: "error" });
+      });
   }, []);
 
   if (!signInCheck || !currentUser) {

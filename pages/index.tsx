@@ -58,6 +58,9 @@ const IndexPage: React.VFC = () => {
                   data: product.data,
                   user,
                 };
+              })
+              .catch(() => {
+                showMessage({ title: "エラーが発生しました", status: "error" });
               });
             return;
           })
@@ -115,9 +118,13 @@ const IndexPage: React.VFC = () => {
   };
 
   useEffect(() => {
-    Promise.all([fetchProducts(), fetchPopularProducts()]).then(() => {
-      setLoading(false);
-    });
+    Promise.all([fetchProducts(), fetchPopularProducts()])
+      .then(() => {
+        setLoading(false);
+      })
+      .catch(() => {
+        showMessage({ title: "エラーが発生しました", status: "error" });
+      });
   }, []);
   if (loading) {
     return (

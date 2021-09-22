@@ -248,9 +248,13 @@ const Mypage: React.VFC = () => {
 
   useEffect(() => {
     !currentUser && Router.push("/");
-    Promise.all([fetchUser(), fetchLikedProducts()]).then(() => {
-      setLoading(false);
-    });
+    Promise.all([fetchUser(), fetchLikedProducts()])
+      .then(() => {
+        setLoading(false);
+      })
+      .catch(() => {
+        showMessage({ title: "エラーが発生しました", status: "error" });
+      });
   }, [currentUser]);
 
   if (!signInCheck || !currentUser) {

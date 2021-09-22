@@ -87,11 +87,16 @@ const CommentEditor: React.VFC<Props> = (props) => {
         console.log("エラーが発生しました", error);
       },
       () => {
-        upLoadTask.snapshot.ref.getDownloadURL().then((downloadURL: string) => {
-          setMarkdown((preMardown) => {
-            return preMardown + `![image](${downloadURL})`;
+        upLoadTask.snapshot.ref
+          .getDownloadURL()
+          .then((downloadURL: string) => {
+            setMarkdown((preMardown) => {
+              return preMardown + `![image](${downloadURL})`;
+            });
+          })
+          .catch(() => {
+            showMessage({ title: "エラーが発生しました", status: "error" });
           });
-        });
       }
     );
   };
