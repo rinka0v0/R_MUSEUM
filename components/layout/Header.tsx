@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, VFC } from "react";
+import React, { useContext, VFC } from "react";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
 import { IconButton } from "@chakra-ui/button";
@@ -25,7 +25,7 @@ import {
   ModalHeader,
   ModalOverlay,
 } from "@chakra-ui/modal";
-import { db, loginWithGitHub, loginWithGoogle, logout } from "../../firebase";
+import { db, loginWithGoogle, logout } from "../../firebase";
 import { AuthContext } from "../../auth/AuthProvider";
 import useMessage from "../../hooks/useMessage";
 import firebase from "firebase";
@@ -44,9 +44,9 @@ const Header: VFC<Props> = (props) => {
 
   const router = useRouter();
 
-  const pushSignIn = useCallback(() => {
-    router.push("/signIn");
-  }, []);
+  // const pushSignIn = useCallback(() => {
+  //   router.push("/signIn");
+  // }, []);
 
   const GoogleLogin = () => {
     try {
@@ -55,13 +55,13 @@ const Header: VFC<Props> = (props) => {
       showMessage({ title: err.message, status: "error" });
     }
   };
-  const GitHubLogin = () => {
-    try {
-      loginWithGitHub();
-    } catch (err) {
-      showMessage({ title: err.message, status: "error" });
-    }
-  };
+  // const GitHubLogin = () => {
+  //   try {
+  //     loginWithGitHub();
+  //   } catch (err) {
+  //     showMessage({ title: err.message, status: "error" });
+  //   }
+  // };
 
   const redirectEditPage = (id: string) => {
     db.collection("products")
@@ -160,7 +160,6 @@ const Header: VFC<Props> = (props) => {
                           display: "block",
                         }}
                       >
-                        {" "}
                         作品の管理
                       </a>
                     </Link>
@@ -188,12 +187,12 @@ const Header: VFC<Props> = (props) => {
                         <PrimaryButton onClick={GoogleLogin}>
                           Login with Google
                         </PrimaryButton>
-                        <PrimaryButton onClick={GitHubLogin}>
+                        {/* <PrimaryButton onClick={GitHubLogin}>
                           Login with GitHub
-                        </PrimaryButton>
-                        <PrimaryButton onClick={pushSignIn}>
+                        </PrimaryButton> */}
+                        {/* <PrimaryButton onClick={pushSignIn}>
                           Login with Email
-                        </PrimaryButton>
+                        </PrimaryButton> */}
                       </Stack>
                     </Flex>
                   </ModalBody>
