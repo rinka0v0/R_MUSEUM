@@ -5,7 +5,6 @@ import { Input } from "@chakra-ui/input";
 import { Box, Flex, Heading, HStack } from "@chakra-ui/layout";
 import { Button } from "@chakra-ui/button";
 import PrimaryButton from "../../../components/atoms/button/PrimaryButton";
-import Header from "../../../components/layout/Header";
 import { AuthContext } from "../../../auth/AuthProvider";
 import Loading from "../../../components/layout/Loading";
 import TagInput from "../../../components/Input/TagsInput";
