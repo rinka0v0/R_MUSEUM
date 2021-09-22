@@ -22,8 +22,6 @@ const EditMyPage: React.VFC = () => {
   const { currentUser, signInCheck } = useContext(AuthContext);
   const { showMessage } = useMessage();
 
-  console.log("mypage edit page レンダリングされました");
-
   const [warningExit, setWarningExit] = useState(true);
   useWarningOnExit(warningExit, "ページを離れてもいいですか？");
 

@@ -25,13 +25,11 @@ const IndexPage: React.VFC = () => {
   const [popularProducts, setPopularProducts]: Array<any> = useState([]);
   const [loading, setLoading] = useState(true);
 
-  console.log("indexページがレンダリングされました");
-
   const fetchProducts = async () => {
     const data = await db
       .collection("products")
       .orderBy("createdAt", "desc")
-      // .where("open", "==", true)
+      .where("open", "==", true)
       .limit(6)
       .get()
       .then((querySnapshot) => {
@@ -72,6 +70,7 @@ const IndexPage: React.VFC = () => {
       .collection("products")
       .where("open", "==", true)
       .orderBy("likeCount", "desc")
+      .where("likeCount", ">", 0)
       .orderBy("createdAt", "desc")
       .limit(6)
       .get();
@@ -151,7 +150,7 @@ const IndexPage: React.VFC = () => {
               })}
           </Flex>
           <Heading as="h2" textAlign="center" mt={5}>
-            人気の作品（過去1週間）
+            人気の作品
           </Heading>
           <Flex
             position="relative"
@@ -230,11 +229,13 @@ const IndexPage: React.VFC = () => {
             );
           })}
         </Flex>
-        <PrimaryButton onClick={() => router.push("/products/latest")}>
-          もっと見る
-        </PrimaryButton>
+        {products.length == 6 ? (
+          <PrimaryButton onClick={() => router.push("/products/latest")}>
+            もっと見る
+          </PrimaryButton>
+        ) : null}
         <Heading as="h2" textAlign="center" mt={5}>
-          人気の作品（過去1週間）
+          人気の作品
         </Heading>
         <Flex
           position="relative"
@@ -270,9 +271,11 @@ const IndexPage: React.VFC = () => {
             );
           })}
         </Flex>
-        <PrimaryButton onClick={() => router.push("/products/popular")}>
-          もっと見る
-        </PrimaryButton>
+        {popularProducts.length == 6 ? (
+          <PrimaryButton onClick={() => router.push("/products/popular")}>
+            もっと見る
+          </PrimaryButton>
+        ) : null}
       </Flex>
     </Box>
   );

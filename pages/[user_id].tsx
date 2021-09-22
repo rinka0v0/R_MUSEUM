@@ -12,8 +12,6 @@ import Header from "../components/layout/Header";
 import { db } from "../firebase";
 
 const ProductPage: React.VFC = () => {
-  console.log("/[user_Id]がレンダリング");
-
   const router = useRouter();
   const userId = router.query.user_id;
   const { currentUser } = useContext(AuthContext);
