@@ -15,7 +15,7 @@ exports.scheduledFunction = functions.pubsub
     // firestore /products/productId のなかで保存されていないものを削除する。
       const productsDoc = await db
           .collection("products")
-          .where("open", "==", false)
+          .where("saved", "==", false)
           .get();
 
       productsDoc.docs.forEach((doc) => {
