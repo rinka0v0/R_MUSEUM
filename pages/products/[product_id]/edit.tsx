@@ -61,35 +61,7 @@ const Edit: React.VFC = () => {
           setTitle(data?.title);
           setMarkdown(data?.content);
           setOpen(data?.open);
-          // タグを取得してステートに設定する
-          const tagNames: Array<string> = [];
-          if (data?.tagsIDs.length) {
-            Promise.all(
-              data?.tagsIDs.map(async (tagId: string) => {
-                await db
-                  .collection("tags")
-                  .doc(tagId)
-                  .get()
-                  .then((doc) => {
-                    if (doc.exists) {
-                      tagNames.push(doc.data()?.name);
-                    }
-                  })
-                  .catch(() => {
-                    showMessage({
-                      title: "エラーが発生しました",
-                      status: "error",
-                    });
-                  });
-              })
-            )
-              .then(() => {
-                setTags(tagNames);
-              })
-              .catch(() => {
-                showMessage({ title: "エラーが発生しました", status: "error" });
-              });
-          }
+          setTags(data?.tagsIDs);
         }
       })
       .catch(() => {
@@ -101,12 +73,10 @@ const Edit: React.VFC = () => {
     setSaving(true);
     if (title && markdown) {
       // タグ付けの機能を追加
-      const tagsDocumentId: Array<string> = [];
       if (tags.length) {
         // タグがつけられている場合の処理
         await Promise.all(
           tags.map(async (tagName) => {
-            // const tagsRef = db.collection("tags");
             const tagData = await db
               .collection("tags")
               .where("name", "==", tagName.toLocaleLowerCase().trim())
@@ -120,16 +90,6 @@ const Edit: React.VFC = () => {
                   count: 0,
                   createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 })
-                .then((res) => {
-                  db.collection("tags")
-                    .doc(res.id)
-                    .collection("productId")
-                    .doc(query)
-                    .set({
-                      id: query,
-                    });
-                  tagsDocumentId.push(res.id);
-                })
                 .catch(() => {
                   showMessage({
                     title: "エラーが発生しました",
@@ -137,17 +97,6 @@ const Edit: React.VFC = () => {
                   });
                   setSaving(false);
                 });
-            } else {
-              tagData.forEach((doc) => {
-                tagsDocumentId.push(doc.id);
-                db.collection("tags")
-                  .doc(doc.id)
-                  .collection("productId")
-                  .doc(query)
-                  .set({
-                    id: query,
-                  });
-              });
             }
           })
         ).catch(() => {
@@ -164,10 +113,10 @@ const Edit: React.VFC = () => {
             content: markdown,
             userId: currentUser?.uid,
             sorceCode: "",
-            tagsIDs: tagsDocumentId,
+            tagsIDs: tags,
             open: open,
             saved: true,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
           },
           { merge: true }
         )

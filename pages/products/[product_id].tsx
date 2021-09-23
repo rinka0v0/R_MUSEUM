@@ -62,20 +62,6 @@ const ProductPage: React.VFC = () => {
         .get();
       const user = fetchedUser.data();
 
-      const tagNames: Array<string> = [];
-      if (productData?.tagsIDs.length) {
-        //タグずけされている場合はクライアントサイドジョインする
-        await Promise.all(
-          productData?.tagsIDs.map(async (tagId: string) => {
-            const fetchedTag = await db.collection("tags").doc(tagId).get();
-            const tagData = fetchedTag.data();
-            tagNames.push(tagData?.name);
-          })
-        ).catch(() => {
-          showMessage({ title: "タグが取得できませんでした", status: "error" });
-        });
-      }
-
       const isLikedDoc = await db
         .collection("users")
         .doc(currentUser?.uid)
@@ -90,7 +76,7 @@ const ProductPage: React.VFC = () => {
         id: fetchedProduct?.id,
         user,
         userId: productData?.userId,
-        tags: tagNames,
+        // tags: tagNames,
       });
     }
   };
@@ -229,8 +215,8 @@ const ProductPage: React.VFC = () => {
         </Heading>
 
         <Box maxW="80%">
-          {product?.tags
-            ? product?.tags.map((tag: string, index: number) => {
+          {product?.data?.tagsIDs.length
+            ? product?.data?.tagsIDs.map((tag: string, index: number) => {
                 return (
                   <Link key={index} href={`/tags/${tag}`}>
                     <Box
