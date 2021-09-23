@@ -214,6 +214,13 @@ const ProductPage: React.VFC = () => {
           {product?.data.title}
         </Heading>
 
+        {product?.data?.updatedAt !== "" ? (
+          <Box>
+            更新:{" "}
+            {moment(product?.data.updatedAt.toDate().toString()).fromNow()}
+          </Box>
+        ) : null}
+
         <Box maxW="80%">
           {product?.data?.tagsIDs?.length
             ? product?.data?.tagsIDs.map((tag: string, index: number) => {
