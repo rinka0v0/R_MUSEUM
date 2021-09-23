@@ -63,6 +63,7 @@ const Header: VFC = () => {
         saved: false,
         likeCount: 0,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: "",
       })
       .then(() => {
         router.push(`/products/${id}/edit`);

@@ -35,6 +35,7 @@ const Edit: React.VFC = () => {
   const [tags, setTags] = useState<Array<string>>([]);
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const { currentUser, signInCheck } = useContext(AuthContext);
   const { showMessage } = useMessage();
@@ -43,70 +44,36 @@ const Edit: React.VFC = () => {
   useWarningOnExit(warningExit, "ページを離れてもいいですか？");
 
   const fetchProduct = async () => {
-    await db
-      .collection("products")
-      .doc(query)
-      .get()
-      .then((product) => {
-        if (product.exists === false) {
-          showMessage({
-            title: `作品が存在しません`,
-            status: "error",
-          });
-          setWarningExit(false);
-          router.push("/");
-        }
-        if (product.data() !== undefined) {
-          const data = product.data();
-          setTitle(data?.title);
-          setMarkdown(data?.content);
-          setOpen(data?.open);
-          // タグを取得してステートに設定する
-          const tagNames: Array<string> = [];
-          if (data?.tagsIDs.length) {
-            Promise.all(
-              data?.tagsIDs.map(async (tagId: string) => {
-                await db
-                  .collection("tags")
-                  .doc(tagId)
-                  .get()
-                  .then((doc) => {
-                    if (doc.exists) {
-                      tagNames.push(doc.data()?.name);
-                    }
-                  })
-                  .catch(() => {
-                    showMessage({
-                      title: "エラーが発生しました",
-                      status: "error",
-                    });
-                  });
-              })
-            )
-              .then(() => {
-                setTags(tagNames);
-              })
-              .catch(() => {
-                showMessage({ title: "エラーが発生しました", status: "error" });
-              });
-          }
-        }
-      })
-      .catch(() => {
-        showMessage({ title: "エラーが発生しました", status: "error" });
-      });
+    try {
+      const productDoc = await db.collection("products").doc(query).get();
+      if (!productDoc.exists) {
+        showMessage({
+          title: `作品が存在しません`,
+          status: "error",
+        });
+        setWarningExit((prev) => !prev);
+        await router.push("/");
+      }
+      const data = productDoc.data();
+      setTitle(data?.title);
+      setMarkdown(data?.content);
+      setOpen(data?.open);
+      setTags(data?.tagsIDs);
+    } catch (err) {
+      setWarningExit((prev) => !prev);
+      router.push("/");
+      showMessage({ title: "作品が見つかりませんでした", status: "error" });
+    }
   };
 
   const onClickSave = async () => {
     setSaving(true);
     if (title && markdown) {
       // タグ付けの機能を追加
-      const tagsDocumentId: Array<string> = [];
       if (tags.length) {
         // タグがつけられている場合の処理
         await Promise.all(
           tags.map(async (tagName) => {
-            // const tagsRef = db.collection("tags");
             const tagData = await db
               .collection("tags")
               .where("name", "==", tagName.toLocaleLowerCase().trim())
@@ -120,16 +87,6 @@ const Edit: React.VFC = () => {
                   count: 0,
                   createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 })
-                .then((res) => {
-                  db.collection("tags")
-                    .doc(res.id)
-                    .collection("productId")
-                    .doc(query)
-                    .set({
-                      id: query,
-                    });
-                  tagsDocumentId.push(res.id);
-                })
                 .catch(() => {
                   showMessage({
                     title: "エラーが発生しました",
@@ -137,17 +94,6 @@ const Edit: React.VFC = () => {
                   });
                   setSaving(false);
                 });
-            } else {
-              tagData.forEach((doc) => {
-                tagsDocumentId.push(doc.id);
-                db.collection("tags")
-                  .doc(doc.id)
-                  .collection("productId")
-                  .doc(query)
-                  .set({
-                    id: query,
-                  });
-              });
             }
           })
         ).catch(() => {
@@ -156,7 +102,7 @@ const Edit: React.VFC = () => {
         });
       }
 
-      db.collection("products")
+      await db.collection("products")
         .doc(query)
         .set(
           {
@@ -164,21 +110,20 @@ const Edit: React.VFC = () => {
             content: markdown,
             userId: currentUser?.uid,
             sorceCode: "",
-            tagsIDs: tagsDocumentId,
+            tagsIDs: tags,
             open: open,
             saved: true,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
           },
           { merge: true }
         )
         .then(() => {
           showMessage({ title: "保存しました", status: "success" });
-          setWarningExit(false);
           if (open) {
+            setWarningExit((prev) => !prev);
             router.push(`/products/${query}`);
-          } else {
-            router.push("/dashboard");
           }
+          setSaving(false);
         })
         .catch(() => {
           showMessage({ title: "エラーが発生しました", status: "error" });
@@ -220,11 +165,12 @@ const Edit: React.VFC = () => {
     }
     const fetchProductData = async () => {
       await fetchProduct();
+      setLoading(false);
     };
     fetchProductData();
   }, [currentUser]);
 
-  if (!signInCheck || !currentUser) {
+  if (!signInCheck || !currentUser || loading) {
     return <Loading />;
   }
 

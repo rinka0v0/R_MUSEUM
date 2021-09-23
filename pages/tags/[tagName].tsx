@@ -10,11 +10,6 @@ import { db } from "../../firebase";
 import firebase from "firebase";
 import useMessage from "../../hooks/useMessage";
 
-type Products = {
-  id: string;
-  dataArray: Array<firebase.firestore.DocumentData> | undefined;
-};
-
 const TagPage: VFC = () => {
   const perPage = 10;
 
@@ -22,35 +17,37 @@ const TagPage: VFC = () => {
   const [nextDoc, setNextDoc]: any = useState();
   const [fetching, setFetching] = useState(false);
   const [empty, setEmpty] = useState(true);
-  const [products, setProducts] = useState<Products>();
+  const [products, setProducts] =
+    useState<Array<firebase.firestore.DocumentData> | undefined>();
   const [loading, setLoading] = useState(true);
 
   const { showMessage } = useMessage();
 
   const fetchProducts = async () => {
-    const tagsRef = await db
-      .collection("tags")
-      .where("name", "==", tagName)
-      .limit(1)
-      .get();
-    if (tagsRef.empty) {
-      setLoading(false);
-      return;
-    }
-    // let tagId: string;
-    const tag: Array<string> = [];
-    tagsRef.forEach((tagRef) => {
-      tag.push(tagRef.id);
-    });
+    // const tagsRef = await db
+    //   .collection("tags")
+    //   .where("name", "==", tagName)
+    //   .limit(1)
+    //   .get();
+    // if (tagsRef.empty) {
+    //   setLoading(false);
+    //   return;
+    // }
+    // const tag: Array<string> = [];
+    // tagsRef.forEach((tagRef) => {
+    //   tag.push(tagRef.id);
+    // });
     const productRefs = await db
       .collection("products")
-      .where("tagsIDs", "array-contains", tag[0])
+      .where("tagsIDs", "array-contains", tagName)
       .where("open", "==", true)
       .orderBy("createdAt", "desc")
       .limit(perPage)
       .get();
 
-    const productsDataArray: Array<any> = [];
+    const productsDataArray:
+      | Array<firebase.firestore.DocumentData>
+      | undefined = [];
     productRefs.forEach((productRef) => {
       const productData = productRef.data();
       productsDataArray.push({
@@ -86,7 +83,8 @@ const TagPage: VFC = () => {
     } else {
       setEmpty(true);
     }
-    setProducts({ id: tag[0], dataArray: productsDataArray });
+
+    setProducts(productsDataArray);
     setLoading(false);
   };
 
@@ -94,7 +92,7 @@ const TagPage: VFC = () => {
     setFetching(true);
     const productRefs = await db
       .collection("products")
-      .where("tagsIDs", "array-contains", products?.id)
+      .where("tagsIDs", "array-contains", tagName)
       .startAfter(start)
       .limit(perPage)
       .get();
@@ -131,7 +129,7 @@ const TagPage: VFC = () => {
     });
 
     setProducts((prev: any) => {
-      return { id: prev?.id, dataArray: [...prev?.dataArray, ...nextProducts] };
+      return [...prev, ...nextProducts];
     });
 
     if (productRefs.docs[perPage - 1]) {
@@ -178,7 +176,7 @@ const TagPage: VFC = () => {
           </Box>
         </Flex>
 
-        {!loading && !products?.dataArray?.length ? (
+        {!loading && !products?.length ? (
           <Box>作品が見つかりませんでした</Box>
         ) : null}
 
@@ -209,7 +207,7 @@ const TagPage: VFC = () => {
                     </Box>
                   );
                 })
-            : products?.dataArray?.map((product: any, index: number) => {
+            : products?.map((product: any, index: number) => {
                 const date: string = product.createdAt.toDate().toString();
                 return (
                   <Box
