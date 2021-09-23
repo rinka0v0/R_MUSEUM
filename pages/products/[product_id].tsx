@@ -53,7 +53,8 @@ const ProductPage: React.VFC = () => {
   const fetchProduct = async () => {
     const fetchedProduct = await db.collection("products").doc(query).get();
     if (!fetchedProduct.exists) {
-      setProduct({ data: { content: "投稿が見つかりませんでした🙇‍♂️" } });
+      showMessage({ title: "投稿が見つかりませんでした🙇‍♂️", status: "error" });
+      await router.push("/");
     } else {
       const productData = fetchedProduct.data();
       const fetchedUser = await db
@@ -76,7 +77,6 @@ const ProductPage: React.VFC = () => {
         id: fetchedProduct?.id,
         user,
         userId: productData?.userId,
-        // tags: tagNames,
       });
     }
   };
@@ -215,7 +215,7 @@ const ProductPage: React.VFC = () => {
         </Heading>
 
         <Box maxW="80%">
-          {product?.data?.tagsIDs.length
+          {product?.data?.tagsIDs?.length
             ? product?.data?.tagsIDs.map((tag: string, index: number) => {
                 return (
                   <Link key={index} href={`/tags/${tag}`}>
