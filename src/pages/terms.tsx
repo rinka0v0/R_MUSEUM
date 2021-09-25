@@ -1,12 +1,11 @@
 import { Box } from "@chakra-ui/layout";
 import { Heading, VStack } from "@chakra-ui/react";
 import React from "react";
-import Header from "../components/layout/Header";
+import Layout from "../components/layout/Layout";
 
 const Terms: React.VFC = () => {
   return (
-    <>
-      <Header />
+    <Layout>
       <VStack
         spacing="4"
         justify="flex-start"
@@ -115,7 +114,7 @@ const Terms: React.VFC = () => {
         </Box>
         以上
       </VStack>
-    </>
+    </Layout>
   );
 };
 
