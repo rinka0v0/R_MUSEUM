@@ -8,7 +8,7 @@ import { db } from "../../firebase";
 import { useEffect } from "react";
 import firebase from "firebase";
 import DOMPurify from "dompurify";
-import marked from "marked";
+import marked from "marked"; 
 import { AuthContext } from "../../auth/AuthProvider";
 import PrimaryButton from "../../components/atoms/button/PrimaryButton";
 import CommentEditor from "../../components/editor/CommentEditor";
