@@ -1,17 +1,11 @@
 import { useEffect, useState, VFC } from "react";
-import {
-  Box,
-  Flex,
-  Heading,
-  SkeletonCircle,
-  SkeletonText,
-} from "@chakra-ui/react";
-import Header from "../../components/layout/Header";
+import { Heading } from "@chakra-ui/react";
 import { db } from "../../firebase";
-import Exhibit from "../../components/card/Exhibit";
-import moment from "moment";
 import PrimaryButton from "../../components/atoms/button/PrimaryButton";
 import useMessage from "../../hooks/useMessage";
+import SkeletonList from "../../components/skeleton/SkeletonList";
+import ProductList from "../../components/List/ProductList";
+import Layout from "../../components/layout/Layout";
 
 const LatestPage: VFC = () => {
   const perPage = 10;
@@ -87,9 +81,9 @@ const LatestPage: VFC = () => {
     newProductsDocs.forEach((productRef) => {
       const productData = productRef.data();
       popularProductsDataArray.push({
-        productId: productRef.id,
+        id: productRef.id,
         title: productData.title,
-        likes: productData.likeCount,
+        likeCount: productData.likeCount,
         createdAt: productData.createdAt,
         authorId: productData.userId,
       });
@@ -130,72 +124,22 @@ const LatestPage: VFC = () => {
   }, []);
 
   return (
-    <Box>
-      <Header />
-      <Flex align="center" justify="center" flexDirection="column" mb={5}>
-        <Heading mt={5}>最新の投稿</Heading>
-        <Flex
-          position="relative"
-          m="2em 0"
-          maxW="960px"
-          w="100%"
-          flexWrap="wrap"
-          justify="space-between"
-          _after={{ content: "''", display: "block", width: "calc(100% / 2)" }}
+    <Layout>
+      <Heading mt={5}>最新の投稿</Heading>
+      {loading ? (
+        <SkeletonList skeletonNumber={10} />
+      ) : (
+        <ProductList products={newProducts} />
+      )}
+      {empty ? null : (
+        <PrimaryButton
+          onClick={() => getNextSnapshot(nextDoc, perPage)}
+          isLoading={fetching}
         >
-          {loading
-            ? Array(10)
-                .fill(0)
-                .map((_, index) => {
-                  return (
-                    <Box
-                      key={index}
-                      m={{ md: "0.5em auto", base: "0.5em auto" }}
-                      p="0"
-                      w={{ md: " calc(96%/2)", base: "96%" }}
-                    >
-                      <Box m="0 auto" w="350px" bg="white" p="12px">
-                        <SkeletonText spacing="2" />
-                        <SkeletonCircle size="10" mt={2} />
-                      </Box>
-                    </Box>
-                  );
-                })
-            : newProducts.map((product: any, index: number) => {
-                const date: string = product.createdAt.toDate().toString();
-                return (
-                  <Box
-                    key={index}
-                    m={{ md: "0.5em auto", base: "0.5em auto" }}
-                    p="0"
-                    w={{ md: " calc(96%/2)", base: "96%" }}
-                  >
-                    <Box m="0 auto" w="350px">
-                      <Exhibit
-                        exhibit={{
-                          id: product.productId,
-                          name: product.title,
-                          userName: product.authorName,
-                          userIcon: product.authorIconURL,
-                          likes: product.likes,
-                          createdAt: moment(date).fromNow(),
-                        }}
-                      />
-                    </Box>
-                  </Box>
-                );
-              })}
-        </Flex>
-        {empty ? null : (
-          <PrimaryButton
-            onClick={() => getNextSnapshot(nextDoc, perPage)}
-            isLoading={fetching}
-          >
-            もっと見る
-          </PrimaryButton>
-        )}
-      </Flex>
-    </Box>
+          もっと見る
+        </PrimaryButton>
+      )}
+    </Layout>
   );
 };
 
