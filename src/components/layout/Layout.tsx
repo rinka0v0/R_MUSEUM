@@ -24,9 +24,7 @@ const Layout: VFC<Props> = (props) => {
           flex="1"
           mb={5}
         >
-          {/* <Box flex="1" as="main"> */}
           {props.children}
-          {/* </Box> */}
         </Flex>
         <Footer />
       </Flex>
