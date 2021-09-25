@@ -83,7 +83,7 @@ const Header: VFC = () => {
 
   return (
     <Flex
-      as="nav"
+      as="header"
       bg="white"
       align="center"
       justify="space-between"
