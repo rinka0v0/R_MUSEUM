@@ -10,14 +10,14 @@ type Props = {
     name: string;
     userName: string;
     createdAt: string;
-    likes: number;
+    likeCount: number;
     id: string;
     userIcon?: string;
     sourceCode?: string;
   };
 };
 
-const Exhibit: React.VFC<Props> = (props) => {
+const ProductListItem: React.VFC<Props> = (props) => {
   const { exhibit } = props;
   return (
     <Link href={`/products/${exhibit.id}`}>
@@ -52,7 +52,7 @@ const Exhibit: React.VFC<Props> = (props) => {
                   <AiFillHeart />
                 </IconContext.Provider>
               </Box>
-              <Box>{exhibit.likes}</Box>
+              <Box>{exhibit.likeCount}</Box>
             </Flex>
           </Flex>
         </Flex>
@@ -60,5 +60,4 @@ const Exhibit: React.VFC<Props> = (props) => {
     </Link>
   );
 };
-
-export default Exhibit;
+export default ProductListItem;
