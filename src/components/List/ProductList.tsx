@@ -5,7 +5,7 @@ import ProductListItem from "../card/ProductListItem";
 import firebase from "firebase";
 
 type Props = {
-  products: Array<firebase.firestore.DocumentData>;
+  products: Array<firebase.firestore.DocumentData> | undefined;
 };
 
 const ProductList: VFC<Props> = (props) => {
@@ -20,9 +20,8 @@ const ProductList: VFC<Props> = (props) => {
       justify="space-between"
       _after={{ content: "''", display: "block", width: "calc(100% / 2)" }}
     >
-      {products.map((product, index) => {
+      {products?.map((product, index) => {
         const date: string = product.createdAt.toDate().toString();
-        console.log(product.authorIconURL);
         return (
           <Box
             key={index}
