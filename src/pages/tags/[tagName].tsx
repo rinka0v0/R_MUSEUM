@@ -1,14 +1,15 @@
-import { Box, Flex, SkeletonCircle, SkeletonText } from "@chakra-ui/react";
-import moment from "moment";
+import { Box, Flex } from "@chakra-ui/react";
 import router from "next/router";
 import { useEffect, useState } from "react";
 import { VFC } from "react";
 import PrimaryButton from "../../components/atoms/button/PrimaryButton";
-import Exhibit from "../../components/card/Exhibit";
-import Header from "../../components/layout/Header";
 import { db } from "../../firebase";
 import firebase from "firebase";
 import useMessage from "../../hooks/useMessage";
+import SkeletonList from "../../components/skeleton/SkeletonList";
+import ProductList from "../../components/List/ProductList";
+import Layout from "../../components/layout/Layout";
+import Tag from "../../components/card/Tag";
 
 const TagPage: VFC = () => {
   const perPage = 10;
@@ -17,26 +18,14 @@ const TagPage: VFC = () => {
   const [nextDoc, setNextDoc]: any = useState();
   const [fetching, setFetching] = useState(false);
   const [empty, setEmpty] = useState(true);
-  const [products, setProducts] =
-    useState<Array<firebase.firestore.DocumentData> | undefined>();
+  const [products, setProducts] = useState<
+    Array<firebase.firestore.DocumentData> | undefined
+  >([]);
   const [loading, setLoading] = useState(true);
 
   const { showMessage } = useMessage();
 
   const fetchProducts = async () => {
-    // const tagsRef = await db
-    //   .collection("tags")
-    //   .where("name", "==", tagName)
-    //   .limit(1)
-    //   .get();
-    // if (tagsRef.empty) {
-    //   setLoading(false);
-    //   return;
-    // }
-    // const tag: Array<string> = [];
-    // tagsRef.forEach((tagRef) => {
-    //   tag.push(tagRef.id);
-    // });
     const productRefs = await db
       .collection("products")
       .where("tagsIDs", "array-contains", tagName)
@@ -51,9 +40,9 @@ const TagPage: VFC = () => {
     productRefs.forEach((productRef) => {
       const productData = productRef.data();
       productsDataArray.push({
-        productId: productRef.id,
+        id: productRef.id,
         title: productData.title,
-        likes: productData.likeCount,
+        likeCount: productData.likeCount,
         createdAt: productData.createdAt,
         authorId: productData.userId,
       });
@@ -101,7 +90,7 @@ const TagPage: VFC = () => {
     productRefs.forEach((productRef) => {
       const productData = productRef.data();
       nextProducts.push({
-        productId: productRef.id,
+        id: productRef.id,
         title: productData.title,
         likes: productData.likeCount,
         createdAt: productData.createdAt,
@@ -146,102 +135,41 @@ const TagPage: VFC = () => {
   }, []);
 
   return (
-    <>
-      <Header />
-      <Flex align="center" justify="center" flexDirection="column">
-        <Flex
-          border="1px solid #ddd"
-          bg="white"
-          borderRadius="md"
-          p={5}
-          justify="center"
-          width="90%"
-          m="2em auto"
-        >
-          <Box>
-            <Box
-              display="inline-block"
-              m=".6em"
-              p=".6em"
-              lineHeight="1"
-              textDecoration="none"
-              color="#00e"
-              backgroundColor="#fff"
-              border="1px solid #00e"
-              borderRadius="2em"
-            >
-              {tagName}
-            </Box>
-            タグがつけられた作品
-          </Box>
-        </Flex>
-
-        {!loading && !products?.length ? (
-          <Box>作品が見つかりませんでした</Box>
-        ) : null}
-
-        <Flex
-          position="relative"
-          m="2em 0"
-          maxW="960px"
-          w="100%"
-          flexWrap="wrap"
-          justify="space-between"
-          _after={{ content: "''", display: "block", width: "calc(100% / 2)" }}
-        >
-          {loading
-            ? Array(10)
-                .fill(0)
-                .map((_, index) => {
-                  return (
-                    <Box
-                      key={index}
-                      m={{ md: "0.5em auto", base: "0.5em auto" }}
-                      p="0"
-                      w={{ md: " calc(96%/2)", base: "96%" }}
-                    >
-                      <Box m="0 auto" w="350px" bg="white" p="12px">
-                        <SkeletonText spacing="2" />
-                        <SkeletonCircle size="10" mt={2} />
-                      </Box>
-                    </Box>
-                  );
-                })
-            : products?.map((product: any, index: number) => {
-                const date: string = product.createdAt.toDate().toString();
-                return (
-                  <Box
-                    key={index}
-                    m={{ md: "0.5em auto", base: "0.5em auto" }}
-                    p="0"
-                    w={{ md: " calc(96%/2)", base: "96%" }}
-                  >
-                    <Box m="0 auto" w="350px">
-                      <Exhibit
-                        exhibit={{
-                          id: product.productId,
-                          name: product.title,
-                          userName: product.authorName,
-                          userIcon: product.authorIconURL,
-                          likes: product.likes,
-                          createdAt: moment(date).fromNow(),
-                        }}
-                      />
-                    </Box>
-                  </Box>
-                );
-              })}
-        </Flex>
-        {empty ? null : (
-          <PrimaryButton
-            onClick={() => getNextSnapshot(nextDoc, perPage)}
-            isLoading={fetching}
-          >
-            もっと見る
-          </PrimaryButton>
-        )}
+    <Layout>
+      <Flex
+        border="1px solid #ddd"
+        bg="white"
+        borderRadius="md"
+        p={5}
+        justify="center"
+        width="90%"
+        m="2em auto"
+      >
+        <Box>
+          <Tag tagName={String(tagName)} />
+          タグがつけられた作品
+        </Box>
       </Flex>
-    </>
+
+      {!loading && !products?.length ? (
+        <Box>作品が見つかりませんでした</Box>
+      ) : null}
+
+      {loading ? (
+        <SkeletonList skeletonNumber={10} />
+      ) : (
+        <ProductList products={products} />
+      )}
+
+      {empty ? null : (
+        <PrimaryButton
+          onClick={() => getNextSnapshot(nextDoc, perPage)}
+          isLoading={fetching}
+        >
+          もっと見る
+        </PrimaryButton>
+      )}
+    </Layout>
   );
 };
 

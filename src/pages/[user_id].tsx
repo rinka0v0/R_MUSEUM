@@ -1,15 +1,29 @@
-import { Avatar } from "@chakra-ui/avatar";
-import { Box, Flex, Heading } from "@chakra-ui/layout";
-import { SkeletonCircle, SkeletonText } from "@chakra-ui/react";
-import moment from "moment";
+import {  Heading } from "@chakra-ui/layout";
 import { useRouter } from "next/router";
 import React, { useContext, useState } from "react";
 import { useEffect } from "react";
 import { AuthContext } from "../auth/AuthProvider";
 import PrimaryButton from "../components/atoms/button/PrimaryButton";
-import Exhibit from "../components/card/Exhibit";
-import Header from "../components/layout/Header";
+import ProductList from "../components/List/ProductList";
+import SkeletonList from "../components/skeleton/SkeletonList";
 import { db } from "../firebase";
+import firebase from "firebase";
+import Layout from "../components/layout/Layout";
+import UserProfile from "../components/user/UserProfile";
+
+type User = {
+  data: firebase.firestore.DocumentData | undefined;
+  products: Array<Products> | undefined;
+};
+
+type Products = {
+  id: string;
+  title: string;
+  likeCount: number;
+  createdAt: firebase.firestore.DocumentData;
+  authorName: string;
+  authorIconURL: string;
+};
 
 const ProductPage: React.VFC = () => {
   const router = useRouter();
@@ -22,7 +36,7 @@ const ProductPage: React.VFC = () => {
 
   const perPage = 10;
 
-  const [userInfo, setUserInfo]: any = useState();
+  const [userInfo, setUserInfo] = useState<User>();
   const [nextDoc, setNextDoc]: any = useState();
   const [fetching, setFetching] = useState(false);
   const [empty, setEmpty] = useState(false);
@@ -38,20 +52,21 @@ const ProductPage: React.VFC = () => {
       .orderBy("createdAt", "desc")
       .limit(perPage)
       .get();
+    const userData = userRef.data();
     const userProducts: Array<any> = [];
     productsRef.forEach(async (productRef) => {
       const productData = productRef.data();
       userProducts.push({
-        productId: productRef.id,
+        id: productRef.id,
         title: productData.title,
-        likes: productData.likeCount,
+        likeCount: productData.likeCount,
         createdAt: productData.createdAt,
-        authorId: productData.userId,
+        authorName: userData?.user_name,
+        authorIconURL: userData?.iconURL,
       });
     });
     setUserInfo({
-      userId: userRef.id,
-      userData: userRef.data(),
+      data: userData,
       products: userProducts,
     });
     if (productsRef.docs[perPage - 1]) {
@@ -78,11 +93,12 @@ const ProductPage: React.VFC = () => {
     newProductsDocs.forEach((productRef) => {
       const productData = productRef.data();
       newProductDataArray.push({
-        productId: productRef.id,
+        id: productRef.id,
         title: productData.title,
         likes: productData.likeCount,
         createdAt: productData.createdAt,
-        authorId: productData.userId,
+        authorName: userInfo?.data?.user_name,
+        authorIconURL: userInfo?.data?.iconURL,
       });
     });
 
@@ -108,89 +124,19 @@ const ProductPage: React.VFC = () => {
 
   return (
     <>
-      <Header />
-      <Flex alignItems="center" flexDirection="column" mb={5}>
-        <Flex
-          w={{ md: "90%" }}
-          alignItems="center"
-          my={10}
-          justify="space-around"
-          flexDirection={{ base: "column", md: "row" }}
-        >
-          <Avatar
-            src={userInfo?.userData.iconURL}
-            size="2xl"
-            mr={3}
-            ml={3}
-            mt={5}
-          />
-          <Box width="70%">
-            <Box fontSize={30}>{userInfo?.userData.user_name}</Box>
-            <Box as="p" fontSize={{ base: ".95em", md: "16px" }}>
-              {userInfo?.userData.profile}
-            </Box>
-          </Box>
-        </Flex>
+      <Layout>
+        <UserProfile user={userInfo?.data} />
+
         <Heading fontSize={24} textAlign="center">
           作品一覧
         </Heading>
 
-        <Flex
-          position="relative"
-          m="2em 0"
-          maxW="960px"
-          w="100%"
-          flexWrap="wrap"
-          justify="space-between"
-          _after={{
-            content: "''",
-            display: "block",
-            width: "calc(100% / 2)",
-          }}
-        >
-          {loading
-            ? Array(10)
-                .fill(0)
-                .map((_, index) => {
-                  return (
-                    <Box
-                      key={index}
-                      m={{ md: "0.5em auto", base: "0.5em auto" }}
-                      p="0"
-                      w={{ md: " calc(96%/2)", base: "96%" }}
-                    >
-                      <Box m="0 auto" w="350px" bg="white" p="12px">
-                        <SkeletonText spacing="2" />
-                        <SkeletonCircle size="10" mt={2} />
-                      </Box>
-                    </Box>
-                  );
-                })
-            : userInfo?.products.map((product: any, index: number) => {
-                const date: string = product.createdAt.toDate().toString();
-                return (
-                  <Box
-                    key={index}
-                    m={{ md: "0.5em auto", base: "0.5em auto" }}
-                    p="0"
-                    w={{ md: " calc(96%/2)", base: "96%" }}
-                  >
-                    <Box m="0 auto" w="350px">
-                      <Exhibit
-                        exhibit={{
-                          id: product.productId,
-                          name: product.title,
-                          userName: userInfo.userData.user_name,
-                          userIcon: userInfo.userData.iconURL,
-                          likes: product.likeCount,
-                          createdAt: moment(date).fromNow(),
-                        }}
-                      />
-                    </Box>
-                  </Box>
-                );
-              })}
-        </Flex>
+        {loading ? (
+          <SkeletonList skeletonNumber={10} />
+        ) : userInfo?.products?.length ? (
+          <ProductList products={userInfo.products} />
+        ) : null}
+
         {empty ? null : (
           <PrimaryButton
             onClick={() => getNextProducts(nextDoc, perPage)}
@@ -199,7 +145,7 @@ const ProductPage: React.VFC = () => {
             もっと見る
           </PrimaryButton>
         )}
-      </Flex>
+      </Layout>
     </>
   );
 };
