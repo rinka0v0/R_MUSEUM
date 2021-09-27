@@ -16,6 +16,7 @@ type Product = {
   popularProducts: Array<ProductData> | undefined;
   fetchMorePopular: () => Promise<void>;
   loading: boolean;
+  fetching: boolean;
   error: boolean;
   nextDoc: firebase.firestore.DocumentData | undefined;
 };
@@ -24,18 +25,25 @@ const useFetchPopularProducts = (limitNum: number): Product => {
   const [popularProducts, setPopularProducts] = useState<Array<ProductData>>();
   const [nextDoc, setNextDoc] = useState<firebase.firestore.DocumentData>();
   const [error, setError] = useState(false);
+  const [fetching, setFetching] = useState(false);
 
   const fetchMorePopular = async () => {
+    setFetching(true);
     try {
       const { nextProducts, nextDoc: nextLatestDoc } =
         await fetchNextPopularProduct(limitNum, nextDoc);
-      setPopularProducts((prev: any) => [...prev, nextProducts]);
+      if (nextProducts) {
+        setPopularProducts((prev: any) => [...prev, ...nextProducts]);
+      }
       if (nextLatestDoc) {
         setNextDoc(nextLatestDoc);
+      } else {
+        setNextDoc(undefined);
       }
     } catch (err) {
       setError(true);
     }
+    setFetching(false);
   };
 
   useEffect(() => {
@@ -51,7 +59,14 @@ const useFetchPopularProducts = (limitNum: number): Product => {
       });
   }, []);
   const loading = !popularProducts && !error;
-  return { popularProducts, fetchMorePopular, loading, error, nextDoc };
+  return {
+    popularProducts,
+    fetchMorePopular,
+    loading,
+    fetching,
+    error,
+    nextDoc,
+  };
 };
 
 export default useFetchPopularProducts;

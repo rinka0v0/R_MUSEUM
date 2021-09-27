@@ -16,6 +16,7 @@ type Product = {
   latestProducts: Array<ProductData> | undefined;
   fetchMoreLatest: () => Promise<void>;
   loading: boolean;
+  fetching: boolean;
   error: boolean;
   nextDoc: firebase.firestore.DocumentData | undefined;
 };
@@ -24,18 +25,26 @@ const useFetchLatestProducts = (limitNum: number): Product => {
   const [latestProducts, setLatestProducts] = useState<Array<ProductData>>();
   const [nextDoc, setNextDoc] = useState<firebase.firestore.DocumentData>();
   const [error, setError] = useState(false);
+  const [fetching, setFetching] = useState(false);
 
   const fetchMoreLatest = async () => {
+    setFetching(true);
     try {
       const { nextProducts, nextDoc: nextLatestDoc } =
         await fetchNextLatestProduct(limitNum, nextDoc);
-      setLatestProducts((prev: any) => [...prev, nextProducts]);
+      if (nextProducts) {
+        setLatestProducts((prev: any) => [...prev, ...nextProducts]);
+      }
+
       if (nextLatestDoc) {
         setNextDoc(nextLatestDoc);
+      } else {
+        setNextDoc(undefined);
       }
     } catch (err) {
       setError(true);
     }
+    setFetching(false);
   };
 
   useEffect(() => {
@@ -51,7 +60,7 @@ const useFetchLatestProducts = (limitNum: number): Product => {
       });
   }, []);
   const loading = !latestProducts && !error;
-  return { latestProducts, fetchMoreLatest, loading, error, nextDoc };
+  return { latestProducts, fetchMoreLatest, loading, fetching, error, nextDoc };
 };
 
 export default useFetchLatestProducts;

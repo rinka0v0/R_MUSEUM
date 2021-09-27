@@ -16,6 +16,7 @@ type Product = {
   likedProducts: Array<ProductData> | undefined;
   fetchMoreProducts: () => Promise<void>;
   loading: boolean;
+  fetching: boolean;
   error: boolean;
   nextDoc: firebase.firestore.DocumentData | undefined;
 };
@@ -24,21 +25,28 @@ const useFetchLikedProduct = (limitNum: number, userId: string): Product => {
   const [likedProducts, setLikedProducts] = useState<Array<ProductData>>();
   const [nextDoc, setNextDoc] = useState<firebase.firestore.DocumentData>();
   const [error, setError] = useState(false);
+  const [fetching, setFetching] = useState(false);
 
   const fetchMoreProducts = async () => {
+    setFetching(true);
     try {
       const { products, nextDoc: nextLatestDoc } = await fetchNextLikedProduct(
         userId,
         limitNum,
         nextDoc
       );
-      setLikedProducts((prev: any) => [...prev, products]);
+      if (products) {
+        setLikedProducts((prev: any) => [...prev, ...products]);
+      }
       if (nextLatestDoc) {
         setNextDoc(nextLatestDoc);
+      } else {
+        setNextDoc(undefined);
       }
     } catch (err) {
       setError(true);
     }
+    setFetching(false);
   };
 
   useEffect(() => {
@@ -54,7 +62,14 @@ const useFetchLikedProduct = (limitNum: number, userId: string): Product => {
       });
   }, []);
   const loading = !likedProducts && !error;
-  return { likedProducts, fetchMoreProducts, loading, error, nextDoc };
+  return {
+    likedProducts,
+    fetchMoreProducts,
+    loading,
+    fetching,
+    error,
+    nextDoc,
+  };
 };
 
 export default useFetchLikedProduct;
