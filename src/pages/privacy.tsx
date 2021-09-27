@@ -1,12 +1,11 @@
 import { Box } from "@chakra-ui/layout";
 import { Heading, VStack } from "@chakra-ui/react";
 import React from "react";
-import Header from "../components/layout/Header";
+import Layout from "../components/layout/Layout";
 
 const Privacy: React.VFC = () => {
   return (
-    <>
-      <Header />
+    <Layout>
       <VStack
         spacing="4"
         justify="flex-start"
@@ -89,7 +88,7 @@ const Privacy: React.VFC = () => {
           住所： 社名： 担当部署： Eメールアドレス： 以上
         </Box>
       </VStack>
-    </>
+    </Layout>
   );
 };
 

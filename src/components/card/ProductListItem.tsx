@@ -6,21 +6,20 @@ import { AiFillHeart } from "react-icons/ai";
 import { IconContext } from "react-icons/lib";
 
 type Props = {
-  exhibit: {
-    name: string;
-    userName: string;
-    createdAt: string;
-    likes: number;
+  product: {
     id: string;
-    userIcon?: string;
-    sourceCode?: string;
+    title: string;
+    authorIconURL: string;
+    authorName: string;
+    createdAt: string;
+    likeCount: number;
   };
 };
 
-const Exhibit: React.VFC<Props> = (props) => {
-  const { exhibit } = props;
+const ProductListItem: React.VFC<Props> = (props) => {
+  const { product } = props;
   return (
-    <Link href={`/products/${exhibit.id}`}>
+    <Link href={`/products/${product.id}`}>
       <Box
         w="350px"
         backgroundColor="white"
@@ -29,30 +28,29 @@ const Exhibit: React.VFC<Props> = (props) => {
         cursor="pointer"
       >
         <Heading as="h1" fontSize="md" minH="30px">
-          {exhibit.name}
+          {product.title}
         </Heading>
         <Flex justify="space-between" align="center" mt={3}>
           <Flex alignItems="center">
             <Avatar
               src={
-                exhibit.userIcon
-                  ? exhibit.userIcon
+                product.authorIconURL
+                  ? product.authorIconURL
                   : "https://bit.ly/broken-link"
               }
               mr={3}
             />
-            <Box>{exhibit.userName}</Box>
+            <Box>{product.authorName}</Box>
           </Flex>
-          {exhibit.sourceCode ? <Box bg="teal">コード公開中</Box> : null}
           <Flex>
-            <Box>{exhibit.createdAt}</Box>
+            <Box>{product.createdAt}</Box>
             <Flex mx={2} alignItems="center">
               <Box>
                 <IconContext.Provider value={{ color: "red" }}>
                   <AiFillHeart />
                 </IconContext.Provider>
               </Box>
-              <Box>{exhibit.likes}</Box>
+              <Box>{product.likeCount}</Box>
             </Flex>
           </Flex>
         </Flex>
@@ -60,5 +58,4 @@ const Exhibit: React.VFC<Props> = (props) => {
     </Link>
   );
 };
-
-export default Exhibit;
+export default ProductListItem;
