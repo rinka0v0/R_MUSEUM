@@ -11,7 +11,7 @@ const PopularPage: VFC = () => {
   const perPage = 10;
 
   // const { showMessage } = useMessage();
-  const { popularProducts, fetchMorePopular, loading, nextDoc } =
+  const { popularProducts, fetchMorePopular, loading, fetching, nextDoc } =
     useFetchPopularProducts(perPage);
 
   return (
@@ -23,7 +23,7 @@ const PopularPage: VFC = () => {
         <ProductList products={popularProducts} />
       )}
       {nextDoc ? (
-        <PrimaryButton onClick={fetchMorePopular} isLoading={loading}>
+        <PrimaryButton onClick={fetchMorePopular} isLoading={fetching}>
           もっと見る
         </PrimaryButton>
       ) : null}

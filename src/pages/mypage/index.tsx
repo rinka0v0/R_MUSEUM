@@ -20,7 +20,6 @@ type User = {
   data: firebase.firestore.DocumentData | undefined;
 };
 
-
 const Mypage: React.VFC = () => {
   const { currentUser, signInCheck } = useContext(AuthContext);
   const { showMessage } = useMessage();
@@ -32,14 +31,18 @@ const Mypage: React.VFC = () => {
 
   const {
     userProducts,
-    loading,
+    loading: userLoading,
+    fetching: fetchingUser,
     nextDoc: nextUserDoc,
     fetchMoreProducts: fetchMoreUserProduct,
   } = useFetchUserProduct(perPage, String(currentUser?.uid));
 
   const {
     likedProducts,
+    loading: likedLoadig,
+    fetching: fetchingLiked,
     fetchMoreProducts: fetchMoreLikedProduct,
+
     nextDoc: nextLikedDoc,
   } = useFetchLikedProduct(perPage, String(currentUser?.uid));
 
@@ -63,7 +66,7 @@ const Mypage: React.VFC = () => {
     return <Loading />;
   }
 
-  if (loading) {
+  if (userLoading || likedLoadig) {
     return (
       <Layout>
         <Box ml="auto" mr={5} mt={5}>
@@ -134,12 +137,18 @@ const Mypage: React.VFC = () => {
 
       {mode == "products" ? (
         nextUserDoc ? (
-          <PrimaryButton onClick={fetchMoreUserProduct} isLoading={loading}>
+          <PrimaryButton
+            onClick={fetchMoreUserProduct}
+            isLoading={fetchingUser}
+          >
             もっと見る
           </PrimaryButton>
         ) : null
       ) : nextLikedDoc ? (
-        <PrimaryButton onClick={fetchMoreLikedProduct} isLoading={loading}>
+        <PrimaryButton
+          onClick={fetchMoreLikedProduct}
+          isLoading={fetchingLiked}
+        >
           もっと見る
         </PrimaryButton>
       ) : null}

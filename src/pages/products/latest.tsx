@@ -8,10 +8,10 @@ import Layout from "../../components/layout/Layout";
 import useFetchLatestProducts from "../../hooks/useFetchLatestProducts";
 
 const LatestPage: VFC = () => {
-  const perPage = 10;
+  const perPage = 1;
 
   // const { showMessage } = useMessage();
-  const { latestProducts, fetchMoreLatest, loading, error, nextDoc } =
+  const { latestProducts, fetchMoreLatest, loading, fetching, error, nextDoc } =
     useFetchLatestProducts(perPage);
 
   return (
@@ -23,7 +23,7 @@ const LatestPage: VFC = () => {
         <ProductList products={latestProducts} />
       )}
       {nextDoc ? (
-        <PrimaryButton onClick={fetchMoreLatest} isLoading={loading}>
+        <PrimaryButton onClick={fetchMoreLatest} isLoading={fetching}>
           もっと見る
         </PrimaryButton>
       ) : null}

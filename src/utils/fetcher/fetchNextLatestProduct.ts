@@ -39,6 +39,8 @@ export const fetchNextLatestProduct = async (
     });
   });
 
+  const products:Array<ProductData> = []
+
   await Promise.all(
     nextProducts.map(async (productData, index: number) => {
       const authorDoc = await db
@@ -47,7 +49,7 @@ export const fetchNextLatestProduct = async (
         .get();
 
       const authorData = authorDoc.data();
-      nextProducts[index] = {
+      products[index] = {
         ...productData,
         authorName: authorData?.user_name,
         authorIconURL: authorData?.iconURL,
@@ -55,5 +57,5 @@ export const fetchNextLatestProduct = async (
       return;
     })
   );
-  return { nextProducts, nextDoc: newProductsDocs.docs[limitNum - 1] };
+  return { nextProducts:products, nextDoc: newProductsDocs.docs[limitNum - 1] };
 };
