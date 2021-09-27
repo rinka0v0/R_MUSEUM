@@ -19,7 +19,7 @@ const Layout: VFC<Props> = (props) => {
         <Flex
           as="main"
           align="center"
-          justify="center"
+          // justify="center"
           flexDirection="column"
           flex="1"
           mb={5}

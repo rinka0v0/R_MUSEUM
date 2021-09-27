@@ -8,7 +8,7 @@ import { db } from "../../firebase";
 import { useEffect } from "react";
 import firebase from "firebase";
 import DOMPurify from "dompurify";
-import marked from "marked"; 
+import marked from "marked";
 import { AuthContext } from "../../auth/AuthProvider";
 import PrimaryButton from "../../components/atoms/button/PrimaryButton";
 import CommentEditor from "../../components/editor/CommentEditor";
@@ -20,6 +20,8 @@ import { IconContext } from "react-icons/lib";
 import "github-markdown-css";
 import useMessage from "../../hooks/useMessage";
 import { Skeleton, SkeletonCircle, SkeletonText } from "@chakra-ui/react";
+import Tag from "../../components/card/Tag";
+import Layout from "../../components/layout/Layout";
 
 const ProductPage: React.VFC = () => {
   const router = useRouter();
@@ -151,13 +153,7 @@ const ProductPage: React.VFC = () => {
     return (
       <>
         <Header />
-        <Flex
-          FlexShadow="lg"
-          justify="center"
-          flexDirection="column"
-          align="center"
-          mb={5}
-        >
+        <Flex justify="center" flexDirection="column" align="center" mb={5}>
           <Flex justify="space-between" my={5} w="80%" align="center">
             <SkeletonCircle h="48px" w="48px" />
             <Skeleton h="48px" w="48px" />
@@ -170,129 +166,112 @@ const ProductPage: React.VFC = () => {
   }
 
   return (
-    <>
-      <Header />
-      <Flex flexDirection="column" align="center">
-        <Flex align="center" my={5} justify="space-between" width="80%">
-          <Link href={`/${product?.userId}`}>
-            <Flex alignItems="center" cursor="pointer">
-              <>
-                <Avatar src={product?.user?.iconURL} mr={3} ml={3} />
-                <Box>{product?.user?.user_name}</Box>
-              </>
-            </Flex>
-          </Link>
-
-          <Flex align="center" justify="space-around">
-            {currentUser?.uid === product?.data.userId ? (
-              <Box>
-                <PrimaryButton onClick={onClickEdit}>編集</PrimaryButton>
-              </Box>
-            ) : null}
-
-            <Box
-              onClick={() =>
-                currentUser
-                  ? onClickLiked(isliked)
-                  : showMessage({
-                      title: "ログインしてください",
-                      status: "error",
-                    })
-              }
-              cursor="pointer"
-            >
-              <IconContext.Provider
-                value={{ color: isliked ? "red" : "gray", size: "3em" }}
-              >
-                <AiFillHeart />
-              </IconContext.Provider>
-            </Box>
+    <Layout>
+      <Flex align="center" my={5} justify="space-between" width="80%">
+        <Link href={`/${product?.userId}`}>
+          <Flex alignItems="center" cursor="pointer">
+            <>
+              <Avatar src={product?.user?.iconURL} mr={3} ml={3} />
+              <Box>{product?.user?.user_name}</Box>
+            </>
           </Flex>
-        </Flex>
+        </Link>
 
-        <Heading my={5} maxW="80%">
-          {product?.data.title}
-        </Heading>
+        <Flex align="center" justify="space-around">
+          {currentUser?.uid === product?.data.userId ? (
+            <Box>
+              <PrimaryButton onClick={onClickEdit}>編集</PrimaryButton>
+            </Box>
+          ) : null}
 
-        {product?.data?.updatedAt !== "" ? (
-          <Box>
-            更新:{" "}
-            {moment(product?.data.updatedAt.toDate().toString()).fromNow()}
+          <Box
+            onClick={() =>
+              currentUser
+                ? onClickLiked(isliked)
+                : showMessage({
+                    title: "ログインしてください",
+                    status: "error",
+                  })
+            }
+            cursor="pointer"
+          >
+            <IconContext.Provider
+              value={{ color: isliked ? "red" : "gray", size: "3em" }}
+            >
+              <AiFillHeart />
+            </IconContext.Provider>
           </Box>
-        ) : null}
+        </Flex>
+      </Flex>
 
-        <Box maxW="80%">
-          {product?.data?.tagsIDs?.length
-            ? product?.data?.tagsIDs.map((tag: string, index: number) => {
+      <Heading my={5} maxW="80%">
+        {product?.data.title}
+      </Heading>
+
+      {product?.data?.updatedAt !== "" ? (
+        <Box>
+          更新: {moment(product?.data.updatedAt.toDate().toString()).fromNow()}
+        </Box>
+      ) : null}
+
+      <Box maxW="80%">
+        {product?.data?.tagsIDs?.length
+          ? product?.data?.tagsIDs.map((tag: string, index: number) => {
+              return (
+                <Link key={index} href={`/tags/${tag}`}>
+                  <Tag tagName={tag} />
+                </Link>
+              );
+            })
+          : null}
+      </Box>
+
+      <Box
+        bg="white"
+        minH="300px"
+        className="markdown-body"
+        p={5}
+        w="80%"
+        my={5}
+      >
+        <Box
+          boxSizing="border-box"
+          dangerouslySetInnerHTML={{
+            __html: DOMPurify.sanitize(
+              marked(product ? product.data.content : "Loading...")
+            ),
+          }}
+        ></Box>
+      </Box>
+      <Box bg="white" H="100px" p={5} w="80%" mb={5}>
+        <Heading fontSize="20px" textAlign="center" my="2em">
+          コメント
+        </Heading>
+        <Box w="100%" m="0 auto">
+          {isError ? <Box>コメントを読み込めませんでした🙇‍♂️</Box> : null}
+          {commentsData && commentsData.length
+            ? commentsData.map((comment, index) => {
                 return (
-                  <Link key={index} href={`/tags/${tag}`}>
-                    <Box
-                      display="inline-block"
-                      m=".6em"
-                      p=".6em"
-                      lineHeight="1"
-                      textDecoration="none"
-                      color="#00e"
-                      backgroundColor="#fff"
-                      border="1px solid #00e"
-                      borderRadius="2em"
-                      cursor="pointer"
-                    >
-                      {tag}
-                    </Box>
-                  </Link>
+                  <Box key={index} mb={4}>
+                    <Comment
+                      commentId={comment.id}
+                      productId={query}
+                      userId={comment.userId}
+                      content={comment.content}
+                      createdAt={moment(comment.createdAt).fromNow()}
+                    />
+                  </Box>
                 );
               })
             : null}
         </Box>
-
-        <Box
-          bg="white"
-          minH="300px"
-          className="markdown-body"
-          p={5}
-          w="80%"
-          my={5}
-        >
-          <Box
-            boxSizing="border-box"
-            dangerouslySetInnerHTML={{
-              __html: DOMPurify.sanitize(
-                marked(product ? product.data.content : "Loading...")
-              ),
-            }}
-          ></Box>
-        </Box>
-        <Box bg="white" H="100px" p={5} w="80%" mb={5}>
-          <Heading fontSize="20px" textAlign="center" my="2em">
-            コメント
-          </Heading>
-          <Box w="100%" m="0 auto">
-            {isError ? <Box>コメントを読み込めませんでした🙇‍♂️</Box> : null}
-            {commentsData && commentsData.length
-              ? commentsData.map((comment, index) => {
-                  return (
-                    <Box key={index} mb={4}>
-                      <Comment
-                        commentId={comment.id}
-                        productId={query}
-                        userId={comment.userId}
-                        content={comment.content}
-                        createdAt={moment(comment.createdAt).fromNow()}
-                      />
-                    </Box>
-                  );
-                })
-              : null}
-          </Box>
-          <CommentEditor
-            markdown={commentMarkdown}
-            setMarkdown={setCommentMarkdown}
-            productId={query}
-          />
-        </Box>
-      </Flex>
-    </>
+        <CommentEditor
+          markdown={commentMarkdown}
+          setMarkdown={setCommentMarkdown}
+          productId={query}
+        />
+      </Box>
+    </Layout>
   );
 };
 
