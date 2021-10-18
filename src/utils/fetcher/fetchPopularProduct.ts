@@ -31,9 +31,9 @@ export const fetchPopularProduct = async (
   popularProductsDocs.forEach((productRef) => {
     const productData = productRef.data();
     popularProductsDataArray.push({
-      productId: productRef.id,
+      id: productRef.id,
       title: productData.title,
-      likes: productData.likeCount,
+      likeCount: productData.likeCount,
       createdAt: productData.createdAt,
       authorId: productData.userId,
     });

@@ -13,7 +13,6 @@ import { fetchLatestProduct } from "../utils/fetcher/fetchLatestProduct";
 
 const IndexPage: React.VFC = () => {
   // const { showMessage } = useMessage();
-  console.log("index page rendring!!");
   fetchLatestProduct(1);
 
   const {

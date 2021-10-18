@@ -10,7 +10,7 @@ import useFetchLatestProducts from "../../hooks/useFetchLatestProducts";
 const LatestPage: VFC = () => {
   const perPage = 1;
 
-  // const { showMessage } = useMessage();
+  // const { showMessage } = useMessage();  
   const { latestProducts, fetchMoreLatest, loading, fetching, error, nextDoc } =
     useFetchLatestProducts(perPage);
 
