@@ -13,7 +13,6 @@ import { fetchLatestProduct } from "../utils/fetcher/fetchLatestProduct";
 
 const IndexPage: React.VFC = () => {
   // const { showMessage } = useMessage();
-  console.log("index page rendring!!");
   fetchLatestProduct(1);
 
   const {
@@ -27,10 +26,6 @@ const IndexPage: React.VFC = () => {
     loading: popularLoading,
     error: popularErr,
   } = useFetchPopularProducts(6);
-
-  
-  console.log(latestProducts, "popular");
-  console.log(popularProducts, "popular");
 
   return (
     <Layout>
