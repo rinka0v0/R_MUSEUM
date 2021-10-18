@@ -28,6 +28,10 @@ const IndexPage: React.VFC = () => {
     error: popularErr,
   } = useFetchPopularProducts(6);
 
+  
+  console.log(latestProducts, "popular");
+  console.log(popularProducts, "popular");
+
   return (
     <Layout>
       <Heading as="h2" textAlign="center" mt={5}>
