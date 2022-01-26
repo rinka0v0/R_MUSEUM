@@ -24,8 +24,7 @@ const UserProfile: VFC<Props> = ({ user }) => {
       <Box mb={5}>
         <Avatar
           src={user?.iconURL ? user.iconURL : "https://bit.ly/broken-link"}
-          size="2xl"
-          w="100%"
+          size="full"
           display="block"
         />
         {/* <Button>アイコンの変更</Button> */}
