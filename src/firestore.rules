@@ -115,7 +115,7 @@ service cloud.firestore {
             && request.resource.data.profile.size() < 100
             && request.resource.data.user_name.size() < 10
             && request.resource.data.user_name.size() > 1
-            && request.resource.data.createdAt == resource.data.createdAt;
+            && request.resource.data.createdAt == request.time
 
             match /likedPosts/{likedPostId} {
                 allow read: if true
